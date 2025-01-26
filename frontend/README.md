@@ -69,31 +69,56 @@
 
 ## Optimisations
 
-### SEO
+### SEO et Métadonnées
+
+#### Optimisation SEO
 - **Métadonnées Dynamiques**:
-  - Titres et descriptions optimisés pour chaque page
-  - Mots-clés pertinents générés automatiquement
-  - Images Open Graph pour le partage social
-  - Support des balises Twitter Card
+  - Composant `RecipeMetadata` pour la gestion des métadonnées des recettes
+  - Génération automatique des balises meta, OpenGraph et Twitter
+  - Support multilingue (fr-FR)
+  - Gestion sécurisée des types avec TypeScript
+
 - **Données Structurées**:
   - Schéma JSON-LD pour les recettes
-  - Informations riches pour les moteurs de recherche
-  - Support des Rich Snippets Google
-  - Notation et avis intégrés
-- **URLs Optimisées**:
-  - Structure claire et descriptive
-  - Support du français dans les URLs
+  - Support complet du format Schema.org/Recipe
+  - Informations détaillées :
+    - Temps de préparation et cuisson
+    - Liste d'ingrédients
+    - Instructions étape par étape
+    - Notes et évaluations
+    - Informations sur l'auteur
+
+- **Balises OpenGraph**:
+  - Titre et description optimisés
+  - Images adaptées aux réseaux sociaux
+  - URL canoniques
+  - Type de contenu spécifique (article pour les recettes)
+
+- **Twitter Cards**:
+  - Format large image pour une meilleure visibilité
+  - Métadonnées spécifiques à Twitter
+  - Images optimisées pour le partage
+
+- **Optimisations Techniques**:
+  - URLs propres et descriptives
   - Gestion des redirections
+  - Sitemap XML dynamique
+  - Fichier robots.txt personnalisé
+  - Balises meta robots appropriées
+
 - **Accessibilité**:
-  - Balises sémantiques HTML5
-  - Attributs ARIA appropriés
+  - Structure HTML5 sémantique
+  - Attributs ARIA
   - Contraste des couleurs optimisé
   - Navigation au clavier
+  - Textes alternatifs pour les images
+
 - **Performance**:
   - Images optimisées et responsives
   - Chargement différé (lazy loading)
-  - Animations fluides
-  - Temps de chargement optimisé 
+  - Minification des ressources
+  - Cache optimisé
+  - Temps de chargement réduit
 
 ## Optimisations de Performance
 

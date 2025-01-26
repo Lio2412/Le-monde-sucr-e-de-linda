@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import type { Recipe } from '@/types/recipe';
 import { generateMetadata } from '@/lib/metadata';
+import type { Metadata } from 'next';
 
 interface RecipeMetadataProps {
   recipe: Recipe;
@@ -18,6 +19,23 @@ export function RecipeMetadata({ recipe }: RecipeMetadataProps) {
       : `/recettes/${recipe.slug}`
   });
 
+  // Extraire les valeurs en toute sécurité
+  const ogImage = metadata.openGraph?.images 
+    ? (Array.isArray(metadata.openGraph.images) 
+      ? String(metadata.openGraph.images[0]) 
+      : String(metadata.openGraph.images))
+    : undefined;
+
+  const twitterImage = metadata.twitter?.images 
+    ? (Array.isArray(metadata.twitter.images) 
+      ? String(metadata.twitter.images[0]) 
+      : String(metadata.twitter.images))
+    : undefined;
+
+  const ogUrl = metadata.openGraph?.url 
+    ? String(metadata.openGraph.url) 
+    : undefined;
+
   return (
     <Head>
       <title>{metadata.title as string}</title>
@@ -25,11 +43,11 @@ export function RecipeMetadata({ recipe }: RecipeMetadataProps) {
       <meta name="keywords" content={metadata.keywords as string} />
       <meta property="og:title" content={metadata.openGraph?.title as string} />
       <meta property="og:description" content={metadata.openGraph?.description as string} />
-      <meta property="og:image" content={metadata.openGraph?.images?.[0]?.url} />
-      <meta property="og:url" content={metadata.openGraph?.url} />
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:url" content={ogUrl} />
       <meta name="twitter:title" content={metadata.twitter?.title as string} />
       <meta name="twitter:description" content={metadata.twitter?.description as string} />
-      <meta name="twitter:image" content={metadata.twitter?.images?.[0]} />
+      <meta name="twitter:image" content={twitterImage} />
       <script type="application/ld+json">
         {JSON.stringify({
           '@context': 'https://schema.org',
