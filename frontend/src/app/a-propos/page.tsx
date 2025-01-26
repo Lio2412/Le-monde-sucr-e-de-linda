@@ -6,6 +6,7 @@ import { Playfair_Display } from 'next/font/google';
 import { Heart, Star, ChefHat } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { NewsletterForm } from '@/components/ui/newsletter-form';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
@@ -154,19 +155,7 @@ export default function AboutPage() {
             <p className="text-gray-600 mb-6">
               Inscrivez-vous à ma newsletter pour recevoir mes dernières recettes et astuces
             </p>
-            <form className="flex gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Votre email"
-                className="flex-1 px-4 py-2 rounded-lg border border-pink-200 focus:outline-none focus:ring-2 focus:ring-pink-200"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 bg-pink-400 text-white rounded-lg hover:bg-pink-500 transition-colors"
-              >
-                S'inscrire
-              </button>
-            </form>
+            <NewsletterForm className="max-w-md mx-auto" />
           </motion.div>
         </div>
       </section>

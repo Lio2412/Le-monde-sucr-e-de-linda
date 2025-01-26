@@ -8,6 +8,7 @@ import { Playfair_Display } from 'next/font/google';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { useNewsletter } from '@/hooks/useNewsletter';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
@@ -24,10 +25,16 @@ export default function RegisterPage() {
     terms: false
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { subscribe } = useNewsletter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implémenter l'inscription
     console.log('Tentative d\'inscription:', formData);
+    
+    if (formData.newsletter) {
+      await subscribe(formData.email);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

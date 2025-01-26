@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { Playfair_Display } from 'next/font/google';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { NewsletterForm } from '@/components/ui/newsletter-form';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
@@ -174,19 +175,7 @@ export default function Home() {
             <p className="text-gray-600 mb-8">
               Recevez nos dernières recettes et astuces directement dans votre boîte mail.
             </p>
-            <form className="flex gap-4">
-              <input
-                type="email"
-                placeholder="Votre email"
-                className="flex-1 px-4 py-3 border-b-2 border-gray-200 focus:outline-none focus:border-pink-200 transition-colors bg-transparent"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 text-pink-400 hover:text-pink-500 border-b-2 border-pink-200 hover:border-pink-400 transition-colors"
-              >
-                S'inscrire
-              </button>
-            </form>
+            <NewsletterForm variant="minimal" />
           </div>
         </div>
       </section>

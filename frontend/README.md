@@ -1,3 +1,27 @@
+### Système de Newsletter
+
+#### Formulaire d'Inscription
+- Composant réutilisable avec deux variantes de design :
+  - Minimal : Design épuré avec champ et bouton en ligne
+  - Standard : Design complet avec champ et bouton empilés
+- Validation du format d'email
+- Gestion des états de chargement
+- Animations fluides avec Framer Motion
+- Notifications de succès/erreur avec Sonner
+
+#### Points d'Intégration
+- Page d'accueil : Version minimale
+- Page À propos : Version standard
+- Formulaire d'inscription : Option lors de la création de compte
+- Tableau de bord : Gestion des préférences de newsletter
+
+#### Fonctionnalités
+- Inscription à la newsletter
+- Désinscription possible depuis le tableau de bord
+- Notifications en temps réel
+- État de chargement pendant les requêtes
+- Gestion des erreurs avec messages utilisateur
+
 ### Fonctionnalités Sociales
 
 #### Système de Partage

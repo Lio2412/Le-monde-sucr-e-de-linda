@@ -8,6 +8,7 @@ import { Heart, User, MessageSquare, Settings } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import RecipeCard from '@/components/recipes/RecipeCard';
+import { useNewsletter } from '@/hooks/useNewsletter';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
@@ -56,6 +57,24 @@ type Tab = 'favorites' | 'profile' | 'comments' | 'settings';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>('favorites');
+  const [notifications, setNotifications] = useState({
+    newRecipes: true,
+    comments: true
+  });
+  const { subscribe, unsubscribe } = useNewsletter();
+
+  const handleNotificationChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setNotifications(prev => ({ ...prev, [name]: checked }));
+
+    if (name === 'newRecipes') {
+      if (checked) {
+        await subscribe('john.doe@example.com'); // TODO: Utiliser l'email de l'utilisateur connecté
+      } else {
+        await unsubscribe('john.doe@example.com'); // TODO: Utiliser l'email de l'utilisateur connecté
+      }
+    }
+  };
 
   const tabs = [
     { id: 'favorites', label: 'Favoris', icon: Heart },
@@ -233,7 +252,9 @@ export default function DashboardPage() {
                     <label className="flex items-center">
                       <input
                         type="checkbox"
-                        defaultChecked
+                        name="newRecipes"
+                        checked={notifications.newRecipes}
+                        onChange={handleNotificationChange}
                         className="h-4 w-4 text-pink-500 focus:ring-pink-400 border-gray-300 rounded"
                       />
                       <span className="ml-2 text-gray-700">
@@ -243,7 +264,9 @@ export default function DashboardPage() {
                     <label className="flex items-center">
                       <input
                         type="checkbox"
-                        defaultChecked
+                        name="comments"
+                        checked={notifications.comments}
+                        onChange={handleNotificationChange}
                         className="h-4 w-4 text-pink-500 focus:ring-pink-400 border-gray-300 rounded"
                       />
                       <span className="ml-2 text-gray-700">
