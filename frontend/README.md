@@ -66,3 +66,31 @@
   - Aperçu automatique dans une nouvelle fenêtre
   - Impression automatique au chargement
   - Fermeture automatique après l'impression 
+
+## Optimisations
+
+### SEO
+- **Métadonnées Dynamiques**:
+  - Titres et descriptions optimisés pour chaque page
+  - Mots-clés pertinents générés automatiquement
+  - Images Open Graph pour le partage social
+  - Support des balises Twitter Card
+- **Données Structurées**:
+  - Schéma JSON-LD pour les recettes
+  - Informations riches pour les moteurs de recherche
+  - Support des Rich Snippets Google
+  - Notation et avis intégrés
+- **URLs Optimisées**:
+  - Structure claire et descriptive
+  - Support du français dans les URLs
+  - Gestion des redirections
+- **Accessibilité**:
+  - Balises sémantiques HTML5
+  - Attributs ARIA appropriés
+  - Contraste des couleurs optimisé
+  - Navigation au clavier
+- **Performance**:
+  - Images optimisées et responsives
+  - Chargement différé (lazy loading)
+  - Animations fluides
+  - Temps de chargement optimisé 
