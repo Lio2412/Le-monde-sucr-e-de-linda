@@ -45,4 +45,24 @@
 - Notation par étoiles (1-5)
 - Affichage de la note moyenne
 - Nombre total d'évaluations visible
-- Mise à jour en temps réel 
+- Mise à jour en temps réel
+
+## Fonctionnalités d'Impression
+
+### Impression des Recettes
+- **Mise en Page Optimisée**: Format dédié pour l'impression avec une disposition claire et lisible
+- **Contenu Complet**: 
+  - Titre et description de la recette
+  - Informations clés (temps de préparation, cuisson, difficulté, nombre de personnes)
+  - Liste complète des ingrédients avec quantités
+  - Instructions détaillées étape par étape
+- **Design Épuré**:
+  - Police adaptée à l'impression
+  - Espacement optimisé
+  - Hiérarchie visuelle claire
+  - Pied de page avec date et attribution
+- **Facilité d'Utilisation**:
+  - Bouton d'impression accessible depuis chaque recette
+  - Aperçu automatique dans une nouvelle fenêtre
+  - Impression automatique au chargement
+  - Fermeture automatique après l'impression 

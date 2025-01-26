@@ -12,6 +12,7 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import RatingSection from '@/components/recipes/RatingSection';
 import CommentSection from '@/components/recipes/CommentSection';
 import { ShareButton } from '@/components/ui/share-button';
+import { usePrint } from '@/hooks/usePrint';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
@@ -22,6 +23,7 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
   const headerOpacity = useTransform(scrollY, [0, 300], [1, 0.8]);
   const headerY = useTransform(scrollY, [0, 300], [0, 30]);
   const gradientOpacity = useTransform(scrollY, [0, 300], [0.6, 0.8]);
+  const { printRecipe } = usePrint();
   
   useEffect(() => {
     // TODO: Remplacer par un appel API réel
@@ -189,8 +191,8 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
             animate="animate"
           >
             {[
-              { icon: Heart, text: "Sauvegarder", color: "pink" },
-              { icon: Printer, text: "Imprimer", color: "gray" }
+              { icon: Heart, text: "Sauvegarder", color: "pink", onClick: () => {} },
+              { icon: Printer, text: "Imprimer", color: "gray", onClick: () => recipe && printRecipe(recipe) }
             ].map((action, index) => (
               <motion.button
                 key={index}
@@ -198,6 +200,7 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
                 variants={fadeInUp}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={action.onClick}
               >
                 <action.icon className="w-5 h-5" />
                 <span>{action.text}</span>
