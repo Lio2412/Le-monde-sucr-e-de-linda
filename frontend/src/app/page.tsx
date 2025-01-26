@@ -6,7 +6,6 @@ import { ArrowRight } from 'lucide-react';
 import { Playfair_Display } from 'next/font/google';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import FeaturedRecipes from '@/components/sections/FeaturedRecipes';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 

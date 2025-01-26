@@ -10,77 +10,94 @@ Le site adopte un design minimaliste et élégant avec une palette de couleurs p
 - **Typographie** : Utilisation de Playfair Display pour les titres
 - **Palette de couleurs** : Rose pastel, blanc et gris pour une ambiance douce
 - **Images** : Format carré avec effets de transition subtils
-- **Animations** : Transitions fluides et effets de survol élégants
+- **Animations** : Transitions fluides avec Framer Motion
 
 ### 📱 Sections Principales
 1. **En-tête**
    - Navigation épurée
    - Barre décorative rose pastel
-   - Menu responsive
+   - Menu responsive avec Tailwind CSS
 
 2. **Hero Section**
-   - Grande image carrée
+   - Grande image carrée optimisée
    - Titre élégant avec Playfair Display
-   - Boutons d'action stylisés
+   - Animations fluides avec Framer Motion
 
 3. **Section Recettes**
-   - Grille de recettes avec images carrées
-   - Badges de catégorie
-   - Informations structurées
+   - Grille responsive avec Tailwind CSS
+   - Badges de catégorie stylisés
+   - Lazy loading des images
 
 4. **Newsletter**
    - Design minimaliste
-   - Formulaire d'inscription élégant
+   - Validation des formulaires côté client et serveur
 
 ## Prérequis
 
 - Node.js >= 18.0.0
-- MongoDB
-- npm ou yarn
+- MongoDB >= 6.0
+- npm >= 9.0.0 ou yarn >= 1.22.0
+- Git
 
 ## Structure du Projet
 
 ```
 le-monde-sucre-de-linda/
-├── backend/           # API Node.js/Express
-└── frontend/         # Application Next.js
+├── backend/              # API Node.js/Express
+│   ├── src/             # Code source
+│   ├── tests/           # Tests unitaires et d'intégration
+│   └── package.json     # Dépendances backend
+└── frontend/            # Application Next.js
+    ├── src/             # Code source
+    ├── public/          # Assets statiques
+    └── package.json     # Dépendances frontend
 ```
 
 ## Installation
 
 1. Cloner le projet :
 ```bash
-git clone <URL_DU_REPO>
+git clone https://github.com/Lio2412/Le-monde-sucr-e-de-linda.git
 cd le-monde-sucre-de-linda
 ```
 
-2. Installer les dépendances du backend :
+2. Configuration du Backend :
 ```bash
 cd backend
 npm install
-```
-
-3. Configurer les variables d'environnement du backend :
-```bash
 cp .env.example .env
-# Modifier les variables dans .env selon votre configuration
+# Configurer les variables dans .env :
+# MONGODB_URI=mongodb://localhost:27017/le-monde-sucre
+# JWT_SECRET=votre_secret_jwt
+# PORT=5000
 ```
 
-4. Installer les dépendances du frontend :
+3. Configuration du Frontend :
 ```bash
 cd ../frontend
 npm install
+cp .env.example .env.local
+# Configurer les variables dans .env.local :
+# NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
 
 ## Démarrage
 
-1. Démarrer le backend :
+1. Démarrer MongoDB :
+```bash
+# Windows
+net start MongoDB
+# Linux/MacOS
+sudo systemctl start mongod
+```
+
+2. Démarrer le backend :
 ```bash
 cd backend
 npm run dev
 ```
 
-2. Dans un nouveau terminal, démarrer le frontend :
+3. Dans un nouveau terminal, démarrer le frontend :
 ```bash
 cd frontend
 npm run dev
@@ -89,48 +106,39 @@ npm run dev
 L'application sera accessible à :
 - Frontend : http://localhost:3000
 - Backend : http://localhost:5000
+- API Documentation : http://localhost:5000/api-docs
 
 ## Technologies Utilisées
 
 ### Frontend
 - Next.js 14
-- TypeScript
-- TailwindCSS
+- TypeScript 5
+- TailwindCSS 3
 - Framer Motion pour les animations
 - Playfair Display (Google Fonts)
-- Composants UI personnalisés
+- Lucide React pour les icônes
 
 ### Backend
-- Node.js
-- Express
-- MongoDB
+- Node.js avec Express
+- MongoDB avec Mongoose
 - JWT pour l'authentification
-- Nodemailer pour les emails
+- Multer pour la gestion des fichiers
+- Jest pour les tests
 
-### Design
-- Design System personnalisé
-- Palette de couleurs pastel
-- Composants réutilisables
-- Interface responsive
-
-## Fonctionnalités
-
-- 🍰 Gestion des recettes de pâtisserie
-- 👤 Authentification des utilisateurs
-- 📝 Blog avec articles et commentaires
-- 📧 Newsletter
-- 📱 Design responsive
-- 🎨 Interface moderne et élégante
-- ✨ Animations fluides
-- 🔍 Recherche de recettes
+### Outils de Développement
+- ESLint
+- Prettier
+- Husky pour les pre-commit hooks
+- Jest pour les tests
+- GitHub Actions pour la CI/CD
 
 ## Contribution
 
 1. Fork le projet
-2. Créer une branche pour votre fonctionnalité (`git checkout -b feature/NouvelleFeature`)
-3. Commit vos changements (`git commit -m 'Ajout d'une nouvelle feature'`)
-4. Push vers la branche (`git push origin feature/NouvelleFeature`)
-5. Ouvrir une Pull Request
+2. Créer une branche (`git checkout -b feature/amelioration`)
+3. Commit (`git commit -m 'feat: ajout nouvelle fonctionnalité'`)
+4. Push (`git push origin feature/amelioration`)
+5. Créer une Pull Request
 
 ## Licence
 
@@ -138,6 +146,6 @@ Ce projet est sous licence ISC. Voir le fichier `LICENSE` pour plus de détails.
 
 ## Contact
 
-Linda - [votre-email@example.com]
+Linda - [linda@lemondesucre.fr](mailto:linda@lemondesucre.fr)
 
-Lien du projet : [https://github.com/votre-username/le-monde-sucre-de-linda] 
+Projet : [https://github.com/Lio2412/Le-monde-sucr-e-de-linda](https://github.com/Lio2412/Le-monde-sucr-e-de-linda) 

@@ -1,22 +1,36 @@
 ---
-name: 💡 Demande de fonctionnalité
-about: Suggérer une idée pour ce projet
-title: '[FEATURE] '
+name: 💡 Page de Recette Détaillée
+about: Création de la page de recette détaillée
+title: '[FEATURE] Création de la page de recette détaillée'
 labels: enhancement
 assignees: ''
 ---
 
-**Votre demande de fonctionnalité est-elle liée à un problème ? Décrivez-le.**
-Une description claire et concise du problème. Ex. Je suis toujours frustré quand [...]
+**Description de la fonctionnalité**
+En tant qu'utilisateur, je souhaite pouvoir consulter une page détaillée pour chaque recette, présentant tous les détails nécessaires pour réaliser la recette.
 
-**Décrivez la solution que vous souhaitez**
-Une description claire et concise de ce que vous voulez qu'il se passe.
-
-**Décrivez les alternatives que vous avez envisagées**
-Une description claire et concise des solutions ou fonctionnalités alternatives que vous avez envisagées.
+**Fonctionnalités requises**
+- Affichage du titre de la recette
+- Image principale de la recette en grand format
+- Temps de préparation, cuisson et total
+- Niveau de difficulté
+- Liste des ingrédients avec quantités
+- Étapes de préparation détaillées
+- Section commentaires
+- Bouton de partage sur les réseaux sociaux
+- Bouton pour imprimer la recette
+- Suggestions de recettes similaires
 
 **Maquettes ou exemples**
-Si applicable, ajoutez des maquettes ou des exemples pour illustrer la fonctionnalité.
+Design inspiré de la page d'accueil actuelle, avec :
+- Une image en bannière
+- Un layout en grille pour les informations clés
+- Une présentation claire des étapes
+- Une section commentaires en bas de page
 
-**Contexte supplémentaire**
-Ajoutez tout autre contexte ou captures d'écran concernant la demande de fonctionnalité ici. 
+**Critères d'acceptation**
+- La page doit être responsive
+- Les temps doivent être clairement visibles
+- La navigation doit être intuitive
+- Le design doit respecter la charte graphique actuelle
+- Les performances doivent être optimisées (images compressées, etc.) 
