@@ -94,3 +94,38 @@
   - Chargement différé (lazy loading)
   - Animations fluides
   - Temps de chargement optimisé 
+
+## Optimisations de Performance
+
+### Gestion du Cache et des Données
+- **SWR (Stale-While-Revalidate)**
+  - Mise en cache automatique des données pendant 1 minute
+  - Revalidation intelligente lors de la reconnexion
+  - Gestion optimisée des états de chargement et d'erreur
+  - Hook personnalisé `useRecipe` pour la gestion des recettes
+
+### Chargement Dynamique
+- **Code Splitting**
+  - Chargement différé des composants non-critiques (RatingSection, CommentSection)
+  - Import dynamique de Framer Motion avec fallback
+  - Réduction du bundle JavaScript initial
+
+### Optimisation des Images
+- **Composant OptimizedImage**
+  - Gestion automatique des tailles responsives
+  - Chargement progressif avec placeholder
+  - Qualité d'image adaptative selon le contexte
+  - Priorité de chargement configurable
+
+### Animations Optimisées
+- **MotionProvider**
+  - Chargement différé des animations
+  - Gestion centralisée des animations de scroll
+  - Réutilisation des composants animés
+  - Désactivation du SSR pour les animations complexes
+
+### Bonnes Pratiques
+- Utilisation du mode client uniquement quand nécessaire
+- Suspense et états de chargement pour une meilleure UX
+- Gestion intelligente des erreurs et états de chargement
+- Cache configurable pour les données fréquemment utilisées 
