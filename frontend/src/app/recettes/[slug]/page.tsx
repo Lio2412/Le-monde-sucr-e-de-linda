@@ -3,12 +3,15 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { Playfair_Display } from 'next/font/google';
-import { Clock, ChefHat, Users, Printer, Share2, Heart } from 'lucide-react';
+import { Clock, ChefHat, Users, Printer, Heart } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Loading from '@/components/ui/loading';
 import type { Recipe } from '@/types/recipe';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import RatingSection from '@/components/recipes/RatingSection';
+import CommentSection from '@/components/recipes/CommentSection';
+import { ShareButton } from '@/components/ui/share-button';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
@@ -19,7 +22,7 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
   const headerOpacity = useTransform(scrollY, [0, 300], [1, 0.8]);
   const headerY = useTransform(scrollY, [0, 300], [0, 30]);
   const gradientOpacity = useTransform(scrollY, [0, 300], [0.6, 0.8]);
-
+  
   useEffect(() => {
     // TODO: Remplacer par un appel API réel
     const fetchRecipe = async () => {
@@ -37,6 +40,11 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
           preparationTime: 45,
           cookingTime: 30,
           servings: 8,
+          rating: {
+            average: 4.5,
+            count: 12,
+            userRating: 0
+          },
           ingredients: [
             { name: "Farine", quantity: 250, unit: "g" },
             { name: "Beurre", quantity: 125, unit: "g" },
@@ -150,7 +158,7 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
         <div className="max-w-4xl mx-auto px-4">
           {/* Informations clés */}
           <motion.div 
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
             variants={staggerChildren}
             initial="initial"
             animate="animate"
@@ -182,7 +190,6 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
           >
             {[
               { icon: Heart, text: "Sauvegarder", color: "pink" },
-              { icon: Share2, text: "Partager", color: "gray" },
               { icon: Printer, text: "Imprimer", color: "gray" }
             ].map((action, index) => (
               <motion.button
@@ -196,6 +203,10 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
                 <span>{action.text}</span>
               </motion.button>
             ))}
+            <ShareButton 
+              url={`${window.location.origin}/recettes/${recipe.slug}`}
+              title={recipe.title}
+            />
           </motion.div>
 
           {/* Ingrédients */}
@@ -251,23 +262,69 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
               animate="animate"
             >
               {recipe.steps.map((step, index) => (
-                <motion.div 
-                  key={index} 
+                <motion.div
+                  key={step.order}
                   className="flex gap-4"
                   variants={fadeInUp}
-                  whileHover={{ x: 10 }}
                 >
-                  <motion.div 
-                    className="flex-shrink-0 w-8 h-8 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center font-medium"
-                    whileHover={{ scale: 1.1 }}
-                  >
+                  <div className="flex-shrink-0 w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center text-pink-500 font-medium">
                     {step.order}
-                  </motion.div>
-                  <p className="text-gray-600">{step.description}</p>
+                  </div>
+                  <p className="flex-1 text-gray-700">{step.description}</p>
                 </motion.div>
               ))}
             </motion.div>
           </motion.section>
+
+          {/* Section de notation */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="border-t border-gray-100 pt-8"
+          >
+            <RatingSection
+              recipeId={recipe.id}
+              initialRating={4.5}
+              totalRatings={12}
+            />
+          </motion.div>
+
+          {/* Section des commentaires */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="border-t border-gray-100"
+          >
+            <CommentSection
+              recipeId={recipe.id}
+              comments={[
+                {
+                  id: '1',
+                  author: {
+                    name: 'Sophie',
+                    avatar: '/images/default-avatar.png'
+                  },
+                  content: 'Délicieuse recette ! La crème au citron est parfaitement équilibrée.',
+                  date: '15/01/2024',
+                  likes: 3,
+                  replies: [
+                    {
+                      id: '2',
+                      author: {
+                        name: 'Linda',
+                        avatar: '/images/linda.jpg'
+                      },
+                      content: 'Merci Sophie ! Heureuse que la recette vous ait plu.',
+                      date: '15/01/2024',
+                      likes: 1
+                    }
+                  ]
+                }
+              ]}
+            />
+          </motion.div>
 
           {/* Tags */}
           <motion.section 

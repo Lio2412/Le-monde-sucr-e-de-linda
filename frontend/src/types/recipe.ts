@@ -30,6 +30,11 @@ export interface Recipe {
     name: string;
     avatar?: string;
   };
+  rating?: {
+    average: number;
+    count: number;
+    userRating?: number;
+  };
   published: boolean;
   featured: boolean;
   createdAt: string;
