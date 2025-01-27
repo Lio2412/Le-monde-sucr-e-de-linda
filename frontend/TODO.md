@@ -58,7 +58,10 @@
 ## 🔄 En Cours de Développement
 - [ ] Mode "Cuisine" étape par étape
   - [x] Interface utilisateur du mode étape par étape
-  - [ ] Navigation entre les étapes
+  - [x] Navigation entre les étapes
+    - [x] Navigation par boutons
+    - [x] Raccourcis clavier (flèches et touches P/N)
+    - [x] Animations de transition
   - [ ] Timer intégré pour chaque étape
   - [ ] Liste des ingrédients nécessaires
   - [ ] Mode plein écran
