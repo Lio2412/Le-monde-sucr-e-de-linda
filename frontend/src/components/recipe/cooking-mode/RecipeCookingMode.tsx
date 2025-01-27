@@ -5,13 +5,17 @@ import { Recipe } from '@/types/recipe';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Bell, Timer, Clock, X, Maximize2, Minimize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell, Timer, Clock, X, Maximize2, Minimize2, StickyNote } from 'lucide-react';
 import { StepTimer } from '@/components/recipe/cooking-mode/StepTimer';
 import { useToast } from '@/components/ui/use-toast';
 import { IngredientsList } from '@/components/recipe/cooking-mode/IngredientsList';
 import { useFullscreen } from '@/hooks/useFullscreen';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { KeyboardShortcutsDialog } from '@/components/recipe/cooking-mode/KeyboardShortcutsDialog';
+import { useStepCompletion } from '@/hooks/useStepCompletion';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useStepNotes } from '@/hooks/useStepNotes';
+import { StepNotes } from '@/components/recipe/cooking-mode/StepNotes';
 
 interface RecipeCookingModeProps {
   recipe: Recipe;
@@ -29,6 +33,20 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
   const { toast } = useToast();
   const containerRef = useRef<HTMLDivElement>(null);
   const { isFullscreen, toggleFullscreen, isEnabled } = useFullscreen(containerRef);
+  const { isStepCompleted, toggleStep, progress } = useStepCompletion({
+    totalSteps: recipe.steps.length,
+  });
+  const {
+    notes,
+    showNotes,
+    updateNote,
+    getNote,
+    toggleNotesVisibility,
+    hasNotes,
+    hasNoteForStep,
+  } = useStepNotes({
+    totalSteps: recipe.steps.length,
+  });
 
   // Vérification de sécurité pour s'assurer que recipe.steps existe
   if (!recipe?.steps?.length) {
@@ -89,6 +107,8 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
     onToggleTimer: stepDuration > 0 ? toggleTimer : undefined,
     onResetTimer: stepDuration > 0 ? resetTimer : undefined,
     onToggleIngredients: toggleIngredientsVisibility,
+    onToggleStep: () => toggleStep(currentStepIndex),
+    onToggleNotes: toggleNotesVisibility,
     isTimerEnabled: stepDuration > 0,
   });
 
@@ -126,7 +146,22 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
             </Button>
             <h1 className="text-xl font-semibold">{recipe.title}</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-muted-foreground">
+              Progression : {progress}%
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleNotesVisibility}
+              className="hover:bg-gray-100 relative"
+              aria-label="Afficher/masquer les notes"
+            >
+              <StickyNote className="h-5 w-5" />
+              {hasNotes && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
+              )}
+            </Button>
             <KeyboardShortcutsDialog shortcuts={shortcuts} />
             {isEnabled && (
               <Button
@@ -175,6 +210,15 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
                   />
                 </Card>
               )}
+
+              {showNotes && (
+                <StepNotes
+                  stepIndex={currentStepIndex}
+                  note={getNote(currentStepIndex)}
+                  onUpdateNote={updateNote}
+                  onClose={toggleNotesVisibility}
+                />
+              )}
             </div>
           )}
 
@@ -183,7 +227,7 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
             <div className="flex-1">
               <div className="flex flex-col space-y-6">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-4">
                     <span className="text-sm font-medium bg-primary/10 text-primary px-3 py-1.5 rounded-full">
                       Étape {currentStepIndex + 1} sur {recipe.steps.length}
                     </span>
@@ -193,6 +237,27 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
                         {stepDuration} minutes
                       </span>
                     )}
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id={`step-${currentStepIndex}`}
+                          checked={isStepCompleted(currentStepIndex)}
+                          onCheckedChange={() => toggleStep(currentStepIndex)}
+                        />
+                        <label
+                          htmlFor={`step-${currentStepIndex}`}
+                          className="text-sm text-muted-foreground"
+                        >
+                          Marquer comme terminée (M)
+                        </label>
+                      </div>
+                      {hasNoteForStep(currentStepIndex) && (
+                        <span className="text-sm text-muted-foreground flex items-center gap-1">
+                          <StickyNote className="w-4 h-4" />
+                          Note ajoutée
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -211,7 +276,9 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
                     className="flex-1"
                   >
                     <div className="prose prose-lg max-w-none">
-                      <p className="text-xl leading-relaxed">{currentStep?.description}</p>
+                      <p className={`text-xl leading-relaxed ${isStepCompleted(currentStepIndex) ? 'text-muted-foreground line-through' : ''}`}>
+                        {currentStep?.description}
+                      </p>
                     </div>
                   </motion.div>
                 </AnimatePresence>

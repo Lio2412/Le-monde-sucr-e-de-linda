@@ -1,15 +1,16 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useMemo } from 'react';
 
-interface KeyboardShortcutsProps {
+interface UseKeyboardShortcutsProps {
   onNextStep: () => void;
   onPreviousStep: () => void;
   onClose: () => void;
   onToggleFullscreen: () => void;
   onToggleTimer?: () => void;
   onResetTimer?: () => void;
-  onToggleIngredients?: () => void;
-  onMarkStepCompleted?: () => void;
-  isTimerEnabled?: boolean;
+  onToggleIngredients: () => void;
+  onToggleStep?: () => void;
+  onToggleNotes?: () => void;
+  isTimerEnabled: boolean;
 }
 
 export function useKeyboardShortcuts({
@@ -20,21 +21,18 @@ export function useKeyboardShortcuts({
   onToggleTimer,
   onResetTimer,
   onToggleIngredients,
-  onMarkStepCompleted,
-  isTimerEnabled = false,
-}: KeyboardShortcutsProps) {
-  const handleKeyPress = useCallback(
-    (event: KeyboardEvent) => {
+  onToggleStep,
+  onToggleNotes,
+  isTimerEnabled,
+}: UseKeyboardShortcutsProps) {
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
       // Ignorer les raccourcis si l'utilisateur est en train de taper dans un champ
-      if (
-        event.target instanceof HTMLInputElement ||
-        event.target instanceof HTMLTextAreaElement
-      ) {
+      if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
         return;
       }
 
       switch (event.key.toLowerCase()) {
-        // Navigation
         case 'arrowright':
         case 'n':
           onNextStep();
@@ -46,11 +44,12 @@ export function useKeyboardShortcuts({
         case 'escape':
           onClose();
           break;
-
-        // Timer
-        case ' ': // Espace
+        case 'f':
+          onToggleFullscreen();
+          break;
+        case ' ':
           if (isTimerEnabled && onToggleTimer) {
-            event.preventDefault(); // Empêcher le défilement de la page
+            event.preventDefault();
             onToggleTimer();
           }
           break;
@@ -59,60 +58,50 @@ export function useKeyboardShortcuts({
             onResetTimer();
           }
           break;
-
-        // Affichage
-        case 'f':
-          onToggleFullscreen();
-          break;
         case 'i':
-          if (onToggleIngredients) {
-            onToggleIngredients();
-          }
+          onToggleIngredients();
           break;
         case 'm':
-          if (onMarkStepCompleted) {
-            onMarkStepCompleted();
+          if (onToggleStep) {
+            onToggleStep();
+          }
+          break;
+        case 't':
+          if (onToggleNotes) {
+            onToggleNotes();
           }
           break;
       }
-    },
-    [
-      onNextStep,
-      onPreviousStep,
-      onClose,
-      onToggleFullscreen,
-      onToggleTimer,
-      onResetTimer,
-      onToggleIngredients,
-      onMarkStepCompleted,
-      isTimerEnabled,
-    ]
-  );
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [handleKeyPress]);
 
-  // Retourner un objet avec les raccourcis disponibles pour l'affichage dans l'interface
-  return {
-    shortcuts: {
-      navigation: [
-        { key: '→, N', description: 'Étape suivante' },
-        { key: '←, P', description: 'Étape précédente' },
-        { key: 'Esc', description: 'Quitter' },
-      ],
-      timer: [
-        { key: 'Espace', description: 'Démarrer/Pause', enabled: isTimerEnabled },
-        { key: 'R', description: 'Réinitialiser', enabled: isTimerEnabled },
-      ],
-      display: [
-        { key: 'F', description: 'Plein écran' },
-        { key: 'I', description: 'Afficher/Masquer les ingrédients' },
-        { key: 'M', description: 'Marquer comme terminé' },
-      ],
-    },
-  };
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [
+    onNextStep,
+    onPreviousStep,
+    onClose,
+    onToggleFullscreen,
+    onToggleTimer,
+    onResetTimer,
+    onToggleIngredients,
+    onToggleStep,
+    onToggleNotes,
+    isTimerEnabled,
+  ]);
+
+  const shortcuts = useMemo(() => [
+    { key: '→ ou N', description: 'Étape suivante' },
+    { key: '← ou P', description: 'Étape précédente' },
+    { key: 'F', description: 'Mode plein écran' },
+    { key: 'I', description: 'Afficher/masquer les ingrédients' },
+    { key: 'M', description: 'Marquer/démarquer l\'étape' },
+    { key: 'T', description: 'Afficher/masquer les notes' },
+    ...(isTimerEnabled ? [
+      { key: 'Espace', description: 'Démarrer/arrêter le minuteur' },
+      { key: 'R', description: 'Réinitialiser le minuteur' },
+    ] : []),
+    { key: 'Échap', description: 'Quitter le mode cuisine' },
+  ], [isTimerEnabled]);
+
+  return { shortcuts };
 } 

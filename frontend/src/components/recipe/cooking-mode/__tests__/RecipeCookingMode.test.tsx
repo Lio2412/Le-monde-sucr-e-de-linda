@@ -173,4 +173,138 @@ describe('RecipeCookingMode', () => {
       expect(nextButton).toBeDisabled();
     });
   });
+
+  describe('Marquage des étapes', () => {
+    it('devrait afficher une case à cocher pour marquer l\'étape comme terminée', () => {
+      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
+      
+      const checkbox = screen.getByRole('checkbox', { name: /marquer comme terminée/i });
+      expect(checkbox).toBeInTheDocument();
+      expect(checkbox).not.toBeChecked();
+    });
+
+    it('devrait marquer l\'étape comme terminée quand la case est cochée', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
+      
+      const checkbox = screen.getByRole('checkbox', { name: /marquer comme terminée/i });
+      await user.click(checkbox);
+      
+      expect(checkbox).toBeChecked();
+      expect(screen.getByText(/préchauffer le four/i)).toHaveClass('text-muted-foreground', 'line-through');
+    });
+
+    it('devrait afficher la progression dans le header', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
+      
+      expect(screen.getByText('Progression : 0%')).toBeInTheDocument();
+      
+      const checkbox = screen.getByRole('checkbox', { name: /marquer comme terminée/i });
+      await user.click(checkbox);
+      
+      expect(screen.getByText('Progression : 50%')).toBeInTheDocument(); // 1/2 étapes = 50%
+    });
+
+    it('devrait conserver l\'état de complétion lors de la navigation entre les étapes', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
+      
+      // Marquer la première étape comme terminée
+      const firstCheckbox = screen.getByRole('checkbox', { name: /marquer comme terminée/i });
+      await user.click(firstCheckbox);
+      
+      // Aller à l'étape suivante
+      const nextButton = screen.getByRole('button', { name: /suivant/i });
+      await user.click(nextButton);
+      
+      // Revenir à la première étape
+      const prevButton = screen.getByRole('button', { name: /précédent/i });
+      await user.click(prevButton);
+      
+      // Vérifier que la première étape est toujours marquée comme terminée
+      const checkboxAfterNavigation = screen.getByRole('checkbox', { name: /marquer comme terminée/i });
+      expect(checkboxAfterNavigation).toBeChecked();
+    });
+  });
+
+  describe('Système de notes', () => {
+    it('devrait afficher le bouton pour ouvrir les notes', () => {
+      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
+      
+      const notesButton = screen.getByRole('button', { name: /afficher\/masquer les notes/i });
+      expect(notesButton).toBeInTheDocument();
+    });
+
+    it('devrait afficher le panneau de notes quand le bouton est cliqué', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
+      
+      const notesButton = screen.getByRole('button', { name: /afficher\/masquer les notes/i });
+      await user.click(notesButton);
+      
+      expect(screen.getByText(/notes pour l'étape 1/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/ajoutez vos notes ici/i)).toBeInTheDocument();
+    });
+
+    it('devrait afficher un indicateur quand une note existe', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
+      
+      // Ouvrir le panneau de notes
+      const notesButton = screen.getByRole('button', { name: /afficher\/masquer les notes/i });
+      await user.click(notesButton);
+      
+      // Ajouter une note
+      const textarea = screen.getByPlaceholderText(/ajoutez vos notes ici/i);
+      await user.type(textarea, 'Ma note pour l\'étape 1');
+      
+      // Vérifier que l'indicateur est affiché
+      expect(screen.getByText(/note ajoutée/i)).toBeInTheDocument();
+    });
+
+    it('devrait conserver les notes lors de la navigation entre les étapes', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
+      
+      // Ouvrir le panneau de notes et ajouter une note
+      const notesButton = screen.getByRole('button', { name: /afficher\/masquer les notes/i });
+      await user.click(notesButton);
+      await user.type(screen.getByPlaceholderText(/ajoutez vos notes ici/i), 'Note étape 1');
+      
+      // Aller à l'étape suivante
+      const nextButton = screen.getByRole('button', { name: /suivant/i });
+      await user.click(nextButton);
+      
+      // Ajouter une note pour l'étape 2
+      await user.type(screen.getByPlaceholderText(/ajoutez vos notes ici/i), 'Note étape 2');
+      
+      // Revenir à l'étape 1
+      const prevButton = screen.getByRole('button', { name: /précédent/i });
+      await user.click(prevButton);
+      
+      // Vérifier que la note de l'étape 1 est toujours présente
+      expect(screen.getByPlaceholderText(/ajoutez vos notes ici/i)).toHaveValue('Note étape 1');
+    });
+
+    it('devrait basculer l\'affichage des notes avec le raccourci T', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
+      
+      // Les notes ne sont pas visibles initialement
+      expect(screen.queryByText(/notes pour l'étape 1/i)).not.toBeInTheDocument();
+      
+      // Utiliser le raccourci clavier
+      await user.keyboard('t');
+      
+      // Les notes sont maintenant visibles
+      expect(screen.getByText(/notes pour l'étape 1/i)).toBeInTheDocument();
+      
+      // Utiliser à nouveau le raccourci
+      await user.keyboard('t');
+      
+      // Les notes sont à nouveau masquées
+      expect(screen.queryByText(/notes pour l'étape 1/i)).not.toBeInTheDocument();
+    });
+  });
 }); 

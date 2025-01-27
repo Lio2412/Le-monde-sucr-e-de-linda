@@ -2,43 +2,24 @@ import React from 'react';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogTrigger,
-} from '../../../components/ui/dialog';
-import { Button } from '../../../components/ui/button';
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { Keyboard } from 'lucide-react';
 
-interface ShortcutGroup {
+interface Shortcut {
   key: string;
   description: string;
-  enabled?: boolean;
 }
 
 interface KeyboardShortcutsDialogProps {
-  shortcuts: {
-    navigation: ShortcutGroup[];
-    timer: ShortcutGroup[];
-    display: ShortcutGroup[];
-  };
+  shortcuts: Shortcut[];
 }
 
 export function KeyboardShortcutsDialog({ shortcuts }: KeyboardShortcutsDialogProps) {
-  const renderShortcutGroup = (group: ShortcutGroup[]) => {
-    return group.map((shortcut, index) => {
-      if (shortcut.enabled === false) return null;
-      return (
-        <div key={index} className="flex justify-between items-center py-1">
-          <span className="text-muted-foreground">{shortcut.description}</span>
-          <kbd className="px-2 py-1 bg-muted rounded text-sm font-mono">
-            {shortcut.key}
-          </kbd>
-        </div>
-      );
-    });
-  };
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -51,26 +32,27 @@ export function KeyboardShortcutsDialog({ shortcuts }: KeyboardShortcutsDialogPr
           <Keyboard className="h-5 w-5" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Raccourcis clavier</DialogTitle>
           <DialogDescription>
             Liste des raccourcis clavier disponibles pour naviguer dans le mode cuisine.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-6">
-          <div>
-            <h3 className="font-semibold mb-2">Navigation</h3>
-            {renderShortcutGroup(shortcuts.navigation)}
-          </div>
-          <div>
-            <h3 className="font-semibold mb-2">Minuteur</h3>
-            {renderShortcutGroup(shortcuts.timer)}
-          </div>
-          <div>
-            <h3 className="font-semibold mb-2">Affichage</h3>
-            {renderShortcutGroup(shortcuts.display)}
-          </div>
+        <div className="grid gap-4">
+          {shortcuts.map((shortcut, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between"
+            >
+              <span className="text-sm text-muted-foreground">
+                {shortcut.description}
+              </span>
+              <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded">
+                {shortcut.key}
+              </kbd>
+            </div>
+          ))}
         </div>
       </DialogContent>
     </Dialog>

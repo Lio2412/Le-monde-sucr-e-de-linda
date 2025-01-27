@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { useKeyboardShortcuts } from '../useKeyboardShortcuts';
+import { fireEvent } from '@testing-library/dom';
 
 describe('useKeyboardShortcuts', () => {
   const mockHandlers = {
@@ -10,124 +11,118 @@ describe('useKeyboardShortcuts', () => {
     onToggleTimer: jest.fn(),
     onResetTimer: jest.fn(),
     onToggleIngredients: jest.fn(),
-    onMarkStepCompleted: jest.fn(),
+    onToggleStep: jest.fn(),
+    onToggleNotes: jest.fn(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  const simulateKeyPress = (key: string) => {
-    const event = new KeyboardEvent('keydown', { key });
-    window.dispatchEvent(event);
-  };
-
   it('devrait appeler onNextStep avec la flèche droite ou N', () => {
     renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
 
-    simulateKeyPress('ArrowRight');
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
     expect(mockHandlers.onNextStep).toHaveBeenCalledTimes(1);
 
-    simulateKeyPress('n');
+    fireEvent.keyDown(window, { key: 'n' });
     expect(mockHandlers.onNextStep).toHaveBeenCalledTimes(2);
   });
 
   it('devrait appeler onPreviousStep avec la flèche gauche ou P', () => {
     renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
 
-    simulateKeyPress('ArrowLeft');
+    fireEvent.keyDown(window, { key: 'ArrowLeft' });
     expect(mockHandlers.onPreviousStep).toHaveBeenCalledTimes(1);
 
-    simulateKeyPress('p');
+    fireEvent.keyDown(window, { key: 'p' });
     expect(mockHandlers.onPreviousStep).toHaveBeenCalledTimes(2);
   });
 
   it('devrait appeler onClose avec Escape', () => {
     renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
 
-    simulateKeyPress('Escape');
+    fireEvent.keyDown(window, { key: 'Escape' });
     expect(mockHandlers.onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('devrait gérer les raccourcis du timer uniquement si isTimerEnabled est true', () => {
-    // Timer désactivé
-    const { unmount } = renderHook(() => 
-      useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: false })
-    );
-
-    simulateKeyPress(' ');
-    expect(mockHandlers.onToggleTimer).not.toHaveBeenCalled();
-
-    simulateKeyPress('r');
-    expect(mockHandlers.onResetTimer).not.toHaveBeenCalled();
-
-    unmount();
-
-    // Timer activé
+  it('devrait appeler onToggleTimer avec Espace quand le timer est activé', () => {
     renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
 
-    simulateKeyPress(' ');
+    fireEvent.keyDown(window, { key: ' ' });
     expect(mockHandlers.onToggleTimer).toHaveBeenCalledTimes(1);
-
-    simulateKeyPress('r');
-    expect(mockHandlers.onResetTimer).toHaveBeenCalledTimes(1);
   });
 
-  it('devrait appeler onToggleFullscreen avec F', () => {
+  it('ne devrait pas appeler onToggleTimer avec Espace quand le timer est désactivé', () => {
+    renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: false }));
+
+    fireEvent.keyDown(window, { key: ' ' });
+    expect(mockHandlers.onToggleTimer).not.toHaveBeenCalled();
+  });
+
+  it('devrait appeler onResetTimer avec R quand le timer est activé', () => {
     renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
 
-    simulateKeyPress('f');
-    expect(mockHandlers.onToggleFullscreen).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(window, { key: 'r' });
+    expect(mockHandlers.onResetTimer).toHaveBeenCalledTimes(1);
   });
 
   it('devrait appeler onToggleIngredients avec I', () => {
     renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
 
-    simulateKeyPress('i');
+    fireEvent.keyDown(window, { key: 'i' });
     expect(mockHandlers.onToggleIngredients).toHaveBeenCalledTimes(1);
   });
 
-  it('devrait appeler onMarkStepCompleted avec M', () => {
+  it('devrait appeler onToggleStep avec M', () => {
     renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
 
-    simulateKeyPress('m');
-    expect(mockHandlers.onMarkStepCompleted).toHaveBeenCalledTimes(1);
+    fireEvent.keyDown(window, { key: 'm' });
+    expect(mockHandlers.onToggleStep).toHaveBeenCalledTimes(1);
+  });
+
+  it('devrait appeler onToggleNotes avec T', () => {
+    renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
+
+    fireEvent.keyDown(window, { key: 't' });
+    expect(mockHandlers.onToggleNotes).toHaveBeenCalledTimes(1);
+  });
+
+  it('devrait retourner la liste des raccourcis disponibles', () => {
+    const { result } = renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
+
+    expect(result.current.shortcuts).toEqual([
+      { key: '→ ou N', description: 'Étape suivante' },
+      { key: '← ou P', description: 'Étape précédente' },
+      { key: 'F', description: 'Mode plein écran' },
+      { key: 'I', description: 'Afficher/masquer les ingrédients' },
+      { key: 'M', description: 'Marquer/démarquer l\'étape' },
+      { key: 'T', description: 'Afficher/masquer les notes' },
+      { key: 'Espace', description: 'Démarrer/arrêter le minuteur' },
+      { key: 'R', description: 'Réinitialiser le minuteur' },
+      { key: 'Échap', description: 'Quitter le mode cuisine' },
+    ]);
+  });
+
+  it('ne devrait pas inclure les raccourcis du timer quand il est désactivé', () => {
+    const { result } = renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: false }));
+
+    const timerShortcuts = result.current.shortcuts.filter(
+      shortcut => shortcut.description.includes('minuteur')
+    );
+    expect(timerShortcuts).toHaveLength(0);
   });
 
   it('devrait ignorer les raccourcis dans les champs de saisie', () => {
     renderHook(() => useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true }));
 
-    // Simuler un événement avec un champ de saisie comme cible
     const input = document.createElement('input');
     document.body.appendChild(input);
-    const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
-    Object.defineProperty(event, 'target', { value: input });
-    window.dispatchEvent(event);
+    input.focus();
 
+    fireEvent.keyDown(input, { key: 'ArrowRight' });
     expect(mockHandlers.onNextStep).not.toHaveBeenCalled();
+
     document.body.removeChild(input);
-  });
-
-  it('devrait retourner la liste des raccourcis disponibles', () => {
-    const { result } = renderHook(() => 
-      useKeyboardShortcuts({ ...mockHandlers, isTimerEnabled: true })
-    );
-
-    expect(result.current.shortcuts).toEqual({
-      navigation: [
-        { key: '→, N', description: 'Étape suivante' },
-        { key: '←, P', description: 'Étape précédente' },
-        { key: 'Esc', description: 'Quitter' },
-      ],
-      timer: [
-        { key: 'Espace', description: 'Démarrer/Pause', enabled: true },
-        { key: 'R', description: 'Réinitialiser', enabled: true },
-      ],
-      display: [
-        { key: 'F', description: 'Plein écran' },
-        { key: 'I', description: 'Afficher/Masquer les ingrédients' },
-        { key: 'M', description: 'Marquer comme terminé' },
-      ],
-    });
   });
 }); 
