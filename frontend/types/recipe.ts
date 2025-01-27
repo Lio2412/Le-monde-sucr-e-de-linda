@@ -22,7 +22,4 @@ export interface Recipe {
   difficulty: 'facile' | 'moyen' | 'difficile';
   category: string;
   image?: string;
-  mainImage?: string;
-  slug: string;
-  tags: string[];
 } 

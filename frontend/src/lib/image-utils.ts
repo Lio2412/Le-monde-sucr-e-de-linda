@@ -18,27 +18,20 @@ export function getOptimizedImageUrl(url: string, width: number, quality = 75): 
   return `/_next/image?url=${encodeURIComponent(url)}&w=${width}&q=${quality}`;
 }
 
-// Configuration des tailles d'images pour différents types de contenu
+export type ImageVariant = 'hero' | 'thumbnail';
+
 export const imageSizeConfigs = {
   hero: {
-    sizes: '100vw',
-    breakpoints: [640, 768, 1024, 1280, 1536],
-    defaultWidth: 1920,
-    quality: 90
+    sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 1200px, 2400px",
+    quality: 90,
+    priority: true
   },
   thumbnail: {
-    sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
-    breakpoints: [320, 480, 640, 768],
-    defaultWidth: 640,
-    quality: 75
-  },
-  avatar: {
-    sizes: '96px',
-    breakpoints: [96],
-    defaultWidth: 96,
-    quality: 80
+    sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+    quality: 75,
+    priority: false
   }
-};
+} as const;
 
 // Fonction pour générer un ensemble d'URLs d'images srcSet
 export function generateSrcSet(url: string, config: typeof imageSizeConfigs.hero): string {
@@ -76,7 +69,15 @@ export function generatePlaceholderSvg(color: string): string {
 }
 
 // Fonction pour générer un placeholder complet pour une image
-export function generateImagePlaceholder(url: string): string {
-  const color = generatePlaceholderColor(url);
-  return generatePlaceholderSvg(color);
+export function generateImagePlaceholder(src: string): string {
+  // Génère une couleur de placeholder basée sur le hash de l'URL de l'image
+  const hash = src.split('').reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  
+  const h = Math.abs(hash) % 360;
+  const s = 20 + (Math.abs(hash >> 8) % 30); // 20-50%
+  const l = 85 + (Math.abs(hash >> 16) % 10); // 85-95%
+  
+  return `hsl(${h}, ${s}%, ${l}%)`;
 } 

@@ -1,18 +1,19 @@
 'use client';
 
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import { Playfair_Display } from 'next/font/google';
-import { Clock, ChefHat, Users, Printer, Heart } from 'lucide-react';
+import { Clock, ChefHat, Users, Printer, Heart, ChevronRight, UtensilsCrossed } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import Loading from '@/components/ui/loading';
-import { ShareButton } from '@/components/ui/share-button';
+import { ShareButton } from '@/components/social/ShareButton';
 import { usePrint } from '@/hooks/usePrint';
 import { RecipeMetadata } from '@/components/seo/RecipeMetadata';
 import { OptimizedImage } from '@/components/ui/optimized-image';
 import dynamic from 'next/dynamic';
 import type { MotionComponents } from '@/components/providers';
 import { useRecipe } from '@/hooks/useRecipe';
+import { RecipeCookingMode } from '@/components/recipe/cooking-mode/RecipeCookingMode';
 
 // Chargement différé des composants non-critiques
 const RatingSection = lazy(() => import('@/components/recipes/RatingSection'));
@@ -46,7 +47,13 @@ const imageSizes = {
 export default function RecipePage({ params }: { params: { slug: string } }) {
   const { recipe, isLoading, isError } = useRecipe(params.slug);
   const { printRecipe } = usePrint();
+  const [isCookingMode, setIsCookingMode] = useState(false);
+  const [origin, setOrigin] = useState('');
   
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 }
@@ -68,6 +75,10 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
   if (isError) return <div>Erreur lors du chargement de la recette</div>;
   if (!recipe) return <div>Recette non trouvée</div>;
 
+  if (isCookingMode) {
+    return <RecipeCookingMode recipe={recipe} onClose={() => setIsCookingMode(false)} />;
+  }
+
   return (
     <>
       <RecipeMetadata recipe={recipe} />
@@ -80,12 +91,13 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
               <MotionHeader className="relative h-[60vh] min-h-[400px] mb-8 overflow-hidden">
                 <div className="absolute inset-0">
                   <OptimizedImage
-                    src={recipe.mainImage}
+                    src={recipe.mainImage || '/images/default-recipe.jpg'}
                     alt={recipe.title}
                     fill
                     variant="hero"
-                    quality={90}
-                    priority
+                    sizes={imageSizes.hero.sizes}
+                    quality={imageSizes.hero.quality}
+                    priority={imageSizes.hero.priority}
                     containerClassName="absolute inset-0"
                   />
                 </div>
@@ -152,6 +164,16 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
                   initial="initial"
                   animate="animate"
                 >
+                  <motion.button
+                    className="flex items-center gap-2 px-4 py-2 text-primary hover:text-primary/90 bg-primary/10 hover:bg-primary/20 rounded-lg transition-colors"
+                    variants={fadeInUp}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsCookingMode(true)}
+                  >
+                    <UtensilsCrossed className="w-5 h-5" />
+                    <span>Mode Cuisine</span>
+                  </motion.button>
                   {[
                     { icon: Heart, text: "Sauvegarder", color: "pink", onClick: () => {} },
                     { icon: Printer, text: "Imprimer", color: "gray", onClick: () => recipe && printRecipe(recipe) }
@@ -168,10 +190,12 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
                       <span>{action.text}</span>
                     </motion.button>
                   ))}
-                  <ShareButton 
-                    url={`${window.location.origin}/recettes/${recipe.slug}`}
-                    title={recipe.title}
-                  />
+                  {origin && (
+                    <ShareButton 
+                      url={`${origin}/recettes/${recipe.slug}`}
+                      title={recipe.title}
+                    />
+                  )}
                 </motion.div>
 
                 {/* Ingrédients */}
@@ -228,96 +252,37 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
                   >
                     {recipe.steps.map((step, index) => (
                       <motion.div
-                        key={step.order}
+                        key={index}
                         className="flex gap-4"
                         variants={fadeInUp}
                       >
                         <div className="flex-shrink-0 w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center text-pink-500 font-medium">
-                          {step.order}
+                          {index + 1}
                         </div>
-                        <p className="flex-1 text-gray-700">{step.description}</p>
+                        <div className="flex-1">
+                          <p className="text-gray-700">{step.description}</p>
+                          {step.duration && (
+                            <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
+                              <Clock className="w-4 h-4" />
+                              <span>{step.duration} minutes</span>
+                            </div>
+                          )}
+                        </div>
                       </motion.div>
                     ))}
                   </motion.div>
                 </motion.section>
 
-                {/* Section de notation avec chargement différé */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true }}
-                  className="border-t border-gray-100 pt-8"
-                >
-                  <Suspense fallback={<div className="animate-pulse h-32 bg-gray-100 rounded-lg"></div>}>
-                    <RatingSection
-                      recipeId={recipe.id}
-                      initialRating={4.5}
-                      totalRatings={12}
-                    />
-                  </Suspense>
-                </motion.div>
-
-                {/* Section des commentaires avec chargement différé */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true, margin: "100px" }}
-                  className="border-t border-gray-100"
-                >
-                  <Suspense fallback={<div className="animate-pulse space-y-4">
-                    <div className="h-24 bg-gray-100 rounded-lg"></div>
-                    <div className="h-24 bg-gray-100 rounded-lg"></div>
-                  </div>}>
-                    <CommentSection
-                      recipeId={recipe.id}
-                      comments={[
-                        {
-                          id: '1',
-                          author: {
-                            name: 'Sophie',
-                            avatar: '/images/default-avatar.png'
-                          },
-                          content: 'Délicieuse recette ! La crème au citron est parfaitement équilibrée.',
-                          date: '15/01/2024',
-                          likes: 3,
-                          replies: [
-                            {
-                              id: '2',
-                              author: {
-                                name: 'Linda',
-                                avatar: '/images/linda.jpg'
-                              },
-                              content: 'Merci Sophie ! Heureuse que la recette vous ait plu.',
-                              date: '15/01/2024',
-                              likes: 1
-                            }
-                          ]
-                        }
-                      ]}
-                    />
-                  </Suspense>
-                </motion.div>
-
-                {/* Tags */}
-                <motion.section 
-                  className="mb-12"
-                  variants={staggerChildren}
-                  initial="initial"
-                  animate="animate"
-                >
-                  <div className="flex flex-wrap gap-2">
-                    {recipe.tags.map((tag, index) => (
-                      <motion.span
-                        key={index}
-                        className="px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded-full"
-                        variants={fadeInUp}
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        {tag}
-                      </motion.span>
-                    ))}
-                  </div>
-                </motion.section>
+                {/* Commentaires */}
+                <Suspense fallback={<div className="animate-pulse space-y-4">
+                  <div className="h-24 bg-gray-100 rounded-lg"></div>
+                  <div className="h-24 bg-gray-100 rounded-lg"></div>
+                </div>}>
+                  <CommentSection
+                    recipeId={String(recipe.id)}
+                    comments={[]}
+                  />
+                </Suspense>
               </div>
             </article>
           )}

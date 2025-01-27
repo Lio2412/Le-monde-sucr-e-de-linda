@@ -57,10 +57,8 @@ export function RecipeMetadata({ recipe }: RecipeMetadataProps) {
           image: recipe.mainImage,
           author: {
             '@type': 'Person',
-            name: recipe.author.name
+            name: 'Linda'
           },
-          datePublished: recipe.createdAt,
-          dateModified: recipe.updatedAt,
           prepTime: `PT${recipe.preparationTime}M`,
           cookTime: `PT${recipe.cookingTime}M`,
           recipeCategory: recipe.category,
@@ -69,12 +67,7 @@ export function RecipeMetadata({ recipe }: RecipeMetadataProps) {
           recipeInstructions: recipe.steps.map(step => ({
             '@type': 'HowToStep',
             text: step.description
-          })),
-          aggregateRating: recipe.rating ? {
-            '@type': 'AggregateRating',
-            ratingValue: recipe.rating.average,
-            ratingCount: recipe.rating.count
-          } : undefined
+          }))
         })}
       </script>
     </Head>

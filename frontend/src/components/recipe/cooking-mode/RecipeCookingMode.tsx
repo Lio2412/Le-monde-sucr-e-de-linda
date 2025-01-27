@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Recipe } from '@/types/recipe';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Bell } from 'lucide-react';
-import { StepTimer } from './StepTimer';
+import { ChevronLeft, ChevronRight, Bell, Timer, Clock, X, Maximize2, Minimize2 } from 'lucide-react';
+import { StepTimer } from '@/components/recipe/cooking-mode/StepTimer';
 import { useToast } from '@/components/ui/use-toast';
-import { IngredientsList } from './IngredientsList';
+import { IngredientsList } from '@/components/recipe/cooking-mode/IngredientsList';
+import { useFullscreen } from '@/hooks/useFullscreen';
 
 interface RecipeCookingModeProps {
   recipe: Recipe;
@@ -21,30 +22,46 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [direction, setDirection] = useState(0);
-  const currentStep = recipe.steps[currentStepIndex];
   const { toast } = useToast();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { isFullscreen, toggleFullscreen, isEnabled } = useFullscreen(containerRef);
 
-  const goToNextStep = () => {
+  // Vérification de sécurité pour s'assurer que recipe.steps existe
+  if (!recipe?.steps?.length) {
+    return (
+      <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center">
+        <Card className="p-6">
+          <p className="text-lg">Aucune étape n'a été trouvée pour cette recette.</p>
+          <Button className="mt-4" onClick={onClose}>Fermer</Button>
+        </Card>
+      </div>
+    );
+  }
+
+  const currentStep = recipe.steps[currentStepIndex];
+  const stepDuration = currentStep?.duration || 0;
+
+  const goToNextStep = useCallback(() => {
     if (currentStepIndex < recipe.steps.length - 1) {
       setDirection(1);
       setCurrentStepIndex(prev => prev + 1);
     }
-  };
+  }, [currentStepIndex, recipe.steps.length]);
 
-  const goToPreviousStep = () => {
+  const goToPreviousStep = useCallback(() => {
     if (currentStepIndex > 0) {
       setDirection(-1);
       setCurrentStepIndex(prev => prev - 1);
     }
-  };
+  }, [currentStepIndex]);
 
-  const handleTimerComplete = () => {
+  const handleTimerComplete = useCallback(() => {
     toast({
       title: "Minuteur terminé !",
       description: "L'étape est terminée, vous pouvez passer à la suivante.",
       duration: 5000,
     });
-  };
+  }, [toast]);
 
   // Gestion des raccourcis clavier
   useEffect(() => {
@@ -66,7 +83,7 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentStepIndex, recipe.steps.length]);
+  }, [goToNextStep, goToPreviousStep, onClose]);
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -86,89 +103,127 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50">
-      <div className="container mx-auto h-full py-8 flex flex-col gap-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{recipe.title}</h1>
-          <div className="flex items-center gap-2">
-            <div className="text-sm text-muted-foreground">
-              Utilisez les flèches ← → ou les touches P N pour naviguer
-            </div>
-            <Button variant="ghost" onClick={onClose}>
-              Fermer
+    <div ref={containerRef} className="fixed inset-0 bg-white z-50 overflow-hidden">
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-white border-b shadow-sm">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="hover:bg-gray-100"
+              aria-label="Fermer le mode cuisine"
+            >
+              <X className="h-5 w-5" />
             </Button>
+            <h1 className="text-xl font-semibold">{recipe.title}</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            {isEnabled && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleFullscreen}
+                className="hover:bg-gray-100"
+                aria-label={isFullscreen ? "Quitter le mode plein écran" : "Passer en mode plein écran"}
+              >
+                {isFullscreen ? (
+                  <Minimize2 className="h-5 w-5" />
+                ) : (
+                  <Maximize2 className="h-5 w-5" />
+                )}
+              </Button>
+            )}
           </div>
         </div>
+      </header>
 
-        {/* Main content */}
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4">
-          {/* Ingredients panel */}
-          <div className="lg:col-span-1 space-y-4">
-            <IngredientsList
-              ingredients={recipe.ingredients}
-              servings={recipe.servings}
-            />
-
-            {currentStep.duration && (
-              <StepTimer
-                duration={currentStep.duration}
-                onComplete={handleTimerComplete}
+      <div className="container mx-auto h-[calc(100vh-4rem)] py-8 px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
+          {/* Panneau latéral */}
+          <div className="lg:col-span-1 space-y-6 overflow-auto">
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold mb-4">Ingrédients</h2>
+              <IngredientsList
+                ingredients={recipe.ingredients || []}
+                defaultServings={recipe.servings || 1}
               />
+            </Card>
+
+            {stepDuration > 0 && (
+              <Card className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Timer className="w-5 h-5 text-primary" />
+                  <h2 className="text-lg font-semibold">Minuteur</h2>
+                </div>
+                <StepTimer
+                  duration={stepDuration}
+                  onComplete={handleTimerComplete}
+                />
+              </Card>
             )}
           </div>
 
-          {/* Current step */}
-          <Card className="p-6 lg:col-span-2 flex flex-col overflow-hidden">
+          {/* Étape courante */}
+          <Card className="lg:col-span-2 flex flex-col p-6 overflow-hidden">
             <div className="flex-1">
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-sm text-muted-foreground">
-                  Étape {currentStepIndex + 1} sur {recipe.steps.length}
-                </div>
-                {currentStep.duration && (
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Bell className="w-4 h-4" />
-                    {currentStep.duration} minutes
+              <div className="flex flex-col space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium bg-primary/10 text-primary px-3 py-1.5 rounded-full">
+                      Étape {currentStepIndex + 1} sur {recipe.steps.length}
+                    </span>
+                    {stepDuration > 0 && (
+                      <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Clock className="w-4 h-4" />
+                        {stepDuration} minutes
+                      </span>
+                    )}
                   </div>
-                )}
+                </div>
+
+                <AnimatePresence initial={false} custom={direction}>
+                  <motion.div
+                    key={currentStepIndex}
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{
+                      x: { type: "spring", stiffness: 300, damping: 30 },
+                      opacity: { duration: 0.2 }
+                    }}
+                    className="flex-1"
+                  >
+                    <div className="prose prose-lg max-w-none">
+                      <p className="text-xl leading-relaxed">{currentStep?.description}</p>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
-              <AnimatePresence initial={false} custom={direction}>
-                <motion.div
-                  key={currentStepIndex}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{
-                    x: { type: "spring", stiffness: 300, damping: 30 },
-                    opacity: { duration: 0.2 }
-                  }}
-                  className="w-full"
-                >
-                  <p className="text-lg">{currentStep.description}</p>
-                </motion.div>
-              </AnimatePresence>
             </div>
 
             {/* Navigation */}
-            <div className="flex justify-between mt-8">
+            <div className="flex justify-between mt-8 pt-6 border-t">
               <Button
                 variant="outline"
                 onClick={goToPreviousStep}
                 disabled={currentStepIndex === 0}
-                className="flex items-center gap-2"
+                className="w-[140px] h-12"
               >
-                <ChevronLeft className="w-4 h-4" />
-                Étape précédente
+                <ChevronLeft className="w-5 h-5 mr-2" />
+                Précédent
               </Button>
               <Button
+                variant="outline"
                 onClick={goToNextStep}
                 disabled={currentStepIndex === recipe.steps.length - 1}
-                className="flex items-center gap-2"
+                className="w-[140px] h-12"
               >
-                Étape suivante
-                <ChevronRight className="w-4 h-4" />
+                Suivant
+                <ChevronRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
           </Card>

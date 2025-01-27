@@ -1,8 +1,6 @@
 import Image, { ImageProps } from 'next/image';
 import { cn } from '@/lib/utils';
-import { imageSizeConfigs, generateImagePlaceholder } from '@/lib/image-utils';
-
-type ImageVariant = keyof typeof imageSizeConfigs;
+import { imageSizeConfigs, generateImagePlaceholder, type ImageVariant } from '@/lib/image-utils';
 
 interface OptimizedImageProps extends Omit<ImageProps, 'sizes'> {
   variant?: ImageVariant;
@@ -16,44 +14,32 @@ export function OptimizedImage({
   quality,
   className,
   containerClassName,
-  fill,
-  width,
-  height,
-  priority = false,
+  priority,
   ...props
 }: OptimizedImageProps) {
   const config = imageSizeConfigs[variant];
   const placeholderColor = generateImagePlaceholder(typeof src === 'string' ? src : '');
 
-  const imageProps = {
+  const imageProps: ImageProps = {
     src,
     alt,
     quality: quality || config.quality,
     sizes: config.sizes,
-    priority,
+    priority: priority ?? config.priority,
     placeholder: "blur" as const,
-    blurDataURL: placeholderColor,
+    blurDataURL: `data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'><rect width='1' height='1' fill='${encodeURIComponent(placeholderColor)}'/></svg>`,
     ...props
   };
 
-  if (fill) {
-    return (
-      <div className={cn("relative", containerClassName)}>
-        <Image
-          {...imageProps}
-          fill
-          className={cn("object-cover", className)}
-        />
-      </div>
-    );
-  }
-
   return (
-    <Image
-      {...imageProps}
-      width={width || config.defaultWidth}
-      height={height || config.defaultWidth}
-      className={className}
-    />
+    <div className={containerClassName}>
+      <Image
+        {...imageProps}
+        className={cn(
+          'transition-all duration-300',
+          className
+        )}
+      />
+    </div>
   );
 } 

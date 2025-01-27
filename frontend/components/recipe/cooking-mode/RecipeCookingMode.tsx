@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell } from 'lucide-react';
+import { StepTimer } from './StepTimer';
+import { useToast } from '@/components/ui/use-toast';
 
 interface RecipeCookingModeProps {
   recipe: Recipe;
@@ -20,6 +22,7 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const currentStep = recipe.steps[currentStepIndex];
+  const { toast } = useToast();
 
   const goToNextStep = () => {
     if (currentStepIndex < recipe.steps.length - 1) {
@@ -33,6 +36,14 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
       setDirection(-1);
       setCurrentStepIndex(prev => prev - 1);
     }
+  };
+
+  const handleTimerComplete = () => {
+    toast({
+      title: "Minuteur terminé !",
+      description: "L'étape est terminée, vous pouvez passer à la suivante.",
+      duration: 5000,
+    });
   };
 
   // Gestion des raccourcis clavier
@@ -93,31 +104,48 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
         {/* Main content */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Ingredients panel */}
-          <Card className="p-4 lg:col-span-1">
-            <h2 className="text-xl font-semibold mb-4">Ingrédients</h2>
-            <ScrollArea className="h-[calc(100vh-300px)]">
-              <ul className="space-y-2">
-                {recipe.ingredients.map((ingredient, index) => (
-                  <li key={index} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id={`ingredient-${index}`}
-                      className="w-4 h-4"
-                    />
-                    <label htmlFor={`ingredient-${index}`}>
-                      {ingredient.quantity} {ingredient.unit} {ingredient.name}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </ScrollArea>
-          </Card>
+          <div className="lg:col-span-1 space-y-4">
+            <Card className="p-4">
+              <h2 className="text-xl font-semibold mb-4">Ingrédients</h2>
+              <ScrollArea className="h-[calc(100vh-500px)]">
+                <ul className="space-y-2">
+                  {recipe.ingredients.map((ingredient, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id={`ingredient-${index}`}
+                        className="w-4 h-4"
+                      />
+                      <label htmlFor={`ingredient-${index}`}>
+                        {ingredient.quantity} {ingredient.unit} {ingredient.name}
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </ScrollArea>
+            </Card>
+
+            {currentStep.duration && (
+              <StepTimer
+                duration={currentStep.duration}
+                onComplete={handleTimerComplete}
+              />
+            )}
+          </div>
 
           {/* Current step */}
           <Card className="p-6 lg:col-span-2 flex flex-col overflow-hidden">
             <div className="flex-1">
-              <div className="text-sm text-muted-foreground mb-4">
-                Étape {currentStepIndex + 1} sur {recipe.steps.length}
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-sm text-muted-foreground">
+                  Étape {currentStepIndex + 1} sur {recipe.steps.length}
+                </div>
+                {currentStep.duration && (
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <Bell className="w-4 h-4" />
+                    {currentStep.duration} minutes
+                  </div>
+                )}
               </div>
               <AnimatePresence initial={false} custom={direction}>
                 <motion.div

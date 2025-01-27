@@ -1,117 +1,94 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ChevronDown, ChevronUp, Scale } from 'lucide-react';
-import { Ingredient } from '@/types/recipe';
+import { Minus, Plus } from 'lucide-react';
+
+interface Ingredient {
+  name: string;
+  quantity: number;
+  unit: string;
+}
 
 interface IngredientsListProps {
   ingredients: Ingredient[];
-  servings: number;
+  defaultServings: number;
 }
 
-export const IngredientsList: React.FC<IngredientsListProps> = ({
-  ingredients,
-  servings,
-}) => {
-  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
-  const [servingsMultiplier, setServingsMultiplier] = useState(1);
+export function IngredientsList({ ingredients, defaultServings }: IngredientsListProps) {
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
+  const [servings, setServings] = useState(defaultServings || 1);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const toggleIngredient = (index: number) => {
+  const toggleIngredient = (ingredientName: string) => {
     const newChecked = new Set(checkedIngredients);
-    if (newChecked.has(index)) {
-      newChecked.delete(index);
+    if (newChecked.has(ingredientName)) {
+      newChecked.delete(ingredientName);
     } else {
-      newChecked.add(index);
+      newChecked.add(ingredientName);
     }
     setCheckedIngredients(newChecked);
   };
 
-  const adjustServings = (delta: number) => {
-    const newMultiplier = Math.max(0.5, servingsMultiplier + delta * 0.5);
-    setServingsMultiplier(newMultiplier);
-  };
-
-  const formatQuantity = (quantity: number): string => {
-    const adjustedQuantity = quantity * servingsMultiplier;
-    return adjustedQuantity % 1 === 0
-      ? adjustedQuantity.toString()
-      : adjustedQuantity.toFixed(1);
+  const adjustQuantity = (quantity: number): string => {
+    if (!quantity || !servings || !defaultServings) return '0';
+    const adjusted = (quantity * servings) / defaultServings;
+    return adjusted % 1 === 0 ? adjusted.toString() : adjusted.toFixed(1);
   };
 
   return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-xl font-semibold">Ingrédients</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 px-2"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-          >
-            {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-          </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          <Scale className="w-4 h-4 text-muted-foreground" />
+    <Card className="w-full">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-2xl font-bold">Ingrédients</CardTitle>
+        <div className="flex items-center space-x-2">
           <Button
             variant="outline"
-            size="sm"
-            onClick={() => adjustServings(-1)}
-            disabled={servingsMultiplier <= 0.5}
+            size="icon"
+            onClick={() => setServings(Math.max(1, servings - 1))}
           >
-            -
+            <Minus className="h-4 w-4" />
           </Button>
-          <span className="text-sm font-medium min-w-[4rem] text-center">
-            {Math.round(servings * servingsMultiplier)} pers.
-          </span>
+          <span className="min-w-[3ch] text-center">{servings}</span>
           <Button
             variant="outline"
-            size="sm"
-            onClick={() => adjustServings(1)}
+            size="icon"
+            onClick={() => setServings(servings + 1)}
           >
-            +
+            <Plus className="h-4 w-4" />
           </Button>
         </div>
-      </div>
-
-      {!isCollapsed && (
-        <ScrollArea className="h-[calc(100vh-500px)]">
-          <ul className="space-y-2">
-            {ingredients.map((ingredient, index) => (
-              <li
-                key={index}
-                className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
-                  checkedIngredients.has(index) ? 'bg-muted/50' : 'hover:bg-muted/30'
-                }`}
+      </CardHeader>
+      <CardContent>
+        <ScrollArea className="h-[300px] w-full pr-4">
+          <div className="space-y-2">
+            {ingredients.map((ingredient) => (
+              <div
+                key={ingredient.name}
+                className="flex items-center space-x-2"
               >
                 <Checkbox
-                  id={`ingredient-${index}`}
-                  checked={checkedIngredients.has(index)}
-                  onCheckedChange={() => toggleIngredient(index)}
+                  id={ingredient.name}
+                  checked={checkedIngredients.has(ingredient.name)}
+                  onCheckedChange={() => toggleIngredient(ingredient.name)}
                 />
                 <label
-                  htmlFor={`ingredient-${index}`}
-                  className={`flex-1 cursor-pointer ${
-                    checkedIngredients.has(index) ? 'line-through text-muted-foreground' : ''
+                  htmlFor={ingredient.name}
+                  className={`flex-1 ${
+                    checkedIngredients.has(ingredient.name)
+                      ? "text-muted-foreground line-through"
+                      : ""
                   }`}
                 >
-                  <span className="font-medium">{formatQuantity(ingredient.quantity)}</span>
-                  {' '}
-                  <span className="text-muted-foreground">{ingredient.unit}</span>
-                  {' '}
-                  {ingredient.name}
+                  {adjustQuantity(ingredient.quantity)} {ingredient.unit} {ingredient.name}
                 </label>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         </ScrollArea>
-      )}
+      </CardContent>
     </Card>
   );
-}; 
+} 

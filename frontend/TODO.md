@@ -1,121 +1,65 @@
-# Checklist Frontend - Le Monde Sucré de Linda
+# TODO List
 
-## ✅ Fonctionnalités Complètes
+## ✅ Fonctionnalités Complétées
 
-### Pages
-- [x] Page d'accueil avec toutes ses sections
-- [x] Page de listing des recettes avec filtres de base
-- [x] Page détail des recettes
-- [x] Page de connexion et inscription
-- [x] Page "Mot de passe oublié"
-- [x] Page de contact
-- [x] Page À propos
-- [x] Page blog
-- [x] Pages d'erreur personnalisées (404, 500)
-- [x] Page de recherche
+- [x] Mise en place de la structure de base du projet
+- [x] Configuration de Next.js avec TypeScript
+- [x] Configuration de TailwindCSS
+- [x] Intégration de Framer Motion pour les animations
+- [x] Création du composant Header
+- [x] Création du composant Footer
+- [x] Mise en place du mode cuisine
+- [x] Implémentation du timer pour les étapes de recette
+- [x] Optimisation des images avec next/image
+- [x] Gestion des métadonnées pour le SEO
+- [x] Système de partage de recettes
+- [x] Mode d'impression des recettes
 
-### Composants UI
-- [x] Header responsive avec navigation
-- [x] Footer avec liens et réseaux sociaux
-- [x] Composants de chargement (Skeleton, Spinner)
-- [x] Système de toast pour les notifications
-- [x] Boutons de partage social
-- [x] Boutons de like
-- [x] Système de notation avec étoiles
-- [x] Images optimisées avec lazy loading
+## 🚧 En Cours
 
-### Fonctionnalités Core
-- [x] Système de newsletter (inscription/désinscription)
-- [x] Système de commentaires avec likes
-- [x] Système de notation des recettes
-- [x] Mode impression des recettes
-- [x] Partage sur réseaux sociaux
-- [x] Authentification email/mot de passe
-- [x] Gestion des favoris (base)
-- [x] Gestion du profil utilisateur
-- [x] Protection des routes authentifiées
-- [x] Validation des formulaires
-- [x] Gestion des erreurs avec feedback utilisateur
+- [ ] Système d'authentification
+- [ ] Gestion des favoris
+- [ ] Système de commentaires
+- [ ] Système de notation des recettes
+- [ ] Recherche de recettes
+- [ ] Filtrage par catégories
 
-### Performance & SEO
-- [x] Optimisation des images
-- [x] Lazy loading
-- [x] Code splitting
-- [x] Métadonnées dynamiques
-- [x] Schema.org pour les recettes
-- [x] Sitemap dynamique
-- [x] URLs propres
+### Mode Cuisine
+- [ ] Mode plein écran
+  - [ ] Bouton de basculement plein écran
+  - [ ] Empêcher la mise en veille
+  - [ ] Interface adaptée au plein écran
+- [ ] Améliorations UX
+  - [ ] Raccourcis clavier (flèches, espace)
+  - [ ] Confirmation avant de quitter
+  - [ ] Marquage des étapes terminées
+- [ ] Fonctionnalités supplémentaires
+  - [ ] Prise de notes pendant la réalisation
+  - [ ] Historique des recettes réalisées
+  - [ ] Adaptation des quantités en temps réel
 
-### UX/UI
-- [x] Design système cohérent
-- [x] Animations et transitions
-- [x] Responsive design complet
-- [x] États de chargement
-- [x] Feedback utilisateur
-- [x] Navigation au clavier
-- [x] Contraste et lisibilité
+## 📝 À Faire
 
-## 🔄 En Cours de Développement
-- [ ] Mode "Cuisine" étape par étape
-  - [x] Interface utilisateur du mode étape par étape
-  - [x] Navigation entre les étapes
-    - [x] Navigation par boutons
-    - [x] Raccourcis clavier (flèches et touches P/N)
-    - [x] Animations de transition
-  - [x] Timer intégré pour chaque étape
-    - [x] Affichage du temps restant
-    - [x] Contrôles (play/pause/reset)
-    - [x] Notification à la fin du timer
-  - [x] Liste des ingrédients nécessaires
-    - [x] Cases à cocher pour suivre la progression
-    - [x] Ajustement des quantités selon le nombre de personnes
-    - [x] Mode réduit/développé
-  - [ ] Mode plein écran
-  - [ ] Commandes vocales (optionnel)
+- [ ] Système de newsletter
+- [ ] Page de profil utilisateur
+- [ ] Système de suggestions de recettes
+- [ ] Mode hors-ligne (PWA)
+- [ ] Internationalisation (i18n)
+- [ ] Tests unitaires et d'intégration
+- [ ] Documentation API
+- [ ] Guide de contribution
 
-## 🚧 Améliorations Prioritaires
+## 🐛 Bugs Résolus
 
-### Phase 1 - Expérience Utilisateur
-- [ ] Conversion des quantités d'ingrédients
-- [ ] Suggestions de recettes similaires
-- [ ] Filtres avancés pour les recettes
-  - [ ] Par temps de préparation
-  - [ ] Par niveau de difficulté
-  - [ ] Par ingrédients
+- [x] Correction des erreurs de typage dans RecipeMetadata
+- [x] Correction des warnings d'images Next.js (propriété sizes)
+- [x] Correction des problèmes de rendu côté serveur avec window.location
+- [x] Optimisation des performances de chargement des images
 
-### Phase 2 - Recherche Avancée
-- [ ] Recherche instantanée
-- [ ] Suggestions de recherche
-- [ ] Historique des recherches
-- [ ] Filtres de recherche avancés
+## 📈 Améliorations Futures
 
-### Phase 3 - Fonctionnalités Sociales
-- [ ] Organisation des favoris en collections
-- [ ] Partage de collections
-- [ ] Commentaires avec images
-- [ ] Mentions et réponses dans les commentaires
-
-### Phase 4 - Authentification & Sécurité
-- [ ] Connexion avec réseaux sociaux
-- [ ] Authentification à deux facteurs
-- [ ] Gestion avancée des sessions
-- [ ] Journal d'activité utilisateur
-
-### Phase 5 - Internationalisation
-- [ ] Support multilingue
-- [ ] Adaptation des dates et formats
-- [ ] Conversion des unités de mesure
-- [ ] Support RTL
-
-### Phase 6 - PWA & Mobile
-- [ ] Service Worker pour le mode hors ligne
-- [ ] Installation sur l'écran d'accueil
-- [ ] Notifications push
-- [ ] Synchronisation en arrière-plan
-
-### Phase 7 - Tests & Qualité
-- [ ] Tests unitaires
-- [ ] Tests d'intégration
-- [ ] Tests E2E
-- [ ] Tests de performance
-- [ ] Tests d'accessibilité 
+- [ ] Amélioration des performances (Core Web Vitals)
+- [ ] Optimisation du bundle size
+- [ ] Mise en cache des recettes
+- [ ] Amélioration de l'accessibilité
+- [ ] Support des thèmes sombres/clairs 
