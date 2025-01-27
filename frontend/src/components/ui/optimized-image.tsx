@@ -1,20 +1,22 @@
-import Image, { ImageProps } from 'next/image';
+import Image from 'next/image';
+import { ImageProps } from 'next/image';
 import { cn } from '@/lib/utils';
 import { imageSizeConfigs, generateImagePlaceholder, type ImageVariant } from '@/lib/image-utils';
 
-interface OptimizedImageProps extends Omit<ImageProps, 'sizes'> {
-  variant?: ImageVariant;
+export interface OptimizedImageProps extends Omit<ImageProps, 'sizes'> {
+  variant: ImageVariant;
   containerClassName?: string;
+  sizes?: string;
 }
 
 export function OptimizedImage({
   src,
   alt,
-  variant = 'hero',
-  quality,
+  variant,
+  quality = imageSizeConfigs[variant].quality,
   className,
   containerClassName,
-  priority,
+  priority = imageSizeConfigs[variant].priority,
   ...props
 }: OptimizedImageProps) {
   const config = imageSizeConfigs[variant];

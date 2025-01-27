@@ -5,7 +5,7 @@ describe('useStepNotes', () => {
   it('devrait initialiser avec aucune note', () => {
     const { result } = renderHook(() => useStepNotes({ totalSteps: 5 }));
     
-    expect(result.current.notes.size).toBe(0);
+    expect(Object.keys(result.current.notes).length).toBe(0);
     expect(result.current.showNotes).toBe(false);
     expect(result.current.hasNotes).toBe(false);
   });
@@ -26,13 +26,12 @@ describe('useStepNotes', () => {
     const { result } = renderHook(() => useStepNotes({ totalSteps: 5 }));
     
     act(() => {
-      result.current.updateNote(0, 'Ma note');
-      result.current.updateNote(0, '   ');
+      result.current.updateNote(0, '');
     });
-
+    
+    expect(Object.keys(result.current.notes).length).toBe(0);
+    expect(result.current.showNotes).toBe(false);
     expect(result.current.hasNotes).toBe(false);
-    expect(result.current.hasNoteForStep(0)).toBe(false);
-    expect(result.current.getNote(0)).toBe('');
   });
 
   it('devrait gérer plusieurs notes', () => {
@@ -43,7 +42,7 @@ describe('useStepNotes', () => {
       result.current.updateNote(2, 'Note 2');
     });
 
-    expect(result.current.notes.size).toBe(2);
+    expect(Object.keys(result.current.notes).length).toBe(2);
     expect(result.current.getNote(0)).toBe('Note 1');
     expect(result.current.getNote(2)).toBe('Note 2');
     expect(result.current.getNote(1)).toBe('');

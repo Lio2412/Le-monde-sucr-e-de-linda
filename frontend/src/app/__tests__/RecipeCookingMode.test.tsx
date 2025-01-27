@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { RecipeCookingMode } from '@/components/recipe/cooking-mode/RecipeCookingMode';
+import { useRouter } from 'next/navigation';
 
 // Mock des composants externes
 jest.mock('@/components/ui/toast', () => ({
@@ -15,6 +16,14 @@ jest.mock('framer-motion', () => ({
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>
   },
   AnimatePresence: ({ children }: any) => <>{children}</>
+}));
+
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn()
+  }))
 }));
 
 describe('RecipeCookingMode', () => {

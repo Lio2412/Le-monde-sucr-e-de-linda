@@ -5,7 +5,7 @@ import { Playfair_Display } from 'next/font/google';
 import { Clock, ChefHat, Users, Printer, Heart, ChevronRight, UtensilsCrossed } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import Loading from '@/components/ui/loading';
+import { Loading } from '@/components/ui/loading';
 import { ShareButton } from '@/components/social/ShareButton';
 import { usePrint } from '@/hooks/usePrint';
 import { RecipeMetadata } from '@/components/seo/RecipeMetadata';
@@ -95,9 +95,9 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
                     alt={recipe.title}
                     fill
                     variant="hero"
-                    sizes={imageSizes.hero.sizes}
-                    quality={imageSizes.hero.quality}
-                    priority={imageSizes.hero.priority}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 1200px, 2400px"
+                    quality={90}
+                    priority
                     containerClassName="absolute inset-0"
                   />
                 </div>
@@ -251,18 +251,18 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
                     animate="animate"
                   >
                     {recipe.steps.map((step, index) => (
-                      <motion.div
+                      <motion.div 
                         key={index}
                         className="flex gap-4"
                         variants={fadeInUp}
                       >
-                        <div className="flex-shrink-0 w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center text-pink-500 font-medium">
-                          {index + 1}
+                        <div className="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                          <span className="text-primary font-medium">{index + 1}</span>
                         </div>
-                        <div className="flex-1">
-                          <p className="text-gray-700">{step.description}</p>
-                          {step.duration && (
-                            <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
+                        <div>
+                          <p className="text-gray-600">{step.description}</p>
+                          {step.duration && step.duration > 0 && (
+                            <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
                               <Clock className="w-4 h-4" />
                               <span>{step.duration} minutes</span>
                             </div>
@@ -273,15 +273,10 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
                   </motion.div>
                 </motion.section>
 
-                {/* Commentaires */}
-                <Suspense fallback={<div className="animate-pulse space-y-4">
-                  <div className="h-24 bg-gray-100 rounded-lg"></div>
-                  <div className="h-24 bg-gray-100 rounded-lg"></div>
-                </div>}>
-                  <CommentSection
-                    recipeId={String(recipe.id)}
-                    comments={[]}
-                  />
+                {/* Sections supplémentaires */}
+                <Suspense fallback={<Loading />}>
+                  <RatingSection recipeId={parseInt(recipe.id)} />
+                  <CommentSection recipeId={parseInt(recipe.id)} comments={recipe.comments || []} />
                 </Suspense>
               </div>
             </article>

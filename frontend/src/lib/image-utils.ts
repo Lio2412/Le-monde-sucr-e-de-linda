@@ -33,9 +33,18 @@ export const imageSizeConfigs = {
   }
 } as const;
 
+// Breakpoints standards pour la génération de srcSet
+const DEFAULT_BREAKPOINTS = {
+  hero: [640, 750, 828, 1080, 1200, 1920, 2048, 2400],
+  thumbnail: [320, 480, 640, 750, 828, 1080]
+} as const;
+
 // Fonction pour générer un ensemble d'URLs d'images srcSet
-export function generateSrcSet(url: string, config: typeof imageSizeConfigs.hero): string {
-  return config.breakpoints
+export function generateSrcSet(url: string, variant: ImageVariant): string {
+  const config = imageSizeConfigs[variant];
+  const breakpoints = DEFAULT_BREAKPOINTS[variant];
+  
+  return breakpoints
     .map(width => {
       const optimizedUrl = getOptimizedImageUrl(url, width, config.quality);
       return `${optimizedUrl} ${width}w`;
@@ -70,14 +79,6 @@ export function generatePlaceholderSvg(color: string): string {
 
 // Fonction pour générer un placeholder complet pour une image
 export function generateImagePlaceholder(src: string): string {
-  // Génère une couleur de placeholder basée sur le hash de l'URL de l'image
-  const hash = src.split('').reduce((acc, char) => {
-    return char.charCodeAt(0) + ((acc << 5) - acc);
-  }, 0);
-  
-  const h = Math.abs(hash) % 360;
-  const s = 20 + (Math.abs(hash >> 8) % 30); // 20-50%
-  const l = 85 + (Math.abs(hash >> 16) % 10); // 85-95%
-  
-  return `hsl(${h}, ${s}%, ${l}%)`;
+  const color = generatePlaceholderColor(src);
+  return color;
 } 

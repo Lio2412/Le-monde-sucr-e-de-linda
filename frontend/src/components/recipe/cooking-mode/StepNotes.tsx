@@ -1,7 +1,5 @@
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, Button, Textarea } from '@/components/ui';
 import { StickyNote, X } from 'lucide-react';
 
 interface StepNotesProps {
