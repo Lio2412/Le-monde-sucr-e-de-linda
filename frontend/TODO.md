@@ -62,8 +62,14 @@
     - [x] Navigation par boutons
     - [x] Raccourcis clavier (flèches et touches P/N)
     - [x] Animations de transition
-  - [ ] Timer intégré pour chaque étape
-  - [ ] Liste des ingrédients nécessaires
+  - [x] Timer intégré pour chaque étape
+    - [x] Affichage du temps restant
+    - [x] Contrôles (play/pause/reset)
+    - [x] Notification à la fin du timer
+  - [x] Liste des ingrédients nécessaires
+    - [x] Cases à cocher pour suivre la progression
+    - [x] Ajustement des quantités selon le nombre de personnes
+    - [x] Mode réduit/développé
   - [ ] Mode plein écran
   - [ ] Commandes vocales (optionnel)
 
