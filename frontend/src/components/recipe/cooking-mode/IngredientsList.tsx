@@ -1,17 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Minus, Plus } from 'lucide-react';
-
-interface Ingredient {
-  name: string;
-  quantity: number;
-  unit: string;
-}
+import { Minus, Plus, UtensilsCrossed } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Ingredient } from '@/types/recipe';
 
 interface IngredientsListProps {
   ingredients: Ingredient[];
@@ -19,76 +15,116 @@ interface IngredientsListProps {
 }
 
 export function IngredientsList({ ingredients, defaultServings }: IngredientsListProps) {
-  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
-  const [servings, setServings] = useState(defaultServings || 1);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [servings, setServings] = useState(defaultServings);
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
 
-  const toggleIngredient = (ingredientName: string) => {
+  const adjustQuantity = (quantity: number) => {
+    return ((quantity * servings) / defaultServings).toFixed(1).replace(/\.0$/, '');
+  };
+
+  const handleServingsChange = (delta: number) => {
+    const newServings = servings + delta;
+    if (newServings > 0) {
+      setServings(newServings);
+    }
+  };
+
+  const toggleIngredient = (index: number) => {
     const newChecked = new Set(checkedIngredients);
-    if (newChecked.has(ingredientName)) {
-      newChecked.delete(ingredientName);
+    if (newChecked.has(index)) {
+      newChecked.delete(index);
     } else {
-      newChecked.add(ingredientName);
+      newChecked.add(index);
     }
     setCheckedIngredients(newChecked);
   };
 
-  const adjustQuantity = (quantity: number): string => {
-    if (!quantity || !servings || !defaultServings) return '0';
-    const adjusted = (quantity * servings) / defaultServings;
-    return adjusted % 1 === 0 ? adjusted.toString() : adjusted.toFixed(1);
-  };
-
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-2xl font-bold">Ingrédients</CardTitle>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setServings(Math.max(1, servings - 1))}
-          >
-            <Minus className="h-4 w-4" />
-          </Button>
-          <span className="min-w-[3ch] text-center">{servings}</span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setServings(servings + 1)}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+    <div className="space-y-6" data-testid="ingredients-list">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <UtensilsCrossed className="h-5 w-5 text-muted-foreground" />
+          <h2 className="text-lg font-semibold">Ingrédients</h2>
         </div>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px] w-full pr-4">
-          <div className="space-y-2">
-            {ingredients.map((ingredient) => (
-              <div
-                key={ingredient.name}
-                className="flex items-center space-x-2"
-              >
-                <Checkbox
-                  id={ingredient.name}
-                  checked={checkedIngredients.has(ingredient.name)}
-                  onCheckedChange={() => toggleIngredient(ingredient.name)}
-                />
-                <label
-                  htmlFor={ingredient.name}
-                  className={`flex-1 ${
-                    checkedIngredients.has(ingredient.name)
-                      ? "text-muted-foreground line-through"
-                      : ""
-                  }`}
-                >
-                  {adjustQuantity(ingredient.quantity)} {ingredient.unit} {ingredient.name}
-                </label>
-              </div>
-            ))}
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-muted-foreground">Portions :</span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handleServingsChange(-1)}
+              disabled={servings <= 1}
+              className="h-8 w-8"
+              aria-label="Diminuer les portions"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <span className="w-8 text-center font-medium">{servings}</span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handleServingsChange(1)}
+              className="h-8 w-8"
+              aria-label="Augmenter les portions"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+
+      <motion.div
+        initial={false}
+        className="space-y-2"
+      >
+        {ingredients.map((ingredient, index) => (
+          <motion.div
+            key={`${ingredient.name}-${index}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+          >
+            <Card
+              className={cn(
+                "p-4 transition-colors",
+                checkedIngredients.has(index) && "bg-primary/5"
+              )}
+            >
+              <div className="flex items-center gap-4">
+                <Checkbox
+                  checked={checkedIngredients.has(index)}
+                  onCheckedChange={() => toggleIngredient(index)}
+                  className={cn(
+                    "h-5 w-5",
+                    checkedIngredients.has(index) && "bg-primary border-primary text-primary-foreground"
+                  )}
+                />
+                <div className="flex-1">
+                  <span
+                    className={cn(
+                      "transition-colors",
+                      checkedIngredients.has(index) && "text-muted-foreground line-through"
+                    )}
+                  >
+                    {ingredient.name}
+                  </span>
+                  {ingredient.quantity && (
+                    <span
+                      className={cn(
+                        "ml-2 text-sm",
+                        checkedIngredients.has(index) ? "text-muted-foreground" : "text-primary"
+                      )}
+                    >
+                      {adjustQuantity(ingredient.quantity)}
+                      {ingredient.unit && ` ${ingredient.unit}`}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
   );
 } 

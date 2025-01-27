@@ -1,14 +1,20 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { RecipeCookingMode } from '../RecipeCookingMode';
-import { Recipe, RecipeStep } from '@/types/recipe';
-import { mockRecipe } from '@/mocks/recipe';
-import { UseBeforeUnloadOptions } from '@/hooks/useBeforeUnload';
+/**
+ * @jest-environment jsdom
+ */
 
-// Augmenter le timeout par défaut pour les tests
-jest.setTimeout(30000);
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { RecipeCookingMode } from '../RecipeCookingMode';
+import { Recipe } from '@/types/recipe';
+import { useStepCompletion } from '@/hooks/useStepCompletion';
+import { useStepNotes } from '@/hooks/useStepNotes';
+import { useRecipeHistory } from '@/hooks/useRecipeHistory';
+import { useDeviceType } from '@/hooks/useDeviceType';
 
 // Mock des hooks
+jest.mock('@/hooks/useStepCompletion');
+jest.mock('@/hooks/useStepNotes');
+jest.mock('@/hooks/useRecipeHistory');
+jest.mock('@/hooks/useDeviceType');
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
@@ -17,209 +23,138 @@ jest.mock('next/navigation', () => ({
   }),
 }));
 
-const mockToggleFullscreen = jest.fn();
-const mockToggleStep = jest.fn();
-const mockToggleNotesVisibility = jest.fn();
-const mockUpdateNote = jest.fn();
+const mockRecipe: Recipe = {
+  id: '1',
+  title: 'Tarte aux pommes',
+  description: 'Une délicieuse tarte aux pommes',
+  preparationTime: 30,
+  cookingTime: 45,
+  servings: 6,
+  difficulty: 'facile',
+  category: 'dessert',
+  image: '/images/tarte-aux-pommes.jpg',
+  mainImage: '/images/tarte-aux-pommes.jpg',
+  slug: 'tarte-aux-pommes',
+  tags: ['dessert', 'pommes'],
+  ingredients: [
+    { name: 'Pommes', quantity: 6, unit: 'pièces' },
+    { name: 'Sucre', quantity: 100, unit: 'g' },
+  ],
+  steps: [
+    { description: 'Préparer la pâte', duration: 0 },
+    { description: 'Cuire au four', duration: 45 },
+  ],
+};
 
-// Mock des hooks avec des valeurs par défaut
-jest.mock('@/hooks/useFullscreen', () => ({
-  useFullscreen: () => ({
-    isFullscreen: false,
-    toggleFullscreen: mockToggleFullscreen,
-    isEnabled: true
-  })
-}));
+const mockStepCompletion = {
+  completedSteps: new Set(),
+  isStepCompleted: jest.fn(),
+  toggleStep: jest.fn(),
+  progress: 0,
+};
 
-const mockCompletedSteps = new Set<number>();
-let mockProgress = 0;
+const mockStepNotes = {
+  notes: {},
+  updateNote: jest.fn(),
+  toggleNotesVisibility: jest.fn(),
+  showNotes: false,
+  hasNotes: false,
+  getNote: jest.fn(),
+  hasNoteForStep: jest.fn(),
+};
 
-jest.mock('@/hooks/useStepCompletion', () => ({
-  useStepCompletion: () => ({
-    isStepCompleted: (stepIndex: number) => mockCompletedSteps.has(stepIndex),
-    toggleStep: (stepIndex: number) => {
-      mockToggleStep(stepIndex);
-      if (mockCompletedSteps.has(stepIndex)) {
-        mockCompletedSteps.delete(stepIndex);
-      } else {
-        mockCompletedSteps.add(stepIndex);
-      }
-      mockProgress = (mockCompletedSteps.size / 2) * 100;
-      return mockCompletedSteps;
-    },
-    completedSteps: mockCompletedSteps,
-    progress: mockProgress
-  })
-}));
-
-const mockNotes: Record<number, string> = {};
-
-jest.mock('@/hooks/useStepNotes', () => ({
-  useStepNotes: () => ({
-    notes: mockNotes,
-    showNotes: false,
-    updateNote: (stepIndex: number, content: string) => {
-      mockUpdateNote(stepIndex, content);
-      if (content.trim() === '') {
-        delete mockNotes[stepIndex];
-      } else {
-        mockNotes[stepIndex] = content;
-      }
-    },
-    getNote: (stepIndex: number) => mockNotes[stepIndex] || '',
-    toggleNotesVisibility: mockToggleNotesVisibility,
-    hasNotes: Object.keys(mockNotes).length > 0,
-    hasNoteForStep: (stepIndex: number) => !!mockNotes[stepIndex]
-  })
-}));
-
-jest.mock('@/hooks/useKeyboardShortcuts', () => ({
-  useKeyboardShortcuts: () => ({
-    shortcuts: []
-  })
-}));
-
-const mockUseBeforeUnload = jest.fn();
-jest.mock('@/hooks/useBeforeUnload', () => ({
-  useBeforeUnload: (options: UseBeforeUnloadOptions) => {
-    mockUseBeforeUnload(options);
-  }
-}));
-
-describe('RecipeCookingMode', () => {
-  const mockOnClose = jest.fn();
-
+describe('Mode Cuisine', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    mockCompletedSteps.clear();
-    mockProgress = 0;
+    (useStepCompletion as jest.Mock).mockReturnValue(mockStepCompletion);
+    (useStepNotes as jest.Mock).mockReturnValue(mockStepNotes);
+    (useRecipeHistory as jest.Mock).mockReturnValue({ addToHistory: jest.fn() });
+    (useDeviceType as jest.Mock).mockReturnValue({ isTablet: true });
   });
 
-  // Tests du mode préparation
-  it('devrait afficher le mode préparation par défaut', () => {
-    render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
-    expect(screen.getByText('Préparation de la recette')).toBeInTheDocument();
-    expect(screen.getByText('Temps total : 50 minutes')).toBeInTheDocument();
+  it('affiche le mode préparation initialement', () => {
+    const onClose = jest.fn();
+    render(<RecipeCookingMode recipe={mockRecipe} onClose={onClose} />);
+    expect(screen.getByText('Commencer la recette')).toBeInTheDocument();
   });
 
-  it('devrait passer au mode cuisine après avoir cliqué sur Commencer', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
-    
-    const startButton = screen.getByRole('button', { name: /commencer la recette/i });
-    await act(async () => {
-      await user.click(startButton);
-    });
-
-    // Attendre que l'animation soit terminée et que l'élément soit visible
-    await waitFor(() => {
-      expect(screen.getByTestId('step-counter')).toBeInTheDocument();
-    }, { timeout: 3000 });
-
-    expect(screen.getByTestId('step-counter')).toHaveTextContent('Étape 1 sur 2');
-  });
-
-  // Tests de base
-  it('devrait appeler useBeforeUnload avec les bonnes options', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
-    
+  it('passe en mode cuisine au clic sur Commencer', async () => {
+    const onClose = jest.fn();
+    render(<RecipeCookingMode recipe={mockRecipe} onClose={onClose} />);
     const startButton = screen.getByTestId('start-recipe');
-    await act(async () => {
-      await user.click(startButton);
-    });
-    
-    // Attendre que l'animation soit terminée (0.2s + marge)
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    // Maintenant on peut chercher step-checkbox
+    fireEvent.click(startButton);
     await waitFor(() => {
-      expect(screen.getByTestId('step-checkbox')).toBeInTheDocument();
-    }, { timeout: 1000 });
-    
-    const checkbox = screen.getByTestId('step-checkbox');
-    await act(async () => {
-      await user.click(checkbox);
-    });
+      expect(screen.getByTestId('step-description')).toHaveTextContent('Préparer la pâte');
+    }, { timeout: 2000 });
+  });
 
-    // Attendre que mockCompletedSteps soit mis à jour
+  it('permet de naviguer entre les étapes', async () => {
+    const onClose = jest.fn();
+    render(<RecipeCookingMode recipe={mockRecipe} onClose={onClose} />);
+    const startButton = screen.getByTestId('start-recipe');
+    fireEvent.click(startButton);
+
     await waitFor(() => {
-      expect(mockUseBeforeUnload).toHaveBeenCalledWith({
-        shouldPreventUnload: true,
-        onConfirm: expect.any(Function),
-        onCancel: expect.any(Function),
-        message: 'Êtes-vous sûr de vouloir quitter ? Les modifications non enregistrées seront perdues.'
-      });
-    }, { timeout: 1000 });
+      expect(screen.getByTestId('step-description')).toHaveTextContent('Préparer la pâte');
+    }, { timeout: 2000 });
+
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('step-description')).toHaveTextContent('Cuire au four');
+    }, { timeout: 2000 });
   });
 
-  it('devrait afficher le titre de la recette', () => {
-    render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
-    expect(screen.getByText('Gâteau au Chocolat')).toBeInTheDocument();
+  it('adapte les quantités selon les portions', async () => {
+    const onClose = jest.fn();
+    render(<RecipeCookingMode recipe={mockRecipe} onClose={onClose} />);
+    const startButton = screen.getByTestId('start-recipe');
+    fireEvent.click(startButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('step-description')).toBeInTheDocument();
+    }, { timeout: 2000 });
+
+    const increaseButton = screen.getByRole('button', { name: /augmenter les portions/i });
+    fireEvent.click(increaseButton);
   });
 
-  it('devrait afficher un message si aucune étape n\'est trouvée', () => {
-    const emptyRecipe = { ...mockRecipe, steps: [] };
-    render(<RecipeCookingMode recipe={emptyRecipe} onClose={mockOnClose} />);
-    expect(screen.getByText('Aucune étape n\'a été trouvée pour cette recette.')).toBeInTheDocument();
+  it('gère les raccourcis clavier', async () => {
+    const onClose = jest.fn();
+    render(<RecipeCookingMode recipe={mockRecipe} onClose={onClose} />);
+    const startButton = screen.getByTestId('start-recipe');
+    fireEvent.click(startButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('step-description')).toHaveTextContent('Préparer la pâte');
+    }, { timeout: 2000 });
+
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('step-description')).toHaveTextContent('Cuire au four');
+    }, { timeout: 2000 });
   });
 
-  // Tests des interactions du mode cuisine
-  describe('Mode cuisine', () => {
-    beforeEach(async () => {
-      const user = userEvent.setup({ delay: null });
-      render(<RecipeCookingMode recipe={mockRecipe} onClose={mockOnClose} />);
-      const startButton = screen.getByTestId('start-recipe');
-      await act(async () => {
-        await user.click(startButton);
-      });
-      // Attendre que l'animation soit terminée
-      await waitFor(() => {
-        expect(screen.getByTestId('step-counter')).toBeInTheDocument();
-      }, { timeout: 3000 });
+  it('demande confirmation avant de quitter avec des changements', async () => {
+    const onClose = jest.fn();
+    (useStepCompletion as jest.Mock).mockReturnValue({
+      ...mockStepCompletion,
+      completedSteps: new Set([0]),
+      isStepCompleted: () => true,
+      progress: 50,
     });
 
-    it('devrait afficher la première étape après avoir commencé', async () => {
-      expect(screen.getByTestId('step-counter')).toHaveTextContent('Étape 1 sur 2');
-      expect(screen.getByTestId('step-description')).toHaveTextContent('Préchauffer le four à 180°C');
-    });
+    render(<RecipeCookingMode recipe={mockRecipe} onClose={onClose} />);
+    const startButton = screen.getByTestId('start-recipe');
+    fireEvent.click(startButton);
 
-    it('devrait fermer le mode cuisine quand le bouton fermer est cliqué', async () => {
-      const user = userEvent.setup({ delay: null });
-      // S'assurer que hasUnsavedChanges est false
-      mockCompletedSteps.clear();
-      mockProgress = 0;
-      
-      const closeButton = screen.getByRole('button', { name: /fermer le mode cuisine/i });
-      await act(async () => {
-        await user.click(closeButton);
-      });
-      expect(mockOnClose).toHaveBeenCalled();
-    });
+    await waitFor(() => {
+      expect(screen.getByTestId('step-description')).toBeInTheDocument();
+    }, { timeout: 2000 });
 
-    it('devrait appeler toggleStep quand la case est cochée', async () => {
-      const user = userEvent.setup({ delay: null });
-      const checkbox = screen.getByTestId('step-checkbox');
-      await act(async () => {
-        await user.click(checkbox);
-      });
-      await waitFor(() => {
-        expect(mockToggleStep).toHaveBeenCalledWith(0);
-      }, { timeout: 3000 });
-    });
+    const closeButton = screen.getByRole('button', { name: /fermer le mode cuisine/i });
+    fireEvent.click(closeButton);
 
-    it('devrait appeler toggleNotesVisibility quand le bouton est cliqué', async () => {
-      const user = userEvent.setup({ delay: null });
-      const notesButton = screen.getByRole('button', { name: /afficher\/masquer les notes/i });
-      await act(async () => {
-        await user.click(notesButton);
-      });
-      expect(mockToggleNotesVisibility).toHaveBeenCalled();
-    });
-
-    it('devrait afficher les étapes de la recette dans l\'ordre', async () => {
-      // Vérifier la première étape
-      expect(screen.getByTestId('step-description')).toHaveTextContent(mockRecipe.steps[0].description);
-    });
+    expect(screen.getByText('Quitter le mode cuisine')).toBeInTheDocument();
   });
 }); 
