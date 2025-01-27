@@ -2,67 +2,84 @@
 
 import Link from 'next/link';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
+import { Playfair_Display } from 'next/font/google';
 
-const navigation = {
-  main: [
-    { name: 'Accueil', href: '/' },
-    { name: 'Recettes', href: '/recettes' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'À propos', href: '/a-propos' },
-    { name: 'Contact', href: '/contact' },
-    { name: 'Mentions légales', href: '/mentions-legales' },
-  ],
-  social: [
-    {
-      name: 'Facebook',
-      href: '#',
-      icon: Facebook,
-    },
-    {
-      name: 'Instagram',
-      href: '#',
-      icon: Instagram,
-    },
-    {
-      name: 'Twitter',
-      href: '#',
-      icon: Twitter,
-    },
-  ],
-};
+const playfair = Playfair_Display({ subsets: ['latin'] });
 
 export default function Footer() {
   return (
-    <footer className="bg-white">
-      <div className="mx-auto max-w-7xl overflow-hidden px-6 py-20 sm:py-24 lg:px-8">
-        <nav className="-mb-6 columns-2 sm:flex sm:justify-center sm:space-x-12" aria-label="Footer">
-          {navigation.main.map((item) => (
-            <div key={item.name} className="pb-6">
-              <Link href={item.href} className="text-sm leading-6 text-gray-600 hover:text-pastry-600">
-                {item.name}
-              </Link>
-            </div>
-          ))}
-        </nav>
-
-        <div className="mt-10 flex justify-center space-x-10">
-          {navigation.social.map((item) => (
-            <Link key={item.name} href={item.href} className="text-gray-400 hover:text-pastry-600">
-              <span className="sr-only">{item.name}</span>
-              <item.icon className="h-6 w-6" aria-hidden="true" />
+    <footer className="bg-gray-50">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid md:grid-cols-4 gap-8">
+          {/* Logo et Description */}
+          <div className="md:col-span-2">
+            <Link href="/" className={`text-2xl font-light ${playfair.className}`}>
+              Le Monde Sucré
             </Link>
-          ))}
+            <p className="mt-4 text-gray-600">
+              Découvrez l'art de la pâtisserie française à travers des recettes authentiques et élégantes.
+            </p>
+          </div>
+
+          {/* Navigation */}
+          <div>
+            <h3 className="font-medium mb-4">Navigation</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/recettes" className="text-gray-600 hover:text-pink-500 transition-colors">
+                  Recettes
+                </Link>
+              </li>
+              <li>
+                <Link href="/a-propos" className="text-gray-600 hover:text-pink-500 transition-colors">
+                  À propos
+                </Link>
+              </li>
+              <li>
+                <Link href="/recherche" className="text-gray-600 hover:text-pink-500 transition-colors">
+                  Recherche
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Réseaux Sociaux */}
+          <div>
+            <h3 className="font-medium mb-4">Suivez-nous</h3>
+            <div className="flex space-x-4">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-pink-500 transition-colors"
+              >
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-pink-500 transition-colors"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-pink-500 transition-colors"
+              >
+                <Twitter className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-10 text-center">
-          <p className="text-sm leading-5 text-gray-500">
-            &copy; {new Date().getFullYear()} Le Monde Sucré de Linda. Tous droits réservés.
+        {/* Copyright */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <p className="text-center text-gray-600 text-sm">
+            © {new Date().getFullYear()} Le Monde Sucré de Linda. Tous droits réservés.
           </p>
-          <div className="mt-4">
-            <Link href="/newsletter" className="text-sm leading-5 text-gray-500 hover:text-pastry-600">
-              S'abonner à la newsletter
-            </Link>
-          </div>
         </div>
       </div>
     </footer>
