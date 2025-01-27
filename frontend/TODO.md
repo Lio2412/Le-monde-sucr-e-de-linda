@@ -55,10 +55,18 @@
 - [x] Navigation au clavier
 - [x] Contraste et lisibilité
 
+## 🔄 En Cours de Développement
+- [ ] Mode "Cuisine" étape par étape
+  - [ ] Interface utilisateur du mode étape par étape
+  - [ ] Navigation entre les étapes
+  - [ ] Timer intégré pour chaque étape
+  - [ ] Liste des ingrédients nécessaires
+  - [ ] Mode plein écran
+  - [ ] Commandes vocales (optionnel)
+
 ## 🚧 Améliorations Prioritaires
 
 ### Phase 1 - Expérience Utilisateur
-- [ ] Mode "Cuisine" étape par étape
 - [ ] Conversion des quantités d'ingrédients
 - [ ] Suggestions de recettes similaires
 - [ ] Filtres avancés pour les recettes
