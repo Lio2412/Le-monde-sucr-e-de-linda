@@ -57,7 +57,7 @@
 
 ## 🔄 En Cours de Développement
 - [ ] Mode "Cuisine" étape par étape
-  - [ ] Interface utilisateur du mode étape par étape
+  - [x] Interface utilisateur du mode étape par étape
   - [ ] Navigation entre les étapes
   - [ ] Timer intégré pour chaque étape
   - [ ] Liste des ingrédients nécessaires
