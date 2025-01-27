@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Recipe } from '@/types/recipe';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,6 +10,8 @@ import { StepTimer } from '@/components/recipe/cooking-mode/StepTimer';
 import { useToast } from '@/components/ui/use-toast';
 import { IngredientsList } from '@/components/recipe/cooking-mode/IngredientsList';
 import { useFullscreen } from '@/hooks/useFullscreen';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { KeyboardShortcutsDialog } from '@/components/recipe/cooking-mode/KeyboardShortcutsDialog';
 
 interface RecipeCookingModeProps {
   recipe: Recipe;
@@ -22,6 +24,8 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [showIngredients, setShowIngredients] = useState(true);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
   const { toast } = useToast();
   const containerRef = useRef<HTMLDivElement>(null);
   const { isFullscreen, toggleFullscreen, isEnabled } = useFullscreen(containerRef);
@@ -56,6 +60,7 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
   }, [currentStepIndex]);
 
   const handleTimerComplete = useCallback(() => {
+    setIsTimerRunning(false);
     toast({
       title: "Minuteur terminé !",
       description: "L'étape est terminée, vous pouvez passer à la suivante.",
@@ -63,27 +68,29 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
     });
   }, [toast]);
 
-  // Gestion des raccourcis clavier
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case 'ArrowRight':
-        case 'n':
-          goToNextStep();
-          break;
-        case 'ArrowLeft':
-        case 'p':
-          goToPreviousStep();
-          break;
-        case 'Escape':
-          onClose();
-          break;
-      }
-    };
+  const toggleTimer = useCallback(() => {
+    setIsTimerRunning(prev => !prev);
+  }, []);
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [goToNextStep, goToPreviousStep, onClose]);
+  const resetTimer = useCallback(() => {
+    setIsTimerRunning(false);
+  }, []);
+
+  const toggleIngredientsVisibility = useCallback(() => {
+    setShowIngredients(prev => !prev);
+  }, []);
+
+  // Utilisation du hook des raccourcis clavier
+  const { shortcuts } = useKeyboardShortcuts({
+    onNextStep: goToNextStep,
+    onPreviousStep: goToPreviousStep,
+    onClose,
+    onToggleFullscreen: toggleFullscreen,
+    onToggleTimer: stepDuration > 0 ? toggleTimer : undefined,
+    onResetTimer: stepDuration > 0 ? resetTimer : undefined,
+    onToggleIngredients: toggleIngredientsVisibility,
+    isTimerEnabled: stepDuration > 0,
+  });
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -120,6 +127,7 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
             <h1 className="text-xl font-semibold">{recipe.title}</h1>
           </div>
           <div className="flex items-center gap-2">
+            <KeyboardShortcutsDialog shortcuts={shortcuts} />
             {isEnabled && (
               <Button
                 variant="ghost"
@@ -142,31 +150,36 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
       <div className="container mx-auto h-[calc(100vh-4rem)] py-8 px-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
           {/* Panneau latéral */}
-          <div className="lg:col-span-1 space-y-6 overflow-auto">
-            <Card className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Ingrédients</h2>
-              <IngredientsList
-                ingredients={recipe.ingredients || []}
-                defaultServings={recipe.servings || 1}
-              />
-            </Card>
-
-            {stepDuration > 0 && (
+          {showIngredients && (
+            <div className="lg:col-span-1 space-y-6 overflow-auto">
               <Card className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Timer className="w-5 h-5 text-primary" />
-                  <h2 className="text-lg font-semibold">Minuteur</h2>
-                </div>
-                <StepTimer
-                  duration={stepDuration}
-                  onComplete={handleTimerComplete}
+                <h2 className="text-lg font-semibold mb-4">Ingrédients</h2>
+                <IngredientsList
+                  ingredients={recipe.ingredients || []}
+                  defaultServings={recipe.servings || 1}
                 />
               </Card>
-            )}
-          </div>
+
+              {stepDuration > 0 && (
+                <Card className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Timer className="w-5 h-5 text-primary" />
+                    <h2 className="text-lg font-semibold">Minuteur</h2>
+                  </div>
+                  <StepTimer
+                    duration={stepDuration}
+                    onComplete={handleTimerComplete}
+                    isRunning={isTimerRunning}
+                    onToggle={toggleTimer}
+                    onReset={resetTimer}
+                  />
+                </Card>
+              )}
+            </div>
+          )}
 
           {/* Étape courante */}
-          <Card className="lg:col-span-2 flex flex-col p-6 overflow-hidden">
+          <Card className={`${showIngredients ? 'lg:col-span-2' : 'lg:col-span-3'} flex flex-col p-6 overflow-hidden`}>
             <div className="flex-1">
               <div className="flex flex-col space-y-6">
                 <div className="flex items-center justify-between">

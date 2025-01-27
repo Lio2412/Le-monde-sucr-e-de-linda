@@ -1,15 +1,24 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Pause, Play, RotateCcw } from 'lucide-react';
 
 interface StepTimerProps {
   duration: number; // en minutes
   onComplete: () => void;
+  isRunning?: boolean;
+  onToggle?: () => void;
+  onReset?: () => void;
 }
 
-export function StepTimer({ duration, onComplete }: StepTimerProps) {
+export function StepTimer({ 
+  duration, 
+  onComplete,
+  isRunning: externalIsRunning,
+  onToggle,
+  onReset,
+}: StepTimerProps) {
   const [timeLeft, setTimeLeft] = useState(duration * 60); // Conversion en secondes
   const [isRunning, setIsRunning] = useState(false);
   const [originalTitle] = useState(document.title);
@@ -20,10 +29,12 @@ export function StepTimer({ duration, onComplete }: StepTimerProps) {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  const reset = useCallback(() => {
-    setTimeLeft(duration * 60);
-    setIsRunning(false);
-  }, [duration]);
+  // Utiliser l'état externe du timer s'il est fourni
+  useEffect(() => {
+    if (externalIsRunning !== undefined) {
+      setIsRunning(externalIsRunning);
+    }
+  }, [externalIsRunning]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -57,10 +68,17 @@ export function StepTimer({ duration, onComplete }: StepTimerProps) {
   }, [timeLeft, isRunning, originalTitle]);
 
   const toggleTimer = () => {
-    setIsRunning(!isRunning);
+    if (onToggle) {
+      onToggle();
+    } else {
+      setIsRunning(!isRunning);
+    }
   };
 
   const resetTimer = () => {
+    if (onReset) {
+      onReset();
+    }
     setIsRunning(false);
     setTimeLeft(duration * 60);
   };

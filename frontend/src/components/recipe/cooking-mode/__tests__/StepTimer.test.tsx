@@ -6,11 +6,15 @@ import '@testing-library/jest-dom';
 
 describe('StepTimer', () => {
   const mockOnComplete = jest.fn();
+  const mockOnToggle = jest.fn();
+  const mockOnReset = jest.fn();
   const originalTitle = document.title;
 
   beforeEach(() => {
     jest.useFakeTimers();
     mockOnComplete.mockClear();
+    mockOnToggle.mockClear();
+    mockOnReset.mockClear();
     document.title = originalTitle;
   });
 
@@ -24,71 +28,154 @@ describe('StepTimer', () => {
     expect(screen.getByText('5:00')).toBeInTheDocument();
   });
 
-  it('devrait démarrer et mettre en pause le timer', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(<StepTimer duration={5} onComplete={mockOnComplete} />);
+  describe('Mode contrôlé', () => {
+    it('devrait utiliser l\'état externe pour le timer', () => {
+      const { rerender } = render(
+        <StepTimer
+          duration={5}
+          onComplete={mockOnComplete}
+          isRunning={true}
+          onToggle={mockOnToggle}
+          onReset={mockOnReset}
+        />
+      );
 
-    // Démarrer le timer
-    const startButton = screen.getByRole('button', { name: /démarrer/i });
-    await user.click(startButton);
+      // Avancer d'une seconde
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
 
-    // Avancer d'une seconde
-    act(() => {
-      jest.advanceTimersByTime(1000);
+      expect(screen.getByText('4:59')).toBeInTheDocument();
+
+      // Mettre en pause via l'état externe
+      rerender(
+        <StepTimer
+          duration={5}
+          onComplete={mockOnComplete}
+          isRunning={false}
+          onToggle={mockOnToggle}
+          onReset={mockOnReset}
+        />
+      );
+
+      // Avancer encore d'une seconde
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      // Le temps ne devrait pas avoir changé
+      expect(screen.getByText('4:59')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('4:59')).toBeInTheDocument();
+    it('devrait appeler onToggle quand le bouton est cliqué', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(
+        <StepTimer
+          duration={5}
+          onComplete={mockOnComplete}
+          isRunning={false}
+          onToggle={mockOnToggle}
+          onReset={mockOnReset}
+        />
+      );
 
-    // Mettre en pause
-    const pauseButton = screen.getByRole('button', { name: /pause/i });
-    await user.click(pauseButton);
+      const toggleButton = screen.getByRole('button', { name: /démarrer/i });
+      await user.click(toggleButton);
 
-    // Avancer encore d'une seconde
-    act(() => {
-      jest.advanceTimersByTime(1000);
+      expect(mockOnToggle).toHaveBeenCalledTimes(1);
     });
 
-    // Le temps ne devrait pas avoir changé
-    expect(screen.getByText('4:59')).toBeInTheDocument();
+    it('devrait appeler onReset quand le bouton est cliqué', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(
+        <StepTimer
+          duration={5}
+          onComplete={mockOnComplete}
+          isRunning={true}
+          onToggle={mockOnToggle}
+          onReset={mockOnReset}
+        />
+      );
+
+      // Avancer de quelques secondes
+      act(() => {
+        jest.advanceTimersByTime(2000);
+      });
+
+      const resetButton = screen.getByRole('button', { name: /réinitialiser/i });
+      await user.click(resetButton);
+
+      expect(mockOnReset).toHaveBeenCalledTimes(1);
+    });
   });
 
-  it('devrait appeler onComplete quand le temps est écoulé', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(<StepTimer duration={1} onComplete={mockOnComplete} />);
+  describe('Mode non contrôlé', () => {
+    it('devrait démarrer et mettre en pause le timer', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<StepTimer duration={5} onComplete={mockOnComplete} />);
 
-    // Démarrer le timer
-    const startButton = screen.getByRole('button', { name: /démarrer/i });
-    await user.click(startButton);
+      // Démarrer le timer
+      const startButton = screen.getByRole('button', { name: /démarrer/i });
+      await user.click(startButton);
 
-    // Avancer d'une minute
-    act(() => {
-      jest.advanceTimersByTime(60000);
+      // Avancer d'une seconde
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      expect(screen.getByText('4:59')).toBeInTheDocument();
+
+      // Mettre en pause
+      const pauseButton = screen.getByRole('button', { name: /pause/i });
+      await user.click(pauseButton);
+
+      // Avancer encore d'une seconde
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      // Le temps ne devrait pas avoir changé
+      expect(screen.getByText('4:59')).toBeInTheDocument();
     });
 
-    expect(mockOnComplete).toHaveBeenCalledTimes(1);
-    expect(screen.getByText('0:00')).toBeInTheDocument();
-  });
+    it('devrait appeler onComplete quand le temps est écoulé', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<StepTimer duration={1} onComplete={mockOnComplete} />);
 
-  it('devrait réinitialiser le timer', async () => {
-    const user = userEvent.setup({ delay: null });
-    render(<StepTimer duration={5} onComplete={mockOnComplete} />);
+      // Démarrer le timer
+      const startButton = screen.getByRole('button', { name: /démarrer/i });
+      await user.click(startButton);
 
-    // Démarrer le timer
-    const startButton = screen.getByRole('button', { name: /démarrer/i });
-    await user.click(startButton);
+      // Avancer d'une minute
+      act(() => {
+        jest.advanceTimersByTime(60000);
+      });
 
-    // Avancer de 2 secondes
-    act(() => {
-      jest.advanceTimersByTime(2000);
+      expect(mockOnComplete).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('0:00')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('4:58')).toBeInTheDocument();
+    it('devrait réinitialiser le timer', async () => {
+      const user = userEvent.setup({ delay: null });
+      render(<StepTimer duration={5} onComplete={mockOnComplete} />);
 
-    // Réinitialiser
-    const resetButton = screen.getByRole('button', { name: /réinitialiser/i });
-    await user.click(resetButton);
+      // Démarrer le timer
+      const startButton = screen.getByRole('button', { name: /démarrer/i });
+      await user.click(startButton);
 
-    expect(screen.getByText('5:00')).toBeInTheDocument();
+      // Avancer de 2 secondes
+      act(() => {
+        jest.advanceTimersByTime(2000);
+      });
+
+      expect(screen.getByText('4:58')).toBeInTheDocument();
+
+      // Réinitialiser
+      const resetButton = screen.getByRole('button', { name: /réinitialiser/i });
+      await user.click(resetButton);
+
+      expect(screen.getByText('5:00')).toBeInTheDocument();
+    });
   });
 
   it('devrait désactiver les boutons correctement', () => {
