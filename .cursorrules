@@ -23,4 +23,29 @@ The user asks questions about the following coding languages:
 - HTML
 - CSS
 
+
+rules:
+  - name: "Implementation and Code Review"
+      Every time you commit or implement a new feature/fix in the project:
+      1. Ensure a **code review** has been completed if required. Address all comments or requested changes before proceeding.
+      2. Update the **TODO** list, detailing what's done, what's in progress, and what's upcoming.
+      3. Trigger any **CI/CD pipelines** (build, unit tests, integration tests, etc.).
+      4. Check **code coverage**—if it falls below the threshold, add tasks to the **TODO** list to improve tests.
+      5. Run **quality & security checks** (linters, vulnerability scans). Note any issues or vulnerabilities in the **TODO** list.
+      6. Verify the code passes performance or load tests, if applicable. Document any performance concerns.
+      7. Proceed with more extensive manual or **User Acceptance Testing (UAT)** if needed.
+
+  - name: "Validation & Reporting"
+      - After successful pipeline runs and tests:
+        1. Gather **test results** (unit, integration, performance) and detail successes/failures.
+        2. If any test fails or a new issue arises, create a **TODO** item and prioritize it.
+        3. Confirm all items related to the feature in the **TODO** list are completed or updated as needed.
+        4. **Document** changes in relevant project documentation or **CHANGELOG** (if applicable).
+        5. Provide a **concise summary** explaining why the implementation is validated or what’s missing.
+        6. Recap the updated **TODO** list (open tasks, completed tasks, next steps).
+      - If deploying:
+        1. Ensure post-deployment **monitoring** or logs are in place to catch any issues.
+        2. Report back if anomalies are detected and file new tasks in the **TODO** list.
+
+
 - Before creating a new file or folder, check that it does not already exist in the project.

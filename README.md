@@ -1,140 +1,77 @@
 # Le Monde Sucré de Linda
 
-Blog de pâtisserie élégant développé avec Next.js et Node.js, mettant en valeur des recettes gourmandes dans un design minimaliste et raffiné.
+Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node.js, mettant en valeur des recettes gourmandes dans un design minimaliste et raffiné.
 
-## État d'Avancement du Projet
+## 🌟 Fonctionnalités
 
-### ✅ Fonctionnalités Implémentées
+### Mode Cuisine
+- Mode cuisine interactif avec timer intégré
+- Système de notes pour les étapes
+- Marquage des étapes complétées
+- Mode plein écran avec Wake Lock API
+- Raccourcis clavier avec boîte de dialogue
+- Indicateur de progression
 
-#### Architecture & Configuration
-- [x] Configuration Next.js avec TypeScript
-- [x] Mise en place de TailwindCSS
-- [x] Configuration des providers (Motion, Theme, SWR)
-- [x] Gestion des métadonnées et SEO
-- [x] Structure de dossiers organisée
-- [x] Configuration du backend Node.js/Express
-- [x] Mise en place de MongoDB
+### Interface & Design
+- Design responsive et moderne avec Tailwind CSS
+- Animations fluides avec Framer Motion
+- SEO optimisé avec métadonnées dynamiques
+- Optimisation des images avec next/image
+- Mode d'impression des recettes
+- Système de partage social
 
-#### Composants de Base
-- [x] Header avec navigation responsive
-- [x] Footer avec liens et réseaux sociaux
-- [x] Layout principal
-- [x] Composants UI réutilisables
-- [x] Design système cohérent
+## 🚧 État d'Avancement
 
-#### Fonctionnalités Principales
-- [x] Système de newsletter avec formulaire réutilisable
-- [x] Système de commentaires avec likes
-- [x] Système de notation des recettes
-- [x] Gestion des erreurs et optimisations
-- [x] Animations avec Framer Motion
+### ✅ Fonctionnalités Complétées
+- Configuration complète de Next.js avec TypeScript
+- Mise en place de TailwindCSS et Framer Motion
+- Composants UI réutilisables avec Shadcn/ui
+- Optimisation des images et gestion du SEO
+- Mode cuisine avec timer et notes
+- Tests unitaires des composants principaux
 
-### 🚧 Fonctionnalités en Cours
+### 🔄 En Développement
+- Système d'authentification
+- Gestion des favoris
+- Système de commentaires
+- Recherche et filtrage des recettes
+- Amélioration de l'accessibilité
+- Support des raccourcis clavier pour tablettes
 
-#### Pages Principales
-- [ ] Page d'accueil avec mise en avant des recettes
-- [ ] Page de listing des recettes avec filtres
-- [ ] Page de détail des recettes
-- [ ] Page de blog
-- [ ] Page À propos
-- [ ] Page de contact
+## 🛠 Technologies
 
-#### Authentification
-- [ ] Système de connexion/inscription
-- [ ] Profil utilisateur
-- [ ] Tableau de bord utilisateur
-- [ ] Gestion des favoris
+### Frontend
+- Next.js 14
+- TypeScript 5
+- TailwindCSS 3
+- Framer Motion
+- Shadcn/ui
+- Lucide React
+- SWR pour la gestion du cache
 
-#### Fonctionnalités Avancées
-- [ ] Système de recherche avancé
-- [ ] Filtres de recettes (catégories, temps, difficulté)
-- [ ] Système de tags
-- [ ] Mode d'impression des recettes
-- [ ] Partage sur réseaux sociaux
+### Backend
+- Node.js avec Express
+- MongoDB avec Mongoose
+- JWT pour l'authentification
+- Multer pour la gestion des fichiers
+- Jest pour les tests
 
-### 📋 Prochaines Étapes
-1. Développement des pages principales
-2. Implémentation du système d'authentification
-3. Mise en place du système de recherche
-4. Intégration des fonctionnalités sociales avancées
-5. Tests et optimisations de performance
-6. Déploiement et monitoring
+### Outils de Développement
+- ESLint
+- Prettier
+- Husky
+- Jest
+- GitHub Actions
 
-## Design & Interface
+## 📦 Installation
 
-### 🎨 Éléments de Design
-- **Typographie** : Utilisation de Playfair Display pour les titres
-- **Palette de couleurs** : Rose pastel, blanc et gris pour une ambiance douce
-- **Images** : Format carré avec effets de transition subtils
-- **Animations** : Transitions fluides avec Framer Motion
-
-### 📱 Sections Principales
-1. **En-tête**
-   - Navigation épurée
-   - Barre décorative rose pastel
-   - Menu responsive avec Tailwind CSS
-
-2. **Hero Section**
-   - Grande image carrée optimisée
-   - Titre élégant avec Playfair Display
-   - Animations fluides avec Framer Motion
-
-3. **Section Recettes**
-   - Grille responsive avec Tailwind CSS
-   - Badges de catégorie stylisés
-   - Lazy loading des images
-
-## Fonctionnalités Détaillées
-
-### 📧 Système de Newsletter
-- **Formulaire d'Inscription**
-  - Design minimal et standard
-  - Validation des emails
-  - États de chargement
-  - Animations fluides
-  - Notifications avec Sonner
-- **Points d'Intégration**
-  - Page d'accueil (version minimale)
-  - Page À propos (version standard)
-  - Formulaire d'inscription
-  - Tableau de bord
-
-### 🤝 Fonctionnalités Sociales
-- **Système de Partage**
-  - Facebook, Instagram, Twitter
-  - Copie de lien rapide
-  - Interface intuitive
-- **Commentaires**
-  - Temps réel
-  - Likes et réponses
-  - Interface moderne
-- **Notes**
-  - Système 5 étoiles
-  - Note moyenne
-  - Mises à jour en temps réel
-
-## Prérequis
-
+### Prérequis
 - Node.js >= 18.0.0
 - MongoDB >= 6.0
 - npm >= 9.0.0 ou yarn >= 1.22.0
 - Git
 
-## Structure du Projet
-
-```
-le-monde-sucre-de-linda/
-├── backend/              # API Node.js/Express
-│   ├── src/             # Code source
-│   ├── tests/           # Tests unitaires et d'intégration
-│   └── package.json     # Dépendances backend
-└── frontend/            # Application Next.js
-    ├── src/             # Code source
-    ├── public/          # Assets statiques
-    └── package.json     # Dépendances frontend
-```
-
-## Installation
+### Configuration
 
 1. Cloner le projet :
 ```bash
@@ -162,7 +99,7 @@ cp .env.example .env.local
 # NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
 
-## Démarrage
+## 🚀 Démarrage
 
 1. Démarrer MongoDB :
 ```bash
@@ -189,32 +126,62 @@ L'application sera accessible à :
 - Backend : http://localhost:5000
 - API Documentation : http://localhost:5000/api-docs
 
-## Technologies Utilisées
+## 🏗 Structure du Projet
 
-### Frontend
-- Next.js 14
-- TypeScript 5
-- TailwindCSS 3
-- Framer Motion
-- Playfair Display
-- Lucide React
-- SWR pour la gestion du cache
+```
+le-monde-sucre-de-linda/
+├── backend/              # API Node.js/Express
+│   ├── src/             # Code source
+│   │   ├── controllers/ # Contrôleurs
+│   │   ├── models/     # Modèles Mongoose
+│   │   ├── routes/     # Routes API
+│   │   └── utils/      # Utilitaires
+│   ├── tests/          # Tests unitaires et d'intégration
+│   └── package.json    # Dépendances backend
+└── frontend/           # Application Next.js
+    ├── src/
+    │   ├── app/       # Pages et routes Next.js
+    │   ├── components/ # Composants React
+    │   ├── hooks/     # Custom hooks
+    │   ├── lib/       # Utilitaires
+    │   ├── types/     # Types TypeScript
+    │   └── styles/    # Styles et configurations
+    ├── public/        # Assets statiques
+    └── package.json   # Dépendances frontend
+```
 
-### Backend
-- Node.js avec Express
-- MongoDB avec Mongoose
-- JWT pour l'authentification
-- Multer pour la gestion des fichiers
-- Jest pour les tests
+## 🧪 Tests
 
-### Outils de Développement
-- ESLint
-- Prettier
-- Husky
-- Jest
-- GitHub Actions
+```bash
+# Lancer les tests unitaires
+npm run test
 
-## Contribution
+# Lancer les tests avec couverture
+npm run test:coverage
+```
+
+## 📚 Documentation
+
+- [Guide de Contribution](./CONTRIBUTING.md)
+- [Documentation API](./API.md)
+- [Guide de Style](./STYLE_GUIDE.md)
+
+## 🔄 Dernières Mises à Jour
+
+- Correction des tests du mode cuisine (RecipeCookingMode)
+- Amélioration de la gestion des hooks dans les tests
+- Correction du mock useBeforeUnload
+- Optimisation des tests avec meilleure gestion des timeouts
+- Amélioration de la gestion des animations dans les tests
+- Correction des problèmes d'accessibilité des dialogues
+- Optimisation des images avec gestion automatique des tailles
+- Correction des problèmes de rendu côté serveur
+- Amélioration du mode cuisine avec timer et notes
+- Mise à jour des dépendances vers les dernières versions
+- Correction des tests du KeyboardShortcutsDialog
+- Résolution des conflits de dépendances
+
+## 🤝 Contribution
 
 1. Fork le projet
 2. Créer une branche (`git checkout -b feature/amelioration`)
@@ -222,11 +189,11 @@ L'application sera accessible à :
 4. Push (`git push origin feature/amelioration`)
 5. Créer une Pull Request
 
-## Licence
+## 📝 Licence
 
 Ce projet est sous licence ISC. Voir le fichier `LICENSE` pour plus de détails.
 
-## Contact
+## 📧 Contact
 
 Linda - [linda@lemondesucre.fr](mailto:linda@lemondesucre.fr)
 
