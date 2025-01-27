@@ -6,6 +6,14 @@ import { Playfair_Display } from 'next/font/google';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
+const navigation = [
+  { name: 'Accueil', href: '/' },
+  { name: 'Recettes', href: '/recettes' },
+  { name: 'Blog', href: '/blog' },
+  { name: 'À propos', href: '/a-propos' },
+  { name: 'Contact', href: '/contact' },
+];
+
 export default function Footer() {
   return (
     <footer className="bg-gray-50">
@@ -25,21 +33,13 @@ export default function Footer() {
           <div>
             <h3 className="font-medium mb-4">Navigation</h3>
             <ul className="space-y-2">
-              <li>
-                <Link href="/recettes" className="text-gray-600 hover:text-pink-500 transition-colors">
-                  Recettes
-                </Link>
-              </li>
-              <li>
-                <Link href="/a-propos" className="text-gray-600 hover:text-pink-500 transition-colors">
-                  À propos
-                </Link>
-              </li>
-              <li>
-                <Link href="/recherche" className="text-gray-600 hover:text-pink-500 transition-colors">
-                  Recherche
-                </Link>
-              </li>
+              {navigation.map((item) => (
+                <li key={item.name}>
+                  <Link href={item.href} className="text-gray-600 hover:text-pink-500 transition-colors">
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
