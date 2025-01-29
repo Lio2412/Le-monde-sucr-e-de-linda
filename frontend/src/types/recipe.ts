@@ -2,6 +2,8 @@ export interface Ingredient {
   name: string;
   quantity: number;
   unit: string;
+  optional?: boolean;
+  adjustedQuantity?: number;
 }
 
 export interface RecipeStep {

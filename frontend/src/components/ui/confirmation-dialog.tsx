@@ -13,21 +13,21 @@ interface ConfirmationDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   confirmLabel?: string;
   cancelLabel?: string;
 }
 
-export function ConfirmationDialog({
+export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  title,
-  description,
-  confirmLabel = 'Confirmer',
-  cancelLabel = 'Annuler',
-}: ConfirmationDialogProps) {
+  title = "Confirmation",
+  description = "Êtes-vous sûr de vouloir effectuer cette action ?",
+  confirmLabel = "Confirmer",
+  cancelLabel = "Annuler",
+}) => {
   const handleConfirm = () => {
     onConfirm();
     onClose();
@@ -35,31 +35,22 @@ export function ConfirmationDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className="sm:max-w-[425px]"
-        aria-labelledby="confirmation-title"
-        aria-describedby="confirmation-description"
-      >
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle id="confirmation-title">{title}</DialogTitle>
-          <DialogDescription id="confirmation-description">
-            {description}
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <DialogFooter className="flex gap-2 justify-end">
+        <DialogFooter>
           <Button
             variant="outline"
             onClick={onClose}
-            aria-label={cancelLabel}
-            className="focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+            data-testid="cancel-button"
           >
             {cancelLabel}
           </Button>
           <Button
-            variant="default"
             onClick={handleConfirm}
-            aria-label={confirmLabel}
-            className="bg-red-500 hover:bg-red-600 focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            data-testid="confirm-button"
           >
             {confirmLabel}
           </Button>
@@ -67,4 +58,4 @@ export function ConfirmationDialog({
       </DialogContent>
     </Dialog>
   );
-} 
+}; 

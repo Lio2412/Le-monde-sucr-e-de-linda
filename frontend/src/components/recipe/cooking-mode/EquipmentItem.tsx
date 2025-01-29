@@ -40,8 +40,15 @@ export function EquipmentItem({ name }: EquipmentItemProps) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <li className="flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors">
-            <IconComponent className="w-5 h-5 text-primary" />
+          <li 
+            className="flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors"
+            data-testid="equipment-item"
+          >
+            <IconComponent 
+              className="w-5 h-5 text-primary" 
+              aria-hidden="true"
+              data-testid="equipment-icon"
+            />
             <span>{name}</span>
           </li>
         </TooltipTrigger>

@@ -26,15 +26,26 @@
 - [x] Système de notes pour les étapes
 - [x] Marquage des étapes complétées
 - [x] Indicateur de progression
+- [x] Historique des recettes consultées
+- [x] Adaptation des quantités en temps réel
+- [x] Confirmation avant de quitter
+- [x] Support des raccourcis clavier pour les tablettes
+- [x] Optimisation des performances
+- [x] Gestion améliorée des images
+- [x] Stabilité générale du mode cuisine
+- [x] Écran de félicitations à la fin de la recette
+- [x] Notifications multi-plateformes (son, vibration, système)
+- [x] Correction des bugs de navigation
+- [x] Amélioration de la gestion des états
 
 ## 🚧 En Cours de Développement
 
 ### Mode Cuisine
-- [ ] Historique des recettes consultées
-- [ ] Adaptation des quantités en temps réel
-- [ ] Confirmation avant de quitter
-- [ ] Amélioration de l'accessibilité des dialogues
-- [ ] Support des raccourcis clavier pour les tablettes
+- [ ] Ajout de la possibilité de partager sa réalisation
+- [ ] Système de progression visuelle plus détaillé
+- [ ] Mode hors-ligne avec synchronisation
+- [ ] Historique des modifications personnelles
+- [ ] Support des unités de mesure internationales
 
 ### Fonctionnalités Principales
 - [ ] Système d'authentification
@@ -50,7 +61,11 @@
 - [x] Tests des raccourcis clavier
 - [x] Tests du système de notes
 - [x] Tests du marquage des étapes
-- [ ] Documentation utilisateur
+- [x] Tests du RecipeCookingMode
+- [x] Tests des dialogues (KeyboardShortcuts et Confirmation)
+- [ ] Tests d'intégration
+- [ ] Tests de performance
+- [ ] Documentation utilisateur complète
 - [ ] Guide des raccourcis clavier
 - [ ] Documentation API
 - [ ] Guide de contribution
@@ -65,6 +80,13 @@
 - [x] Correction des tests du KeyboardShortcutsDialog
 - [x] Résolution des conflits de dépendances
 - [x] Correction des erreurs de typage dans StepNotes
+- [x] Correction des tests du RecipeCookingMode
+- [x] Amélioration des mocks des hooks
+- [x] Gestion des timeouts dans les tests
+- [x] Correction des boucles infinies dans RecipeCookingMode
+- [x] Optimisation des effets et des états
+- [x] Correction des problèmes de typage des images
+- [x] Amélioration de la gestion des dépendances
 
 ## 📈 Améliorations Futures
 - [ ] Amélioration des performances (Core Web Vitals)
@@ -78,22 +100,22 @@
 - [ ] Système de suggestions de recettes
 
 ## 📋 Prochaines Étapes
-1. Amélioration de l'accessibilité des dialogues
-2. Support des raccourcis clavier pour les tablettes
-3. Système de confirmation avant de quitter
-4. Adaptation des quantités en temps réel
+1. Tests d'intégration avec les autres composants
+2. Tests de performance
+3. Documentation utilisateur complète
+4. Guide des raccourcis clavier
 
 ## Tests
 - [x] Correction des tests du RecipeCookingMode
 - [x] Amélioration des mocks des hooks
 - [x] Gestion des timeouts dans les tests
-- [ ] Améliorer la couverture de tests
-- [ ] Ajouter des tests d'intégration
-- [ ] Tester les cas d'erreur
+- [ ] Tests d'intégration
+- [ ] Tests de performance
+- [ ] Tests de charge
 
 ## Accessibilité
-- [ ] Ajouter DialogTitle aux DialogContent
-- [ ] Ajouter des descriptions aux dialogues
+- [x] Ajouter DialogTitle aux DialogContent
+- [x] Ajouter des descriptions aux dialogues
 - [ ] Améliorer la navigation au clavier
 - [ ] Tester avec des lecteurs d'écran
 - [ ] Ajouter des aria-labels manquants

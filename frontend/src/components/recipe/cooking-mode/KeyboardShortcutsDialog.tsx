@@ -32,7 +32,11 @@ const Shortcut = ({ keys, description }: ShortcutProps) => (
   </div>
 );
 
-export function KeyboardShortcutsDialog() {
+interface KeyboardShortcutsDialogProps {
+  shortcuts: { key: string; description: string; }[];
+}
+
+export function KeyboardShortcutsDialog({ shortcuts }: KeyboardShortcutsDialogProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -48,22 +52,17 @@ export function KeyboardShortcutsDialog() {
         <DialogHeader>
           <DialogTitle>Raccourcis Clavier</DialogTitle>
           <DialogDescription>
-            Utilisez ces raccourcis pour naviguer rapidement dans le mode cuisine.
+            Utilisez ces raccourcis pour naviguer plus rapidement dans la recette.
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4" role="list">
-          <Shortcut keys={["←", "→"]} description="Naviguer entre les étapes" />
-          <Shortcut keys={["Espace"]} description="Démarrer/Arrêter le minuteur" />
-          <Shortcut keys={["Échap"]} description="Quitter le mode plein écran" />
-          <Shortcut keys={["N"]} description="Ajouter une note à l'étape" />
-          <Shortcut
-            keys={["Ctrl", "+"]}
-            description="Augmenter le nombre de portions"
-          />
-          <Shortcut
-            keys={["Ctrl", "-"]}
-            description="Diminuer le nombre de portions"
-          />
+        <div className="space-y-2">
+          {shortcuts.map((shortcut, index) => (
+            <Shortcut
+              key={index}
+              keys={[shortcut.key]}
+              description={shortcut.description}
+            />
+          ))}
         </div>
       </DialogContent>
     </Dialog>

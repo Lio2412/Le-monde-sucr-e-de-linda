@@ -1,21 +1,38 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Clock, ChefHat, UtensilsCrossed } from 'lucide-react';
+import { Clock, ChefHat, UtensilsCrossed, Plus, Minus } from 'lucide-react';
 import { Recipe } from '@/types/recipe';
 import { IngredientsList } from './IngredientsList';
 import { EquipmentItem } from './EquipmentItem';
 import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 
 interface PreparationModeProps {
   recipe: Recipe;
-  onStart?: () => void;
+  onStart: () => void;
   children?: React.ReactNode;
+  initialServings?: number;
+  onServingsChange?: (servings: number) => void;
 }
 
-export function PreparationMode({ recipe, onStart, children }: PreparationModeProps) {
+export function PreparationMode({ 
+  recipe, 
+  onStart, 
+  children,
+  initialServings,
+  onServingsChange 
+}: PreparationModeProps) {
+  const [servings, setServings] = useState(initialServings || recipe.servings || 1);
   const totalTime = recipe.preparationTime + recipe.cookingTime;
+
+  const adjustServings = (increment: boolean) => {
+    const newValue = increment ? servings + 1 : servings - 1;
+    const finalValue = Math.max(1, newValue);
+    setServings(finalValue);
+    onServingsChange?.(finalValue);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -47,41 +64,63 @@ export function PreparationMode({ recipe, onStart, children }: PreparationModePr
     >
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Préparation de la recette</h2>
-        <div className="flex items-center gap-2 text-muted-foreground bg-accent/50 px-3 py-1.5 rounded-full">
-          <Clock className="w-5 h-5" />
-          <span>Temps total : {totalTime} minutes</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => adjustServings(false)}
+              disabled={servings <= 1}
+              className="h-8 w-8"
+              data-testid="decrease-servings"
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
+            <span className="w-12 text-center">
+              {servings} {servings > 1 ? 'parts' : 'part'}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => adjustServings(true)}
+              className="h-8 w-8"
+              data-testid="increase-servings"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground bg-accent/50 px-3 py-1.5 rounded-full">
+            <Clock className="w-5 h-5" />
+            <span>Temps total : {totalTime} minutes</span>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
-        {/* Ingrédients */}
-        <motion.div variants={itemVariants}>
-          <Card className="p-6 h-full">
-            <div className="flex items-center gap-2 mb-6">
-              <ChefHat className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold">Ingrédients nécessaires</h3>
-            </div>
+      <div className="grid gap-8 md:grid-cols-2">
+        <div>
+          <h2 className="text-2xl font-semibold mb-6">Ingrédients nécessaires</h2>
+          <Card className="p-6">
             <IngredientsList
-              ingredients={recipe.ingredients || []}
+              ingredients={recipe.ingredients}
               defaultServings={recipe.servings || 1}
+              servings={servings}
             />
           </Card>
-        </motion.div>
+        </div>
 
-        {/* Équipements */}
-        <motion.div variants={itemVariants}>
-          <Card className="p-6 h-full">
-            <div className="flex items-center gap-2 mb-6">
-              <UtensilsCrossed className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold">Équipements recommandés</h3>
-            </div>
-            <ul className="space-y-2">
-              {recipe.equipment?.map((item: string, index: number) => (
-                <EquipmentItem key={index} name={item} />
+        <div>
+          <h2 className="text-2xl font-semibold mb-6">Équipements recommandés</h2>
+          <Card className="p-6">
+            <div className="space-y-4">
+              {recipe.equipment?.map((item, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full bg-primary/50" />
+                  <span className="text-sm">{item}</span>
+                </div>
               ))}
-            </ul>
+            </div>
           </Card>
-        </motion.div>
+        </div>
       </div>
 
       <motion.div 
@@ -89,13 +128,13 @@ export function PreparationMode({ recipe, onStart, children }: PreparationModePr
         variants={itemVariants}
       >
         {children || (
-          <button
+          <Button
             data-testid="start-recipe"
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:shadow-xl h-12 px-8 py-2"
+            className="bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:shadow-xl h-12 px-8 py-2"
             onClick={onStart}
           >
             Commencer la recette
-          </button>
+          </Button>
         )}
       </motion.div>
     </motion.div>

@@ -59,6 +59,15 @@ export const useFullscreen = (ref: React.RefObject<HTMLElement>) => {
 
   const isEnabled = typeof document !== 'undefined' && document.fullscreenEnabled;
 
+  const fullscreenElement = ref.current as HTMLElement & {
+    requestFullscreen?: () => Promise<void>;
+    webkitRequestFullscreen?: () => Promise<void>;
+    mozRequestFullScreen?: () => Promise<void>;
+    msRequestFullscreen?: () => Promise<void>;
+  };
+
+  const isFullscreenSupported = Boolean(fullscreenElement && fullscreenElement.requestFullscreen);
+
   const requestWakeLock = useCallback(async () => {
     if ('wakeLock' in navigator) {
       try {
@@ -82,10 +91,10 @@ export const useFullscreen = (ref: React.RefObject<HTMLElement>) => {
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      const newIsFullscreen = document.fullscreenElement === ref.current;
-      setIsFullscreen(newIsFullscreen);
+      console.log('useFullscreen - Fullscreen state changed, document.fullscreenElement:', document.fullscreenElement);
+      setIsFullscreen(Boolean(document.fullscreenElement));
       
-      if (newIsFullscreen) {
+      if (document.fullscreenElement === ref.current) {
         requestWakeLock();
       } else {
         releaseWakeLock();
@@ -100,39 +109,58 @@ export const useFullscreen = (ref: React.RefObject<HTMLElement>) => {
   }, [ref, requestWakeLock, releaseWakeLock]);
 
   const enterFullscreen = useCallback(async () => {
-    try {
-      if (!ref.current) {
-        throw new Error('No element to make fullscreen');
-      }
-      await ref.current.requestFullscreen();
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Fullscreen error'));
+    if (!ref.current) {
+      console.warn('useFullscreen - Cannot enter fullscreen, ref.current is null');
+      return;
     }
-  }, [ref]);
+
+    if (!isFullscreenSupported) {
+      console.warn('useFullscreen - Fullscreen API not supported on this element');
+      return;
+    }
+
+    try {
+      console.log('useFullscreen - Requesting fullscreen on ref.current:', ref.current);
+      await fullscreenElement.requestFullscreen();
+    } catch (err) {
+      console.error('useFullscreen - Error requesting fullscreen:', err);
+      setError(err as Error);
+    }
+  }, [ref, isFullscreenSupported, fullscreenElement]);
 
   const exitFullscreen = useCallback(async () => {
+    if (!document.exitFullscreen) {
+      console.warn('useFullscreen - Fullscreen API not supported');
+      return;
+    }
+
     try {
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-        setError(null);
-      }
+      console.log('useFullscreen - Exiting fullscreen');
+      await document.exitFullscreen();
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Fullscreen error'));
+      console.error('useFullscreen - Error exiting fullscreen:', err);
+      setError(err as Error);
     }
   }, []);
 
-  const toggleFullscreen = useCallback(async () => {
-    if (isFullscreen) {
-      await exitFullscreen();
-    } else {
-      await enterFullscreen();
+  const toggleFullscreen = useCallback(() => {
+    if (!isEnabled || !isFullscreenSupported) {
+      console.warn('useFullscreen - Fullscreen is not supported');
+      return;
     }
-  }, [isFullscreen, enterFullscreen, exitFullscreen]);
+
+    if (isFullscreen) {
+      console.log('useFullscreen - Exiting fullscreen');
+      exitFullscreen();
+    } else {
+      console.log('useFullscreen - Entering fullscreen, containerRef:', ref);
+      enterFullscreen();
+    }
+  }, [isFullscreen, isEnabled, isFullscreenSupported, exitFullscreen, enterFullscreen]);
 
   return {
     isFullscreen,
-    isEnabled,
+    isEnabled: isEnabled && isFullscreenSupported,
     enterFullscreen,
     exitFullscreen,
     toggleFullscreen,

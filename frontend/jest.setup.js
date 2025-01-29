@@ -12,23 +12,40 @@ afterEach(() => {
 let fullscreenElement = null;
 let wakeLockSentinel = null;
 
-// Mock de l'API Fullscreen
+// Configuration globale pour les tests
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+}));
+
+// Mock pour l'API Fullscreen
 Object.defineProperty(document, 'fullscreenEnabled', {
-  configurable: true,
-  get: () => true,
+    writable: true,
+    value: true,
 });
 
 Object.defineProperty(document, 'fullscreenElement', {
-  configurable: true,
-  get: () => fullscreenElement,
-  set: (value) => {
-    fullscreenElement = value;
-  },
+    writable: true,
+    value: null,
 });
 
-document.exitFullscreen = jest.fn().mockImplementation(() => {
-  fullscreenElement = null;
-  return Promise.resolve();
+document.documentElement.requestFullscreen = jest.fn();
+document.exitFullscreen = jest.fn();
+
+// Mock pour window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: jest.fn().mockImplementation(query => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+    })),
 });
 
 // Fonction utilitaire pour les tests du mode plein écran
@@ -95,4 +112,62 @@ afterEach(() => {
   fullscreenElement = null;
   document.exitFullscreen.mockClear();
   global.mockWakeLock.reset();
-}); 
+});
+
+// Mock fetch
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () => Promise.resolve({}),
+  })
+);
+
+// Mock IntersectionObserver
+class IntersectionObserver {
+  observe() {
+    return null;
+  }
+  disconnect() {
+    return null;
+  }
+  unobserve() {
+    return null;
+  }
+}
+window.IntersectionObserver = IntersectionObserver;
+
+// Mock window.scroll
+window.scroll = jest.fn();
+window.scrollTo = jest.fn();
+
+// Mock Performance API
+if (typeof window.performance === 'undefined') {
+  window.performance = {
+    mark: jest.fn(),
+    measure: jest.fn(),
+    clearMarks: jest.fn(),
+    clearMeasures: jest.fn(),
+    getEntriesByName: jest.fn().mockReturnValue([{ duration: 0 }]),
+  };
+}
+
+// Mock requestAnimationFrame
+global.requestAnimationFrame = callback => setTimeout(callback, 0);
+global.cancelAnimationFrame = jest.fn();
+
+// Mock localStorage
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+};
+global.localStorage = localStorageMock;
+
+// Mock sessionStorage
+const sessionStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+};
+global.sessionStorage = sessionStorageMock; 

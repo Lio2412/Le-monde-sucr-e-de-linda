@@ -6,6 +6,7 @@ import { Playfair_Display } from 'next/font/google';
 import { MessageCircle, Reply, MoreVertical } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LikeButton } from '@/components/ui/like-button';
+import { Avatar } from '@/components/ui/avatar';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
@@ -63,14 +64,8 @@ export default function CommentSection({ recipeId, comments: initialComments }: 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="flex gap-4 items-start">
-          <Image
-            src="/images/default-avatar.png"
-            alt="Avatar"
-            width={40}
-            height={40}
-            className="rounded-full"
-          />
+        <div className="flex items-start space-x-4 mt-6">
+          <Avatar size={40} alt="Votre avatar" />
           <div className="flex-1">
             <textarea
               value={newComment}
@@ -101,15 +96,9 @@ export default function CommentSection({ recipeId, comments: initialComments }: 
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
           >
-            <div className="flex items-start gap-4">
-              <Image
-                src={comment.author.avatar}
-                alt={comment.author.name}
-                width={40}
-                height={40}
-                className="rounded-full"
-              />
-              <div className="flex-1">
+            <div className="flex items-start space-x-4">
+              <Avatar size={40} alt={`Avatar de ${comment.author.name}`} />
+              <div className="flex-1 space-y-1">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-medium">{comment.author.name}</h3>
                   <span className="text-sm text-gray-500">{comment.date}</span>
@@ -175,13 +164,7 @@ export default function CommentSection({ recipeId, comments: initialComments }: 
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                       >
-                        <Image
-                          src={reply.author.avatar}
-                          alt={reply.author.name}
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                        />
+                        <Avatar size={32} alt={`Avatar de ${reply.author.name}`} />
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-medium">{reply.author.name}</span>

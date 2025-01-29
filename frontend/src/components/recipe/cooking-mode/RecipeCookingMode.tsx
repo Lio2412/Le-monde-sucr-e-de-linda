@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Recipe } from '@/types/recipe';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Bell, Timer, Clock, X, Maximize2, Minimize2, StickyNote, Edit, Plus, Minus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell, Timer, Clock, X, Maximize2, Minimize2, StickyNote, Edit, Plus, Minus, ChefHat, Trophy, PartyPopper } from 'lucide-react';
 import { StepTimer } from '@/components/recipe/cooking-mode/StepTimer';
 import { useToast } from '@/components/ui/use-toast';
 import { IngredientsList } from '@/components/recipe/cooking-mode/IngredientsList';
@@ -30,13 +30,51 @@ interface RecipeCookingModeProps {
   onClose: () => void;
 }
 
+interface CompletionModeProps {
+  recipe: Recipe;
+  onClose: () => void;
+}
+
+const CompletionMode: React.FC<CompletionModeProps> = ({ recipe, onClose }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="flex flex-col items-center justify-center h-full text-center px-4"
+    >
+      <div className="flex items-center justify-center mb-6">
+        <PartyPopper className="h-16 w-16 text-pink-500 mr-4" />
+        <Trophy className="h-16 w-16 text-yellow-500" />
+      </div>
+      <h2 className="text-3xl font-bold mb-4">Félicitations !</h2>
+      <p className="text-xl text-muted-foreground mb-8">
+        Vous avez terminé la recette "{recipe.title}" avec succès !
+      </p>
+      <div className="space-y-4">
+        <p className="text-lg">
+          N'oubliez pas de prendre une photo de votre création et de la partager !
+        </p>
+        <div className="flex gap-4 justify-center">
+          <Button
+            onClick={onClose}
+            className="bg-pink-500 hover:bg-pink-600 text-white px-8"
+          >
+            Terminer
+          </Button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
   recipe: initialRecipe,
   onClose,
 }) => {
   // Ajouter les équipements par défaut si nécessaire
-  const recipe = {
+  const recipe = useMemo(() => ({
     ...initialRecipe,
+    servings: initialRecipe.servings || 1,
     equipment: initialRecipe.equipment || [
       'Four',
       'Batteur électrique',
@@ -47,16 +85,19 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
       'Spatule',
       'Papier cuisson'
     ]
-  };
+  }), [initialRecipe]);
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [showPreparation, setShowPreparation] = useState(true);
   const [showIngredients, setShowIngredients] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [servings, setServings] = useState(recipe.servings || 1);
+  const [completedIngredients, setCompletedIngredients] = useState<Set<number>>(new Set());
+  const [showCompletion, setShowCompletion] = useState(false);
 
   const { toast } = useToast();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -67,8 +108,7 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
   const {
     notes,
     updateNote,
-    toggleNotesVisibility,
-    showNotes,
+    toggleNotesVisibility: toggleNotesPanel,
     hasNotes,
     getNote,
     hasNoteForStep,
@@ -78,19 +118,34 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
   const { addToHistory } = useRecipeHistory();
   const { isTablet } = useDeviceType();
 
+  const toggleNotesVisibility = useCallback(() => {
+    setShowNotes(prev => !prev);
+    if (showIngredients) {
+      setShowIngredients(false);
+    }
+  }, [showIngredients]);
+
+  const toggleIngredientsVisibility = useCallback(() => {
+    setShowIngredients(prev => !prev);
+    if (showNotes) {
+      setShowNotes(false);
+    }
+  }, [showNotes]);
+
   // Optimisation des effets
   useEffect(() => {
     const checkUnsavedChanges = () => {
       const hasNotes = Object.values(notes).some(note => note.trim() !== '');
       const hasCompletedSteps = completedSteps.size > 0;
-      return hasNotes || hasCompletedSteps;
+      const hasCompletedIngredients = completedIngredients.size > 0;
+      const hasChanges = hasNotes || hasCompletedSteps || hasCompletedIngredients;
+      console.log('Changements détectés:', { hasNotes, hasCompletedSteps, hasCompletedIngredients, hasChanges });
+      return hasChanges;
     };
 
     const unsavedChanges = checkUnsavedChanges();
-    if (hasUnsavedChanges !== unsavedChanges) {
-      setHasUnsavedChanges(unsavedChanges);
-    }
-  }, [notes, completedSteps]);
+    setHasUnsavedChanges(unsavedChanges);
+  }, [notes, completedSteps, completedIngredients]);
 
   // Effet pour l'historique
   useEffect(() => {
@@ -110,22 +165,26 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
   }, [recipe?.id]);
 
   const handleClose = useCallback(() => {
-    if (hasUnsavedChanges) {
-      setShowExitConfirmation(true);
-    } else {
-      onClose();
-    }
-  }, [hasUnsavedChanges, onClose]);
+    console.log('handleClose appelé, hasUnsavedChanges:', hasUnsavedChanges);
+    setShowExitConfirmation(true);
+  }, [hasUnsavedChanges]);
+
+  const handleConfirmExit = useCallback(() => {
+    console.log('handleConfirmExit appelé');
+    setShowExitConfirmation(false);
+    onClose();
+  }, [onClose]);
+
+  const handleCancelExit = useCallback(() => {
+    console.log('handleCancelExit appelé');
+    setShowExitConfirmation(false);
+  }, []);
 
   // Utilisation du hook useBeforeUnload avec les callbacks
   useBeforeUnload({
     shouldPreventUnload: hasUnsavedChanges,
-    onConfirm: () => {
-      onClose();
-    },
-    onCancel: () => {
-      // Ne rien faire, l'utilisateur reste sur la page
-    }
+    onConfirm: handleConfirmExit,
+    onCancel: handleCancelExit
   });
 
   useEffect(() => {
@@ -154,8 +213,11 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
     );
   }
 
-  const currentStep = recipe.steps[currentStepIndex];
-  const stepDuration = currentStep?.duration || 0;
+  // Optimisation des valeurs calculées
+  const currentStep = useMemo(() => recipe.steps[currentStepIndex], [recipe.steps, currentStepIndex]);
+  const stepDuration = useMemo(() => currentStep?.duration || 0, [currentStep]);
+  const isLastStep = useMemo(() => currentStepIndex === recipe.steps.length - 1, [currentStepIndex, recipe.steps.length]);
+  const allStepsCompleted = useMemo(() => progress === 100, [progress]);
 
   const goToNextStep = useCallback(() => {
     if (currentStepIndex < recipe.steps.length - 1) {
@@ -190,41 +252,118 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
     setIsTimerRunning(false);
   }, []);
 
-  const toggleIngredientsVisibility = useCallback(() => {
-    setShowIngredients(prev => !prev);
+  const toggleIngredient = useCallback((index: number) => {
+    setCompletedIngredients(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
   }, []);
 
   // Utilisation du hook des raccourcis clavier
   const { shortcuts } = useKeyboardShortcuts({
-    onNextStep: goToNextStep,
-    onPreviousStep: goToPreviousStep,
+    onNextStep: () => {
+      goToNextStep();
+    },
+    onPreviousStep: () => {
+      goToPreviousStep();
+    },
     onClose,
-    onToggleFullscreen: toggleFullscreen,
+    onToggleFullscreen: () => {
+      toggleFullscreen();
+    },
     onToggleTimer: stepDuration > 0 ? toggleTimer : undefined,
     onResetTimer: stepDuration > 0 ? resetTimer : undefined,
     onToggleIngredients: toggleIngredientsVisibility,
-    onToggleStep: () => toggleStep(currentStepIndex),
+    onToggleStep: () => {
+      toggleStep(currentStepIndex);
+    },
     onToggleNotes: toggleNotesVisibility,
     isTimerEnabled: stepDuration > 0,
   });
 
   // Optimisation de l'effet de progression automatique
   useEffect(() => {
-    if (!isStepCompleted(currentStepIndex) || showPreparation) return;
+    if (showPreparation) return;
+
+    // Vérifier si toutes les étapes sont complétées
+    const allStepsCompleted = Array.from({ length: recipe.steps.length }).every((_, index) => 
+      isStepCompleted(index)
+    );
+
+    console.log('Vérification des étapes:', {
+      allStepsCompleted,
+      completedSteps: Array.from(completedSteps),
+      totalSteps: recipe.steps.length,
+      currentStepIndex
+    });
+
+    // Si toutes les étapes sont complétées ou si nous sommes à la dernière étape et qu'elle est complétée
+    if ((allStepsCompleted || (currentStepIndex === recipe.steps.length - 1 && isStepCompleted(currentStepIndex))) && !showCompletion) {
+      console.log('Condition de complétion remplie !');
+      setShowCompletion(true);
+      toast({
+        title: "Félicitations !",
+        description: "Vous avez terminé toutes les étapes de la recette !",
+        duration: 5000,
+      });
+      return;
+    }
+
+    // Gérer la progression normale
+    if (isStepCompleted(currentStepIndex)) {
+      const timeoutId = setTimeout(() => {
+        if (currentStepIndex < recipe.steps.length - 1) {
+          goToNextStep();
+          toast({
+            title: "Étape complétée !",
+            description: "Passage à l'étape suivante...",
+            duration: 3000,
+          });
+        }
+      }, 1000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentStepIndex, isStepCompleted, showPreparation, recipe.steps.length, goToNextStep, toast, completedSteps, showCompletion]);
+
+  // Ajouter un gestionnaire pour marquer une étape comme complétée
+  const handleStepComplete = useCallback(() => {
+    toggleStep(currentStepIndex);
     
-    const timeoutId = setTimeout(() => {
-      if (currentStepIndex < recipe.steps.length - 1) {
-        goToNextStep();
+    // Vérifier immédiatement après avoir marqué l'étape comme complétée
+    const isLastStep = currentStepIndex === recipe.steps.length - 1;
+    if (isLastStep) {
+      const allStepsCompleted = Array.from({ length: recipe.steps.length }).every((_, index) => 
+        index === currentStepIndex || isStepCompleted(index)
+      );
+
+      console.log('Vérification finale:', { isLastStep, allStepsCompleted });
+
+      if (allStepsCompleted) {
+        setShowCompletion(true);
         toast({
-          title: "Étape complétée !",
-          description: "Passage à l'étape suivante...",
-          duration: 3000,
+          title: "Félicitations !",
+          description: "Vous avez terminé toutes les étapes de la recette !",
+          duration: 5000,
         });
       }
-    }, 1000);
+    }
+  }, [currentStepIndex, recipe.steps.length, isStepCompleted, toggleStep, toast]);
 
-    return () => clearTimeout(timeoutId);
-  }, [currentStepIndex, isStepCompleted, showPreparation]);
+  // Ajouter un log pour déboguer la progression
+  useEffect(() => {
+    console.log('État actuel:', {
+      currentStepIndex,
+      totalSteps: recipe.steps.length,
+      completedSteps: Array.from(completedSteps),
+      showCompletion
+    });
+  }, [currentStepIndex, recipe.steps.length, completedSteps, showCompletion]);
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -243,15 +382,11 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
     })
   };
 
-  const adjustQuantity = (quantity: number) => {
-    if (!recipe.servings) return quantity;
-    return (quantity * servings) / recipe.servings;
-  };
-
-  const handleServingsChange = useCallback((newServings: number) => {
-    if (newServings > 0) {
-      setServings(newServings);
-    }
+  const adjustServings = useCallback((increment: boolean) => {
+    setServings(prev => {
+      const newValue = increment ? prev + 1 : prev - 1;
+      return Math.max(1, newValue); // Empêcher les valeurs négatives
+    });
   }, []);
 
   const handleKeyboardShortcut = useCallback((e: KeyboardEvent) => {
@@ -266,7 +401,9 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
         break;
       case ' ':
         e.preventDefault();
-        toggleTimer();
+        if (stepDuration > 0) {
+          toggleTimer();
+        }
         break;
       case 'n':
       case 'N':
@@ -276,298 +413,261 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
       case '+':
         if (e.ctrlKey) {
           e.preventDefault();
-          handleServingsChange(servings + 1);
+          adjustServings(true);
         }
         break;
       case '-':
         if (e.ctrlKey) {
           e.preventDefault();
-          handleServingsChange(servings - 1);
+          adjustServings(false);
         }
         break;
     }
-  }, [goToPreviousStep, goToNextStep, toggleTimer, toggleNotesVisibility, servings, handleServingsChange, showPreparation]);
+  }, [
+    showPreparation,
+    goToPreviousStep,
+    goToNextStep,
+    stepDuration,
+    toggleTimer,
+    toggleNotesVisibility,
+    adjustServings
+  ]);
 
-  const isLastStep = currentStepIndex === recipe.steps.length - 1;
-  const allStepsCompleted = progress === 100;
-
-  const renderContent = () => {
-    if (allStepsCompleted) {
-      return (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center h-full text-center p-8"
-        >
-          <div className="mb-8">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 mx-auto"
-            >
-              <Bell className="w-8 h-8 text-primary" />
-            </motion.div>
-            <h2 className="text-2xl font-bold mb-2">Félicitations !</h2>
-            <p className="text-muted-foreground mb-6">
-              Vous avez terminé la recette "{recipe.title}" avec succès.
-            </p>
-            <div className="grid gap-2 text-sm text-muted-foreground">
-              <p>Temps total : {recipe.preparationTime + recipe.cookingTime} minutes</p>
-              <p>Difficulté : {recipe.difficulty}</p>
-              <p>Portions : {servings}</p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <Button variant="outline" onClick={onClose}>
-              Quitter
-            </Button>
-            <Button onClick={() => {
-              setCurrentStepIndex(0);
-              setShowPreparation(true);
-            }}>
-              Recommencer
-            </Button>
-          </div>
-        </motion.div>
-      );
-    }
-
-    return (
-      <AnimatePresence mode="wait" initial={false} custom={direction}>
-        <StepDisplay
-          key={currentStepIndex}
-          description={currentStep.description}
-          currentIndex={currentStepIndex}
-          totalSteps={recipe.steps.length}
-          isCompleted={isStepCompleted(currentStepIndex)}
-          onToggleComplete={() => toggleStep(currentStepIndex)}
-          duration={currentStep.duration}
-          temperature={currentStep.temperature}
-          direction={direction}
-        />
-      </AnimatePresence>
-    );
-  };
+  // Modifier le rendu du StepDisplay
+  const renderStepDisplay = useCallback(() => (
+    <StepDisplay
+      description={currentStep.description}
+      currentIndex={currentStepIndex}
+      totalSteps={recipe.steps.length}
+      isCompleted={isStepCompleted(currentStepIndex)}
+      onToggleComplete={handleStepComplete}
+      duration={stepDuration}
+      temperature={currentStep.temperature}
+      direction={direction}
+    />
+  ), [currentStep, currentStepIndex, recipe.steps.length, isStepCompleted, handleStepComplete, stepDuration, direction]);
 
   return (
-    <>
-      <div ref={containerRef} className="fixed inset-0 bg-white z-50 overflow-hidden">
-        {/* Header */}
-        <header className="sticky top-0 z-10 bg-white border-b shadow-sm">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleClose}
-                className="hover:bg-gray-100"
-                aria-label="Fermer le mode cuisine"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-              <h1 className="text-xl font-semibold">{recipe.title}</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              {!showPreparation && (
-                <>
-                  <div className="text-sm font-medium px-3 py-1 rounded-full bg-primary/10 text-primary">
-                    Progression : {progress}%
-                  </div>
+    <div
+      ref={containerRef}
+      className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex flex-col"
+      data-testid="cooking-mode"
+    >
+      {/* En-tête */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleClose}
+            className="shrink-0"
+            data-testid="close-cooking-mode-button"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+          <h2 className="text-xl font-semibold truncate">{recipe.title}</h2>
+        </div>
+        <div className="flex items-center gap-2">
+          {isEnabled && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleFullscreen}
+              className="shrink-0"
+              data-testid="fullscreen-button"
+            >
+              {isFullscreen ? (
+                <Minimize2 className="h-4 w-4" />
+              ) : (
+                <Maximize2 className="h-4 w-4" />
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Contenu principal */}
+      <div className="container mx-auto px-4 py-6 h-[calc(100vh-4rem)] flex flex-col">
+        {showPreparation ? (
+          <PreparationMode 
+            recipe={recipe} 
+            onStart={() => setShowPreparation(false)}
+            initialServings={servings}
+            onServingsChange={setServings}
+          >
+            <Button
+              data-testid="start-recipe"
+              className="bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:shadow-xl h-12 px-8 py-2"
+              onClick={() => setShowPreparation(false)}
+            >
+              Commencer la recette
+            </Button>
+          </PreparationMode>
+        ) : showCompletion ? (
+          <CompletionMode recipe={recipe} onClose={onClose} />
+        ) : (
+          <div className="flex flex-col lg:flex-row gap-6 h-full">
+            {/* Étapes de la recette */}
+            <div className="flex-1 flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleIngredientsVisibility}
+                    className="relative"
+                    data-testid="toggle-ingredients"
+                  >
+                    <ChefHat className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={toggleNotesVisibility}
-                    className="hover:bg-gray-100 relative"
-                    aria-label="Afficher/masquer les notes"
+                    className="relative"
+                    data-testid="toggle-notes"
                   >
-                    <StickyNote className="h-5 w-5" />
+                    <StickyNote className="h-4 w-4" />
                     {hasNotes && (
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
+                      <span className="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full" />
                     )}
                   </Button>
-                  <KeyboardShortcutsDialog />
-                  {isEnabled && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={toggleFullscreen}
-                      className="hover:bg-gray-100"
-                      aria-label={isFullscreen ? "Quitter le mode plein écran" : "Passer en mode plein écran"}
-                    >
-                      {isFullscreen ? (
-                        <Minimize2 className="h-5 w-5" />
-                      ) : (
-                        <Maximize2 className="h-5 w-5" />
-                      )}
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        </header>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Étape {currentStepIndex + 1} sur {recipe.steps.length}
+                </div>
+              </div>
 
-        <div className="container mx-auto h-[calc(100vh-4rem)] py-8 px-4">
-          <AnimatePresence initial={false} mode="wait">
-            {showPreparation ? (
-              <motion.div
-                key="preparation"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2 }}
-                className="h-full"
-              >
-                <PreparationMode recipe={recipe}>
-                  <button
-                    data-testid="start-recipe"
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4"
-                    onClick={() => setShowPreparation(false)}
+              <div className="flex-1 relative">
+                <AnimatePresence initial={false} custom={direction}>
+                  <motion.div
+                    key={currentStepIndex}
+                    custom={direction}
+                    variants={slideVariants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{
+                      x: { type: "spring", stiffness: 300, damping: 30 },
+                      opacity: { duration: 0.2 }
+                    }}
+                    className="absolute inset-0"
                   >
-                    Commencer la recette
-                  </button>
-                </PreparationMode>
-              </motion.div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4">
-                {/* Étape courante */}
-                <Card className={`${showIngredients ? 'lg:col-span-2' : 'lg:col-span-3'} flex flex-col p-6 overflow-hidden`}>
-                  <div className="flex-1 overflow-y-auto p-4">
-                    {renderContent()}
-                    {!allStepsCompleted && currentStep.duration && currentStep.duration > 0 && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mt-8"
-                      >
-                        <StepTimer 
-                          duration={currentStep.duration || 0} 
-                          onComplete={handleTimerComplete}
-                          isRunning={isTimerRunning}
-                          onToggle={toggleTimer}
-                          onReset={resetTimer}
-                        />
-                      </motion.div>
-                    )}
-                  </div>
-                </Card>
-
-                {/* Liste des ingrédients */}
-                {showIngredients && (
-                  <Card className="lg:col-span-2 p-6">
-                    <IngredientsList
-                      ingredients={recipe.ingredients || []}
-                      defaultServings={recipe.servings || 1}
-                    />
-                  </Card>
-                )}
-
-                {/* Colonne de droite - Notes */}
-                <AnimatePresence>
-                  {showNotes && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      className="lg:col-span-1"
-                    >
-                      <StepNotes
-                        stepIndex={currentStepIndex}
-                        note={getNote(currentStepIndex)}
-                        onUpdateNote={updateNote}
-                        onClose={toggleNotesVisibility}
-                      />
-                    </motion.div>
-                  )}
+                    {renderStepDisplay()}
+                  </motion.div>
                 </AnimatePresence>
               </div>
-            )}
-          </AnimatePresence>
-        </div>
+
+              {/* Navigation entre les étapes */}
+              <nav 
+                className="flex justify-between items-center mt-6 gap-4" 
+                role="navigation"
+                aria-label="Navigation des étapes"
+                data-testid="step-navigation"
+              >
+                <Button
+                  onClick={goToPreviousStep}
+                  disabled={currentStepIndex === 0}
+                  variant="outline"
+                  className="flex items-center gap-2 min-w-[120px]"
+                  data-testid="previous-step-button"
+                >
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                  <span>Précédent</span>
+                </Button>
+
+                {currentStep.duration && currentStep.duration > 0 && (
+                  <StepTimer
+                    duration={currentStep.duration}
+                    isRunning={isTimerRunning}
+                    onToggle={toggleTimer}
+                    onReset={resetTimer}
+                    onComplete={handleTimerComplete}
+                  />
+                )}
+
+                <Button
+                  onClick={goToNextStep}
+                  disabled={currentStepIndex === recipe.steps.length - 1}
+                  variant="outline"
+                  className="flex items-center gap-2 min-w-[120px]"
+                  data-testid="next-step-button"
+                >
+                  <span>Suivant</span>
+                  <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </nav>
+            </div>
+
+            {/* Panneau latéral */}
+            <div className="w-full lg:w-96">
+              <AnimatePresence mode="wait">
+                {showNotes && (
+                  <motion.div
+                    key="notes"
+                    initial={{ opacity: 0, x: 300 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 300 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="h-full"
+                  >
+                    <Card className="p-4 h-full">
+                      <StepNotes
+                        currentStep={currentStepIndex + 1}
+                        totalSteps={recipe.steps.length}
+                        note={getNote(currentStepIndex)}
+                        onNoteChange={(note: string) => updateNote(currentStepIndex, note)}
+                        hasNoteForStep={hasNoteForStep}
+                        onClose={() => setShowNotes(false)}
+                      />
+                    </Card>
+                  </motion.div>
+                )}
+                {showIngredients && (
+                  <motion.div
+                    key="ingredients"
+                    initial={{ opacity: 0, x: 300 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 300 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="h-full"
+                  >
+                    <Card className="p-4 h-full relative">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowIngredients(false)}
+                        className="absolute top-2 right-2 h-8 w-8"
+                        data-testid="close-ingredients"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                      <IngredientsList
+                        ingredients={recipe.ingredients}
+                        defaultServings={recipe.servings}
+                        servings={servings}
+                        onToggleIngredient={toggleIngredient}
+                        completedIngredients={completedIngredients}
+                      />
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* Dialogue de confirmation de sortie */}
       <ConfirmationDialog
         isOpen={showExitConfirmation}
-        onClose={() => setShowExitConfirmation(false)}
-        onConfirm={onClose}
+        onClose={handleCancelExit}
+        onConfirm={handleConfirmExit}
         title="Quitter le mode cuisine"
-        description="Êtes-vous sûr de vouloir quitter le mode cuisine ? Votre progression ne sera pas sauvegardée."
+        description="Êtes-vous sûr de vouloir quitter le mode cuisine ? Vos progrès ne seront pas sauvegardés."
         confirmLabel="Quitter"
-        cancelLabel="Rester"
+        cancelLabel="Annuler"
       />
-
-      {isTablet && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4 grid grid-cols-3 gap-4">
-          <div className="flex justify-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleServingsChange(servings - 1)}
-              aria-label="Diminuer les portions"
-            >
-              <Minus className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handleServingsChange(servings + 1)}
-              aria-label="Augmenter les portions"
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="flex justify-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={goToPreviousStep}
-              disabled={currentStepIndex === 0}
-              aria-label="Étape précédente"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={goToNextStep}
-              disabled={currentStepIndex === recipe.steps.length - 1}
-              aria-label="Étape suivante"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="flex justify-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTimer}
-              aria-label="Démarrer/Arrêter le minuteur"
-            >
-              <Timer className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleNotesVisibility}
-              aria-label="Ajouter une note"
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {recipe.image && (
-        <Image
-          src={recipe.image}
-          alt={recipe.title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover"
-        />
-      )}
-    </>
+    </div>
   );
 }; 

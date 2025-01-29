@@ -168,18 +168,14 @@ npm run test:coverage
 
 ## 🔄 Dernières Mises à Jour
 
-- Correction des tests du mode cuisine (RecipeCookingMode)
-- Amélioration de la gestion des hooks dans les tests
-- Correction du mock useBeforeUnload
-- Optimisation des tests avec meilleure gestion des timeouts
-- Amélioration de la gestion des animations dans les tests
-- Correction des problèmes d'accessibilité des dialogues
-- Optimisation des images avec gestion automatique des tailles
-- Correction des problèmes de rendu côté serveur
-- Amélioration du mode cuisine avec timer et notes
-- Mise à jour des dépendances vers les dernières versions
-- Correction des tests du KeyboardShortcutsDialog
-- Résolution des conflits de dépendances
+- Optimisation du mode cuisine avec meilleure gestion des effets et des états
+- Correction des problèmes de boucles infinies dans RecipeCookingMode
+- Amélioration de la gestion des images avec next/image
+- Optimisation des performances avec useCallback et useMemo
+- Meilleure gestion des dépendances dans les effets
+- Correction des problèmes de typage pour les images
+- Amélioration de la stabilité générale du mode cuisine
+- Mise à jour de la documentation et de la TODO list
 
 ## 🤝 Contribution
 

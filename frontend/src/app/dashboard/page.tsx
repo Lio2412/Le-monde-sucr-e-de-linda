@@ -9,6 +9,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import RecipeCard from '@/components/recipes/RecipeCard';
 import { useNewsletter } from '@/hooks/useNewsletter';
+import { Avatar } from '@/components/ui/avatar';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
@@ -154,14 +155,7 @@ export default function DashboardPage() {
                       Photo de profil
                     </label>
                     <div className="flex items-center gap-4">
-                      <div className="relative w-20 h-20 rounded-full overflow-hidden">
-                        <Image
-                          src="/images/default-avatar.png"
-                          alt="Photo de profil"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
+                      <Avatar size={48} alt="Votre avatar" />
                       <button
                         type="button"
                         className="px-4 py-2 text-sm text-pink-600 border border-pink-200 rounded-lg hover:bg-pink-50"
