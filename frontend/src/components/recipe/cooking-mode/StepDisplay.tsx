@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils';
 import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 
 interface StepDisplayProps {
   description: string;
@@ -50,82 +52,88 @@ export function StepDisplay({
   imageUrl,
 }: StepDisplayProps) {
   const [imageError, setImageError] = useState(false);
+  const progress = ((currentIndex + 1) / totalSteps) * 100;
 
   return (
-    <motion.div
-      custom={direction}
-      variants={slideVariants}
-      initial="enter"
-      animate="center"
-      exit="exit"
-      transition={{
-        x: { type: "spring", stiffness: 300, damping: 30 },
-        opacity: { duration: 0.2 }
-      }}
-      className={cn(
-        "rounded-lg p-6 transition-all",
-        isCompleted ? "bg-primary/5 border-primary/20" : "bg-muted border-transparent",
-        "border-2"
-      )}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-sm text-muted-foreground">
-          Étape {currentIndex + 1} sur {totalSteps}
+    <div className="space-y-6">
+      {/* Barre de progression améliorée */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center text-sm text-muted-foreground">
+          <span>Progression de la recette</span>
+          <span>{Math.round(progress)}%</span>
         </div>
-        <div className="flex items-center gap-4">
-          {temperature && (
-            <div className="flex items-center gap-2 text-sm">
-              <Thermometer className="h-4 w-4" aria-hidden="true" />
-              <span>{temperature}°C</span>
-            </div>
-          )}
+        <div className="relative">
+          <Progress value={progress} className="h-2" />
+          <div className="absolute top-3 left-0 right-0 flex justify-between">
+            {Array.from({ length: totalSteps }).map((_, index) => (
+              <div
+                key={index}
+                className={`w-4 h-4 rounded-full border-2 ${
+                  index < currentIndex
+                    ? 'bg-primary border-primary'
+                    : index === currentIndex
+                    ? 'bg-primary/50 border-primary animate-pulse'
+                    : 'bg-background border-muted'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <Card className="p-6 relative">
+        {/* Indicateurs de temps et température */}
+        <div className="absolute -top-3 right-4 flex gap-3">
           {duration && (
-            <div className="flex items-center gap-2 text-sm">
-              <Clock className="h-4 w-4" aria-hidden="true" />
+            <div className="bg-accent text-accent-foreground px-3 py-1 rounded-full flex items-center gap-2 text-sm">
+              <Clock className="w-4 h-4" />
               <span>{duration} min</span>
             </div>
           )}
-          <div className="flex items-center gap-2">
+          {temperature && (
+            <div className="bg-accent text-accent-foreground px-3 py-1 rounded-full flex items-center gap-2 text-sm">
+              <Thermometer className="w-4 h-4" />
+              <span>{temperature}°C</span>
+            </div>
+          )}
+        </div>
+
+        {/* Description de l'étape */}
+        <div className="space-y-4">
+          <p 
+            className="text-lg leading-relaxed"
+            data-testid="step-description"
+          >
+            {description}
+          </p>
+          
+          {/* Case à cocher avec animation */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center space-x-2"
+          >
             <Checkbox
-              id="complete-step"
+              id={`step-${currentIndex}`}
               checked={isCompleted}
               onCheckedChange={onToggleComplete}
-              data-testid="complete-step-button"
-              aria-label="Marquer comme terminé"
+              className="data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
             />
             <label
-              htmlFor="complete-step"
+              htmlFor={`step-${currentIndex}`}
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Marquer comme terminé
+              Marquer comme terminée
             </label>
-          </div>
+          </motion.div>
         </div>
-      </div>
-      <div className="flex-1 overflow-y-auto">
-        {imageUrl && !imageError && (
-          <div className="relative w-full h-48 mb-4">
-            <Image
-              src={imageUrl}
-              alt="Illustration de l'étape"
-              fill
-              className="object-cover rounded-lg"
-              onError={() => setImageError(true)}
-            />
-          </div>
-        )}
-        {imageError && (
-          <div className="relative w-full h-48 mb-4 bg-muted rounded-lg flex items-center justify-center">
-            <Image
-              src="/images/recipe-placeholder.jpg"
-              alt="Image invalide"
-              fill
-              className="object-cover rounded-lg"
-            />
-          </div>
-        )}
-        <p className="text-lg" data-testid="step-description">{description}</p>
-      </div>
-    </motion.div>
+
+        {/* Indicateur de progression */}
+        <div className="absolute bottom-4 right-4 text-sm text-muted-foreground">
+          Étape {currentIndex + 1} sur {totalSteps}
+        </div>
+      </Card>
+    </div>
   );
 } 

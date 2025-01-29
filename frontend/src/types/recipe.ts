@@ -42,4 +42,9 @@ export interface Recipe {
   tags: string[];
   comments?: Comment[];
   equipment?: string[]; // Liste optionnelle des équipements nécessaires
+}
+
+export interface ShareData {
+  image: File | null;
+  comment: string;
 } 

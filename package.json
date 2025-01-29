@@ -2,6 +2,16 @@
   "devDependencies": {
     "@babel/preset-env": "^7.26.7",
     "@types/jest-axe": "^3.5.9",
-    "jest-axe": "^9.0.0"
+    "jest-axe": "^9.0.0",
+    "prisma": "^6.3.0",
+    "vitest": "^3.0.4"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.7.4",
+    "@prisma/client": "^6.3.0",
+    "next-auth": "^4.24.11"
+  },
+  "scripts": {
+    "test": "vitest"
   }
 }

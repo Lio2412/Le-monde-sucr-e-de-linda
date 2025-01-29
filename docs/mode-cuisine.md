@@ -66,11 +66,22 @@ Le Mode Cuisine est une fonctionnalité interactive qui vous aide à suivre vos 
 - Notifications système (si autorisées)
 - Alerte visuelle dans l'interface
 
-### Écran de Félicitations
+### Écran de Félicitations et Partage
 - Affichage automatique à la fin de la recette
-- Animation festive avec trophée
-- Possibilité de partager sa réalisation
+- Animation festive avec trophée et confettis
+- Possibilité de partager sa réalisation :
+  - Upload d'une photo de votre création
+  - Ajout d'un commentaire personnel
+  - Partage avec la communauté
 - Retour à l'accueil ou nouvelle recette
+
+### Partage de Réalisations
+- Prenez une photo de votre création
+- Ajoutez un commentaire pour partager vos impressions
+- Partagez avec la communauté
+- Consultez les réalisations des autres utilisateurs
+- Limite de taille des images : 5MB
+- Formats acceptés : PNG, JPG, GIF
 
 ## 📱 Support Mobile et Tablette
 
@@ -114,6 +125,12 @@ R: Utilisez les boutons + et - dans la section ingrédients. Les quantités s'aj
 
 **Q: Le timer fonctionne-t-il en arrière-plan ?**
 R: Oui, le timer continue même si vous changez d'application ou si l'écran est verrouillé.
+
+**Q: Comment partager ma réalisation ?**
+R: Une fois la recette terminée, cliquez sur "Partager ma réalisation" dans l'écran de félicitations. Vous pourrez ajouter une photo et un commentaire.
+
+**Q: Quels formats d'images sont acceptés pour le partage ?**
+R: Les formats PNG, JPG et GIF sont acceptés, avec une limite de 5MB par image.
 
 ## 🔧 Dépannage
 

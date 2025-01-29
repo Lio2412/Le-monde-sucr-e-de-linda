@@ -5,7 +5,7 @@ import { Recipe } from '@/types/recipe';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Bell, Timer, Clock, X, Maximize2, Minimize2, StickyNote, Edit, Plus, Minus, ChefHat, Trophy, PartyPopper } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bell, Timer, Clock, X, Maximize2, Minimize2, StickyNote, Edit, Plus, Minus, ChefHat, Trophy, PartyPopper, Camera } from 'lucide-react';
 import { StepTimer } from '@/components/recipe/cooking-mode/StepTimer';
 import { useToast } from '@/components/ui/use-toast';
 import { IngredientsList } from '@/components/recipe/cooking-mode/IngredientsList';
@@ -24,6 +24,7 @@ import RecipeHistory from './RecipeHistory';
 import { useDeviceType } from '@/hooks/useDeviceType';
 import { StepDisplay } from './StepDisplay';
 import Image from 'next/image';
+import { ShareRecipeCompletion } from '@/components/recipe/cooking-mode/ShareRecipeCompletion';
 
 interface RecipeCookingModeProps {
   recipe: Recipe;
@@ -35,35 +36,83 @@ interface CompletionModeProps {
   onClose: () => void;
 }
 
-const CompletionMode: React.FC<CompletionModeProps> = ({ recipe, onClose }) => {
+export const CompletionMode: React.FC<CompletionModeProps> = ({ recipe, onClose }) => {
+  const [showShare, setShowShare] = useState(false);
+  const { toast } = useToast();
+
+  const handleShare = async (data: ShareData) => {
+    try {
+      const formData = new FormData();
+      if (data.image) {
+        formData.append('image', data.image);
+      }
+      formData.append('comment', data.comment);
+      formData.append('recipeId', recipe.id);
+
+      const response = await fetch('/api/recipes/share', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors du partage');
+      }
+
+      toast({
+        title: "Partage réussi !",
+        description: "Votre réalisation a été partagée avec succès.",
+      });
+    } catch (error) {
+      console.error('Erreur lors du partage:', error);
+      throw error;
+    }
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="flex flex-col items-center justify-center h-full text-center px-4"
-    >
-      <div className="flex items-center justify-center mb-6">
-        <PartyPopper className="h-16 w-16 text-pink-500 mr-4" />
-        <Trophy className="h-16 w-16 text-yellow-500" />
-      </div>
-      <h2 className="text-3xl font-bold mb-4">Félicitations !</h2>
-      <p className="text-xl text-muted-foreground mb-8">
-        Vous avez terminé la recette "{recipe.title}" avec succès !
-      </p>
-      <div className="space-y-4">
-        <p className="text-lg">
-          N'oubliez pas de prendre une photo de votre création et de la partager !
-        </p>
-        <div className="flex gap-4 justify-center">
-          <Button
-            onClick={onClose}
-            className="bg-pink-500 hover:bg-pink-600 text-white px-8"
-          >
-            Terminer
-          </Button>
+    <>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col items-center justify-center h-full text-center px-4"
+      >
+        <div className="flex items-center justify-center mb-6">
+          <PartyPopper className="h-16 w-16 text-pink-500 mr-4" />
+          <Trophy className="h-16 w-16 text-yellow-500" />
         </div>
-      </div>
-    </motion.div>
+        <h2 className="text-3xl font-bold mb-4">Félicitations !</h2>
+        <p className="text-xl text-muted-foreground mb-8">
+          Vous avez terminé la recette "{recipe.title}" avec succès !
+        </p>
+        <div className="space-y-4">
+          <p className="text-lg">
+            N'oubliez pas de prendre une photo de votre création et de la partager !
+          </p>
+          <div className="flex gap-4 justify-center">
+            <Button
+              onClick={() => setShowShare(true)}
+              className="bg-pink-500 hover:bg-pink-600 text-white px-8 gap-2"
+            >
+              <Camera className="h-4 w-4" />
+              Partager ma réalisation
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onClose}
+            >
+              Terminer
+            </Button>
+          </div>
+        </div>
+      </motion.div>
+
+      {showShare && (
+        <ShareRecipeCompletion
+          recipeTitle={recipe.title}
+          onClose={() => setShowShare(false)}
+          onShare={handleShare}
+        />
+      )}
+    </>
   );
 };
 

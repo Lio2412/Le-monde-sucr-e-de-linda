@@ -1,120 +1,81 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { StepDisplay } from '../StepDisplay';
 
-const mockStep = {
-  description: 'Préchauffer le four à 180°C',
-  duration: 10,
-  temperature: 180
-};
-
 describe('StepDisplay', () => {
-  const mockOnToggleComplete = jest.fn();
+  const defaultProps = {
+    description: 'Test description',
+    currentIndex: 0,
+    totalSteps: 5,
+    isCompleted: false,
+    onToggleComplete: jest.fn(),
+    direction: 1,
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('affiche correctement le numéro et la description de l\'étape', () => {
-    render(
-      <StepDisplay
-        description={mockStep.description}
-        currentIndex={0}
-        totalSteps={5}
-        isCompleted={false}
-        onToggleComplete={mockOnToggleComplete}
-        duration={mockStep.duration}
-        temperature={mockStep.temperature}
-      />
-    );
-
-    expect(screen.getByText('Étape 1 sur 5')).toBeInTheDocument();
-    expect(screen.getByText(mockStep.description)).toBeInTheDocument();
+  it('affiche la description de l\'étape', () => {
+    render(<StepDisplay {...defaultProps} />);
+    expect(screen.getByText('Test description')).toBeInTheDocument();
   });
 
-  it('affiche correctement la durée et la température', () => {
-    render(
-      <StepDisplay
-        description={mockStep.description}
-        currentIndex={0}
-        totalSteps={5}
-        isCompleted={false}
-        onToggleComplete={mockOnToggleComplete}
-        duration={mockStep.duration}
-        temperature={mockStep.temperature}
-      />
-    );
-
-    expect(screen.getByTestId('step-duration')).toHaveTextContent('10 min');
-    expect(screen.getByTestId('step-temperature')).toHaveTextContent('180°C');
+  it('affiche la progression correcte', () => {
+    render(<StepDisplay {...defaultProps} />);
+    expect(screen.getByText('20%')).toBeInTheDocument();
   });
 
-  it('permet de marquer une étape comme terminée', async () => {
-    render(
-      <StepDisplay
-        description={mockStep.description}
-        currentIndex={0}
-        totalSteps={5}
-        isCompleted={false}
-        onToggleComplete={mockOnToggleComplete}
-        duration={mockStep.duration}
-        temperature={mockStep.temperature}
-      />
+  it('affiche le bon nombre d\'indicateurs d\'étapes', () => {
+    render(<StepDisplay {...defaultProps} />);
+    const indicators = screen.getAllByRole('generic').filter(
+      element => element.className.includes('rounded-full border-2')
     );
-
-    const checkbox = screen.getByTestId('step-checkbox');
-    await userEvent.click(checkbox);
-    expect(mockOnToggleComplete).toHaveBeenCalled();
+    expect(indicators).toHaveLength(5);
   });
 
-  it('affiche une étape comme terminée', () => {
-    render(
-      <StepDisplay
-        description={mockStep.description}
-        currentIndex={0}
-        totalSteps={5}
-        isCompleted={true}
-        onToggleComplete={mockOnToggleComplete}
-        duration={mockStep.duration}
-        temperature={mockStep.temperature}
-      />
-    );
+  it('affiche la durée si elle est fournie', () => {
+    render(<StepDisplay {...defaultProps} duration={30} />);
+    expect(screen.getByText('30 min')).toBeInTheDocument();
+  });
 
-    const checkbox = screen.getByTestId('step-checkbox');
+  it('affiche la température si elle est fournie', () => {
+    render(<StepDisplay {...defaultProps} temperature={180} />);
+    expect(screen.getByText('180°C')).toBeInTheDocument();
+  });
+
+  it('appelle onToggleComplete lors du clic sur la case à cocher', () => {
+    render(<StepDisplay {...defaultProps} />);
+    const checkbox = screen.getByRole('checkbox');
+    fireEvent.click(checkbox);
+    expect(defaultProps.onToggleComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('affiche le statut complété correctement', () => {
+    render(<StepDisplay {...defaultProps} isCompleted={true} />);
+    const checkbox = screen.getByRole('checkbox');
     expect(checkbox).toBeChecked();
   });
 
-  it('gère les animations avec la direction', () => {
-    render(
-      <StepDisplay
-        description={mockStep.description}
-        currentIndex={0}
-        totalSteps={5}
-        isCompleted={false}
-        onToggleComplete={mockOnToggleComplete}
-        duration={mockStep.duration}
-        temperature={mockStep.temperature}
-        direction={1}
-      />
-    );
-
-    const stepElement = screen.getByTestId('step-description');
-    expect(stepElement).toBeInTheDocument();
+  it('affiche la position actuelle dans la recette', () => {
+    render(<StepDisplay {...defaultProps} />);
+    expect(screen.getByText('Étape 1 sur 5')).toBeInTheDocument();
   });
 
-  it('affiche correctement une étape sans durée ni température', () => {
-    render(
-      <StepDisplay
-        description="Mélanger les ingrédients"
-        currentIndex={0}
-        totalSteps={5}
-        isCompleted={false}
-        onToggleComplete={mockOnToggleComplete}
-      />
-    );
+  it('met en surbrillance l\'indicateur d\'étape actuel', () => {
+    const { container } = render(<StepDisplay {...defaultProps} currentIndex={2} />);
+    const indicators = container.querySelectorAll('[class*="rounded-full border-2"]');
+    expect(indicators[2].className).toContain('bg-primary/50');
+  });
 
-    expect(screen.queryByTestId('step-duration')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('step-temperature')).not.toBeInTheDocument();
+  it('marque les étapes précédentes comme complétées', () => {
+    const { container } = render(<StepDisplay {...defaultProps} currentIndex={2} />);
+    const indicators = container.querySelectorAll('[class*="rounded-full border-2"]');
+    expect(indicators[0].className).toContain('bg-primary');
+    expect(indicators[1].className).toContain('bg-primary');
   });
 }); 
