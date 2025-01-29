@@ -1,5 +1,5 @@
 # Dependencies
-node_modules/
+/node_modules
 /.pnp
 .pnp.js
 
@@ -7,13 +7,13 @@ node_modules/
 /coverage
 
 # Next.js
-.next/
+/.next/
 /out/
-build/
-dist/
+/build
 
 # Production
 /build
+/dist
 
 # Misc
 .DS_Store
@@ -29,9 +29,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Local Prisma
+/prisma/*.db
+/prisma/migrations/
+
 # IDE
-.idea/
-.vscode/
+.idea
+.vscode
 *.swp
 *.swo
 
@@ -40,4 +44,8 @@ yarn-error.log*
 
 # TypeScript
 *.tsbuildinfo
-next-env.d.ts 
+next-env.d.ts
+
+# Images uploads
+/public/uploads/*
+!/public/uploads/.gitkeep 
