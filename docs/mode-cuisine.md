@@ -71,17 +71,25 @@ Le Mode Cuisine est une fonctionnalité interactive qui vous aide à suivre vos 
 - Animation festive avec trophée et confettis
 - Possibilité de partager sa réalisation :
   - Upload d'une photo de votre création
+  - Notation de votre expérience (1 à 5 étoiles)
   - Ajout d'un commentaire personnel
-  - Partage avec la communauté
-- Retour à l'accueil ou nouvelle recette
+  - Formats acceptés : PNG, JPG, GIF
+  - Limite de taille : 5MB
+  - Prévisualisation de l'image avant envoi
+  - Badge de récompense pour les partages
+  - Animations fluides et retours visuels
+  - Gestion des erreurs avec messages clairs
 
 ### Partage de Réalisations
-- Prenez une photo de votre création
-- Ajoutez un commentaire pour partager vos impressions
-- Partagez avec la communauté
-- Consultez les réalisations des autres utilisateurs
-- Limite de taille des images : 5MB
-- Formats acceptés : PNG, JPG, GIF
+- Interface moderne et intuitive
+- Système de notation avec étoiles
+- Prévisualisation des images en temps réel
+- Validation automatique des fichiers
+- Messages d'erreur explicites
+- Animations de chargement
+- Retours visuels sur les actions
+- Sauvegarde automatique dans le dossier approprié
+- Conservation de l'extension d'origine des images
 
 ## 📱 Support Mobile et Tablette
 

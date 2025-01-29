@@ -7,6 +7,8 @@
 - [x] Configuration de Next.js avec TypeScript
 - [x] Configuration de TailwindCSS
 - [x] Intégration de Framer Motion pour les animations
+- [x] Configuration du système d'upload d'images
+- [x] Initialisation automatique des dossiers d'upload
 
 ### Composants de Base
 - [x] Création du composant Header
@@ -51,8 +53,8 @@
 - [x] Tests de l'API de partage
 - [x] Gestion des erreurs de l'API
 - [x] Validation des images (taille et format)
-- [x] Optimisation des images téléchargées
-- [x] Intégration avec la base de données pour le partage
+- [x] Système de notation des réalisations
+- [x] Gestion des commentaires sur les réalisations
 
 ### Base de Données et API
 - [x] Configuration de PostgreSQL
@@ -65,26 +67,24 @@
 ## 🚧 En Cours de Développement
 
 ### Mode Cuisine
+- [ ] Optimisation des images uploadées avec sharp
 - [ ] Mode hors-ligne avec synchronisation
 - [ ] Historique des modifications personnelles
 - [ ] Support des unités de mesure internationales
 
+### Base de Données
+- [ ] Intégration complète avec PostgreSQL
+- [ ] Modèles Prisma pour les partages
+- [ ] Migration des données existantes
+
 ### Fonctionnalités Principales
 - [ ] Système d'authentification complet
 - [ ] Gestion des favoris
-- [ ] Système de commentaires
-- [ ] Système de notation des recettes
+- [ ] Système de commentaires global
 - [ ] Recherche de recettes
 - [ ] Filtrage par catégories
 
 ### Tests et Documentation
-- [x] Tests du StepTimer
-- [x] Tests du mode plein écran
-- [x] Tests des raccourcis clavier
-- [x] Tests du système de notes
-- [x] Tests du marquage des étapes
-- [x] Tests du RecipeCookingMode
-- [x] Tests des dialogues (KeyboardShortcuts et Confirmation)
 - [ ] Tests d'intégration
 - [ ] Tests de performance
 - [ ] Documentation utilisateur complète
@@ -96,7 +96,7 @@
 - [x] Correction des erreurs de typage dans RecipeMetadata
 - [x] Optimisation des images et gestion du ratio d'aspect
 - [x] Gestion du Wake Lock dans le mode plein écran
-- [x] Correction des warnings d'images Next.js (propriété sizes)
+- [x] Correction des warnings d'images Next.js
 - [x] Correction des problèmes de rendu côté serveur
 - [x] Amélioration de l'accessibilité des dialogues
 - [x] Correction des tests du KeyboardShortcutsDialog
@@ -109,6 +109,7 @@
 - [x] Optimisation des effets et des états
 - [x] Correction des problèmes de typage des images
 - [x] Amélioration de la gestion des dépendances
+- [x] Correction des erreurs lors du partage des réalisations
 
 ## 📈 Améliorations Futures
 - [ ] Amélioration des performances (Core Web Vitals)
@@ -122,10 +123,10 @@
 - [ ] Système de suggestions de recettes
 
 ## 📋 Prochaines Étapes
-1. Intégration avec la base de données pour le partage
-2. Tests d'intégration
-3. Documentation utilisateur complète
-4. Guide des raccourcis clavier
+1. Optimisation des images avec sharp
+2. Intégration complète avec PostgreSQL
+3. Système d'authentification
+4. Tests d'intégration
 
 ## Tests
 - [x] Correction des tests du RecipeCookingMode

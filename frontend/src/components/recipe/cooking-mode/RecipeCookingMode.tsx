@@ -36,6 +36,13 @@ interface CompletionModeProps {
   onClose: () => void;
 }
 
+interface ShareData {
+  image: File | null;
+  comment: string;
+  rating: number;
+  recipeId: string;
+}
+
 export const CompletionMode: React.FC<CompletionModeProps> = ({ recipe, onClose }) => {
   const [showShare, setShowShare] = useState(false);
   const { toast } = useToast();
@@ -47,7 +54,8 @@ export const CompletionMode: React.FC<CompletionModeProps> = ({ recipe, onClose 
         formData.append('image', data.image);
       }
       formData.append('comment', data.comment);
-      formData.append('recipeId', recipe.id);
+      formData.append('rating', data.rating.toString());
+      formData.append('recipeId', data.recipeId);
 
       const response = await fetch('/api/recipes/share', {
         method: 'POST',
@@ -55,7 +63,8 @@ export const CompletionMode: React.FC<CompletionModeProps> = ({ recipe, onClose 
       });
 
       if (!response.ok) {
-        throw new Error('Erreur lors du partage');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors du partage');
       }
 
       toast({
@@ -108,6 +117,7 @@ export const CompletionMode: React.FC<CompletionModeProps> = ({ recipe, onClose 
       {showShare && (
         <ShareRecipeCompletion
           recipeTitle={recipe.title}
+          recipeId={recipe.id}
           onClose={() => setShowShare(false)}
           onShare={handleShare}
         />

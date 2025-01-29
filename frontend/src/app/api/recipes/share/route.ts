@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import sharp from 'sharp';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,6 +8,7 @@ export async function POST(request: NextRequest) {
     const image = formData.get('image') as File | null;
     const comment = formData.get('comment') as string;
     const recipeId = formData.get('recipeId') as string;
+    const rating = Number(formData.get('rating')) || 0;
 
     if (!recipeId) {
       return NextResponse.json(
@@ -19,44 +19,46 @@ export async function POST(request: NextRequest) {
 
     let imageUrl = null;
     if (image) {
-      // Vérification du type de fichier
-      const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      if (!validTypes.includes(image.type)) {
-        return NextResponse.json(
-          { error: 'Type de fichier non supporté' },
-          { status: 400 }
-        );
-      }
-
-      // Vérification de la taille
-      if (image.size > 5 * 1024 * 1024) { // 5MB
-        return NextResponse.json(
-          { error: 'Image trop volumineuse' },
-          { status: 400 }
-        );
-      }
-
       try {
-        // Lecture du buffer de l'image
-        const buffer = Buffer.from(await image.arrayBuffer());
+        // Vérification du type de fichier
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(image.type)) {
+          return NextResponse.json(
+            { error: 'Type de fichier non supporté' },
+            { status: 400 }
+          );
+        }
 
-        // Optimisation de l'image avec sharp
-        const optimizedBuffer = await sharp(buffer)
-          .resize(1200, 1200, {
-            fit: 'inside',
-            withoutEnlargement: true
-          })
-          .jpeg({ quality: 80 })
-          .toBuffer();
+        // Vérification de la taille
+        if (image.size > 5 * 1024 * 1024) { // 5MB
+          return NextResponse.json(
+            { error: 'Image trop volumineuse' },
+            { status: 400 }
+          );
+        }
 
-        // Création du nom de fichier unique
-        const fileName = `${recipeId}-${Date.now()}.jpg`;
-        const publicPath = join(process.cwd(), 'public', 'uploads', 'shares');
-        const filePath = join(publicPath, fileName);
+        // Création des dossiers si nécessaire
+        const publicDir = join(process.cwd(), 'public');
+        const uploadsDir = join(publicDir, 'uploads');
+        const sharesDir = join(uploadsDir, 'shares');
+        
+        await mkdir(uploadsDir, { recursive: true });
+        await mkdir(sharesDir, { recursive: true });
 
-        // Sauvegarde de l'image optimisée
-        await writeFile(filePath, optimizedBuffer);
+        // Lecture et sauvegarde de l'image
+        const arrayBuffer = await image.arrayBuffer();
+        const uint8Array = new Uint8Array(arrayBuffer);
+
+        // Création du nom de fichier unique avec l'extension originale
+        const extension = image.name.split('.').pop() || 'jpg';
+        const fileName = `${recipeId}-${Date.now()}.${extension}`;
+        const filePath = join(sharesDir, fileName);
+
+        // Sauvegarde de l'image
+        await writeFile(filePath, uint8Array);
         imageUrl = `/uploads/shares/${fileName}`;
+
+        console.log('Image sauvegardée avec succès:', imageUrl);
       } catch (error) {
         console.error('Erreur lors du traitement de l\'image:', error);
         return NextResponse.json(
@@ -67,11 +69,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Enregistrement dans la base de données
-    // TODO: Implémenter la sauvegarde dans la base de données
     const share = {
       recipeId,
       imageUrl,
       comment,
+      rating,
       createdAt: new Date().toISOString(),
     };
 
