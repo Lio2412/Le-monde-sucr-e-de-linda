@@ -25,6 +25,7 @@ import { useDeviceType } from '@/hooks/useDeviceType';
 import { StepDisplay } from './StepDisplay';
 import Image from 'next/image';
 import { ShareRecipeCompletion } from '@/components/recipe/cooking-mode/ShareRecipeCompletion';
+import { useRecipeCache } from '@/hooks/useRecipeCache';
 
 interface RecipeCookingModeProps {
   recipe: Recipe;
@@ -130,21 +131,35 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
   recipe: initialRecipe,
   onClose,
 }) => {
-  // Ajouter les équipements par défaut si nécessaire
-  const recipe = useMemo(() => ({
-    ...initialRecipe,
-    servings: initialRecipe.servings || 1,
-    equipment: initialRecipe.equipment || [
-      'Four',
-      'Batteur électrique',
-      'Moule à tarte',
-      'Balance de cuisine',
-      'Saladier',
-      'Fouet',
-      'Spatule',
-      'Papier cuisson'
-    ]
-  }), [initialRecipe]);
+  const { cacheRecipe, getCachedRecipe } = useRecipeCache();
+  
+  // Utiliser les données en cache si disponibles
+  const recipe = useMemo(() => {
+    const cachedData = getCachedRecipe(initialRecipe.id);
+    if (cachedData) {
+      console.log('Utilisation des données en cache pour la recette:', initialRecipe.id);
+      return cachedData;
+    }
+    
+    // Si pas de cache, mettre en cache la nouvelle recette
+    const recipeWithDefaults = {
+      ...initialRecipe,
+      servings: initialRecipe.servings || 1,
+      equipment: initialRecipe.equipment || [
+        'Four',
+        'Batteur électrique',
+        'Moule à tarte',
+        'Balance de cuisine',
+        'Saladier',
+        'Fouet',
+        'Spatule',
+        'Papier cuisson'
+      ]
+    };
+    
+    cacheRecipe(recipeWithDefaults);
+    return recipeWithDefaults;
+  }, [initialRecipe, getCachedRecipe, cacheRecipe]);
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -345,25 +360,22 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
     isTimerEnabled: stepDuration > 0,
   });
 
-  // Optimisation de l'effet de progression automatique
+  // Optimisation des calculs de progression
+  const progressData = useMemo(() => {
+    if (showPreparation) return null;
+    return {
+      allStepsCompleted: Array.from({ length: recipe.steps.length }).every((_, index) => isStepCompleted(index)),
+      isLastStepCompleted: currentStepIndex === recipe.steps.length - 1 && isStepCompleted(currentStepIndex)
+    };
+  }, [showPreparation, recipe.steps.length, currentStepIndex, isStepCompleted]);
+
+  // Optimisation de l'effet de progression
   useEffect(() => {
-    if (showPreparation) return;
+    if (!progressData) return;
 
-    // Vérifier si toutes les étapes sont complétées
-    const allStepsCompleted = Array.from({ length: recipe.steps.length }).every((_, index) => 
-      isStepCompleted(index)
-    );
-
-    console.log('Vérification des étapes:', {
-      allStepsCompleted,
-      completedSteps: Array.from(completedSteps),
-      totalSteps: recipe.steps.length,
-      currentStepIndex
-    });
-
-    // Si toutes les étapes sont complétées ou si nous sommes à la dernière étape et qu'elle est complétée
-    if ((allStepsCompleted || (currentStepIndex === recipe.steps.length - 1 && isStepCompleted(currentStepIndex))) && !showCompletion) {
-      console.log('Condition de complétion remplie !');
+    const { allStepsCompleted, isLastStepCompleted } = progressData;
+    
+    if ((allStepsCompleted || isLastStepCompleted) && !showCompletion) {
       setShowCompletion(true);
       toast({
         title: "Félicitations !",
@@ -373,7 +385,6 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
       return;
     }
 
-    // Gérer la progression normale
     if (isStepCompleted(currentStepIndex)) {
       const timeoutId = setTimeout(() => {
         if (currentStepIndex < recipe.steps.length - 1) {
@@ -388,7 +399,7 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
 
       return () => clearTimeout(timeoutId);
     }
-  }, [currentStepIndex, isStepCompleted, showPreparation, recipe.steps.length, goToNextStep, toast, completedSteps, showCompletion]);
+  }, [progressData, currentStepIndex, showCompletion, recipe.steps.length, goToNextStep, toast, isStepCompleted]);
 
   // Ajouter un gestionnaire pour marquer une étape comme complétée
   const handleStepComplete = useCallback(() => {
@@ -426,19 +437,41 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
 
   const slideVariants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0
+      x: direction > 0 ? 500 : -500,
+      opacity: 0,
+      transition: {
+        type: "tween",
+        duration: 0.3,
+        ease: "easeInOut"
+      }
     }),
     center: {
       zIndex: 1,
       x: 0,
-      opacity: 1
+      opacity: 1,
+      transition: {
+        type: "tween",
+        duration: 0.3,
+        ease: "easeInOut"
+      }
     },
     exit: (direction: number) => ({
       zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0
+      x: direction < 0 ? 500 : -500,
+      opacity: 0,
+      transition: {
+        type: "tween",
+        duration: 0.3,
+        ease: "easeInOut"
+      }
     })
+  };
+
+  // Optimisation des animations de transition
+  const transition = {
+    type: "tween",
+    duration: 0.3,
+    ease: "easeInOut"
   };
 
   const adjustServings = useCallback((increment: boolean) => {
@@ -598,7 +631,7 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
               </div>
 
               <div className="flex-1 relative">
-                <AnimatePresence initial={false} custom={direction}>
+                <AnimatePresence mode="wait" initial={false} custom={direction}>
                   <motion.div
                     key={currentStepIndex}
                     custom={direction}
@@ -606,11 +639,13 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
                     initial="enter"
                     animate="center"
                     exit="exit"
-                    transition={{
-                      x: { type: "spring", stiffness: 300, damping: 30 },
-                      opacity: { duration: 0.2 }
+                    transition={transition}
+                    style={{ 
+                      position: 'absolute',
+                      width: '100%',
+                      willChange: 'transform',
+                      backfaceVisibility: 'hidden'
                     }}
-                    className="absolute inset-0"
                   >
                     {renderStepDisplay()}
                   </motion.div>

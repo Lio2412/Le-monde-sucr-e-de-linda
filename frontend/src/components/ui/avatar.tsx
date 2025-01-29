@@ -47,6 +47,7 @@ export function Avatar({
           width={size}
           height={size}
           className="absolute inset-0 w-full h-full object-cover"
+          sizes="(max-width: 768px) 48px, 48px"
         />
       )}
     </div>

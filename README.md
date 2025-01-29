@@ -12,6 +12,14 @@ Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node
 - Raccourcis clavier avec boîte de dialogue
 - Indicateur de progression
 
+### Système de Partage
+- Partage de photos des réalisations
+- Notation des recettes (1-5 étoiles)
+- Commentaires et retours d'expérience
+- Galerie des réalisations de la communauté
+- Optimisation automatique des images
+- Nettoyage automatique du cache d'images
+
 ### Interface & Design
 - Design responsive et moderne avec Tailwind CSS
 - Animations fluides avec Framer Motion
@@ -29,12 +37,15 @@ Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node
 - Optimisation des images et gestion du SEO
 - Mode cuisine avec timer et notes
 - Tests unitaires des composants principaux
+- Système de partage des réalisations
+- Gestion des uploads d'images
+- Intégration avec PostgreSQL et Prisma
 
 ### 🔄 En Développement
-- Système d'authentification
-- Gestion des favoris
-- Système de commentaires
-- Recherche et filtrage des recettes
+- Pagination des partages
+- Filtrage des réalisations
+- Système de likes
+- Notifications des nouveaux partages
 - Amélioration de l'accessibilité
 - Support des raccourcis clavier pour tablettes
 

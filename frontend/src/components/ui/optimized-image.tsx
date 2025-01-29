@@ -1,47 +1,50 @@
+import React from 'react';
 import Image from 'next/image';
-import { ImageProps } from 'next/image';
 import { cn } from '@/lib/utils';
-import { imageSizeConfigs, generateImagePlaceholder, type ImageVariant } from '@/lib/image-utils';
 
-export interface OptimizedImageProps extends Omit<ImageProps, 'sizes'> {
-  variant: ImageVariant;
-  containerClassName?: string;
-  sizes?: string;
+interface OptimizedImageProps {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  className?: string;
+  priority?: boolean;
 }
 
 export function OptimizedImage({
   src,
   alt,
-  variant,
-  quality = imageSizeConfigs[variant].quality,
+  width = 800,
+  height = 600,
   className,
-  containerClassName,
-  priority = imageSizeConfigs[variant].priority,
-  ...props
+  priority = false,
 }: OptimizedImageProps) {
-  const config = imageSizeConfigs[variant];
-  const placeholderColor = generateImagePlaceholder(typeof src === 'string' ? src : '');
+  // Si c'est une data URL, on utilise directement l'image sans optimisation
+  const isDataUrl = src.startsWith('data:');
 
-  const imageProps: ImageProps = {
-    src,
-    alt,
-    quality: quality || config.quality,
-    sizes: config.sizes,
-    priority: priority ?? config.priority,
-    placeholder: "blur" as const,
-    blurDataURL: `data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'><rect width='1' height='1' fill='${encodeURIComponent(placeholderColor)}'/></svg>`,
-    ...props
-  };
-
-  return (
-    <div className={containerClassName}>
-      <Image
-        {...imageProps}
-        className={cn(
-          'transition-all duration-300',
-          className
-        )}
+  if (isDataUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        className={cn('w-full h-full object-cover', className)}
       />
-    </div>
+    );
+  }
+
+  // Pour les URLs normales, on utilise next/image avec l'optimisation
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      className={cn('w-full h-full object-cover', className)}
+      priority={priority}
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+    />
   );
 } 

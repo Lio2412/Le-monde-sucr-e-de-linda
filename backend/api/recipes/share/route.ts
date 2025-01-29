@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { RecipeShareService } from '../../../services/recipeShareService';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../lib/auth';
+import { ImageOptimizationService } from '@/services/imageOptimizationService';
+import path from 'path';
+import { promises as fs } from 'fs';
+
+const imageService = new ImageOptimizationService();
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +14,7 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const recipeId = formData.get('recipeId') as string;
     const comment = formData.get('comment') as string;
+    const rating = Number(formData.get('rating'));
     const image = formData.get('image') as File | null;
 
     if (!recipeId) {
@@ -18,27 +24,65 @@ export async function POST(req: Request) {
       );
     }
 
-    let imageUrl = null;
-    if (image) {
-      // Simuler le traitement de l'image pour les tests
-      imageUrl = `/uploads/shares/${Date.now()}.jpg`;
+    if (rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { error: 'La note doit être comprise entre 1 et 5' },
+        { status: 400 }
+      );
     }
 
-    const share = await RecipeShareService.create({
+    let imagePath = null;
+
+    if (image) {
+      try {
+        const buffer = Buffer.from(await image.arrayBuffer());
+        const isValid = await imageService.validateImage(buffer);
+        
+        if (!isValid) {
+          return NextResponse.json(
+            { error: 'Format d\'image non supporté' },
+            { status: 400 }
+          );
+        }
+
+        // Créer le dossier de destination s'il n'existe pas
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'shares');
+        await fs.mkdir(uploadDir, { recursive: true });
+
+        // Générer un nom de fichier unique
+        const extension = image.name.split('.').pop() || 'jpg';
+        const filename = `share-${recipeId}-${Date.now()}.${extension}`;
+        const fullPath = path.join(uploadDir, filename);
+
+        // Sauvegarder l'image
+        await fs.writeFile(fullPath, buffer);
+        imagePath = `/uploads/shares/${filename}`;
+
+        console.log('Image sauvegardée:', imagePath);
+      } catch (error) {
+        console.error('Erreur lors du traitement de l\'image:', error);
+        return NextResponse.json(
+          { error: 'Erreur lors du traitement de l\'image' },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Créer le partage dans la base de données
+    const shareService = new RecipeShareService();
+    const share = await shareService.createShare({
       recipeId,
-      imageUrl,
-      comment,
       userId: session?.user?.id,
+      comment,
+      rating,
+      imagePath
     });
 
-    return NextResponse.json({
-      success: true,
-      data: share
-    });
+    return NextResponse.json({ success: true, share });
   } catch (error) {
-    console.error('Error sharing recipe:', error);
+    console.error('Erreur lors du partage:', error);
     return NextResponse.json(
-      { error: 'Failed to share recipe' },
+      { error: 'Une erreur est survenue lors du partage' },
       { status: 500 }
     );
   }

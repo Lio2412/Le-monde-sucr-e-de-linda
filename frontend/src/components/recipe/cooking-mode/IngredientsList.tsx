@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Ingredient } from '@/types/recipe';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 interface IngredientsListProps {
   ingredients: Ingredient[];
@@ -25,6 +26,15 @@ export function IngredientsList({
   completedIngredients = new Set(),
   onClose
 }: IngredientsListProps) {
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: ingredients.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 40, // Hauteur estimée de chaque élément
+    overscan: 5 // Nombre d'éléments à pré-rendre
+  });
+
   // Fonction pour formater les nombres décimaux
   const formatNumber = (num: number): string => {
     if (Number.isInteger(num)) return num.toString();
@@ -112,57 +122,44 @@ export function IngredientsList({
         </span>
       </div>
 
-      <div className="space-y-3">
-        {adjustedIngredients.map((ingredient, index) => (
-          <div 
-            key={`${ingredient.name}-${index}`} 
-            className={cn(
-              "flex items-center justify-between py-2 px-3 rounded-lg transition-colors",
-              completedIngredients.has(index) && "bg-muted/50"
-            )}
-          >
-            <div className="flex items-center gap-3">
-              {onToggleIngredient && (
-                <Checkbox
-                  checked={completedIngredients.has(index)}
-                  onCheckedChange={() => onToggleIngredient(index)}
-                  aria-label={`Marquer ${ingredient.name} comme utilisé`}
-                />
-              )}
-              <div className="flex flex-col">
-                <span className={cn(
-                  "text-sm font-medium",
-                  ingredient.optional && "text-muted-foreground",
-                  completedIngredients.has(index) && "line-through"
-                )}>
-                  {ingredient.name}
-                </span>
-                {ingredient.optional && (
-                  <span className="text-xs text-muted-foreground">(optionnel)</span>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <span 
-                className={cn(
-                  "text-sm font-medium tabular-nums",
-                  completedIngredients.has(index) && "text-muted-foreground"
-                )}
-                data-testid={`ingredient-quantity-${index}`}
+      <div 
+        ref={parentRef}
+        className="max-h-[60vh] overflow-auto"
+        style={{
+          height: `${Math.min(ingredients.length * 40, window.innerHeight * 0.6)}px`
+        }}
+      >
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative'
+          }}
+        >
+          {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+            const ingredient = ingredients[virtualItem.index];
+            const quantity = (ingredient.quantity / defaultServings) * servings;
+            
+            return (
+              <div
+                key={virtualItem.key}
+                data-index={virtualItem.index}
+                ref={rowVirtualizer.measureElement}
+                className="absolute top-0 left-0 w-full"
+                style={{
+                  transform: `translateY(${virtualItem.start}px)`
+                }}
               >
-                {ingredient.adjustedQuantity}
-              </span>
-              {ingredient.unit && (
-                <span className={cn(
-                  "text-sm text-muted-foreground",
-                  completedIngredients.has(index) && "line-through"
-                )}>
-                  {ingredient.unit}
-                </span>
-              )}
-            </div>
-          </div>
-        ))}
+                <div className="flex items-center gap-3 py-2">
+                  <div className="h-2 w-2 rounded-full bg-primary/50" />
+                  <span className="text-sm">
+                    {quantity} {ingredient.unit} {ingredient.name}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

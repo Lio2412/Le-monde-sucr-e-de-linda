@@ -7,7 +7,7 @@ interface RecipeCardProps {
     id: number;
     title: string;
     description: string;
-    image: string;
+    mainImage: string;
     category: string;
     difficulty: string;
     time: string;
@@ -19,10 +19,11 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
     <article className="flex flex-col overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
       <div className="relative h-48 w-full">
         <Image
-          src={recipe.image}
+          src={recipe.mainImage}
           alt={recipe.title}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
       </div>
       <div className="flex flex-1 flex-col justify-between bg-white p-6">

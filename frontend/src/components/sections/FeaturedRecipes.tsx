@@ -29,6 +29,7 @@ interface Recipe {
   category: string;
   difficulty: string;
   time: string;
+  mainImage: string;
 }
 
 interface FeaturedRecipesProps {
@@ -84,10 +85,11 @@ export default function FeaturedRecipes({ recipes }: FeaturedRecipesProps) {
               {/* Image de la recette */}
               <div className="relative aspect-[4/3] overflow-hidden rounded-t-xl">
                 <Image
-                  src={recipe.image}
+                  src={recipe.mainImage}
                   alt={recipe.title}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                 

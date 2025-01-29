@@ -1,18 +1,14 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Share2, Upload, X, Heart, Star, Award } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import { Camera, X, Star } from 'lucide-react';
+import { OptimizedImage } from '@/components/ui/optimized-image';
 import { useToast } from '@/components/ui/use-toast';
-import Confetti from 'react-confetti';
-import { useWindowSize } from '@/hooks/useWindowSize';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ShareRecipeCompletionProps {
   recipeTitle: string;
@@ -32,295 +28,203 @@ export function ShareRecipeCompletion({
   recipeTitle,
   recipeId,
   onClose,
-  onShare,
+  onShare
 }: ShareRecipeCompletionProps) {
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [comment, setComment] = useState('');
-  const [isSharing, setIsSharing] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(true);
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const { width, height } = useWindowSize();
+  const [rating, setRating] = useState(5);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowConfetti(false);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB max
-        toast({
-          title: "Image trop volumineuse",
-          description: "L'image ne doit pas dépasser 5MB",
-          variant: "destructive",
-        });
-        return;
-      }
+    if (!file) return;
 
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    // Vérifier le type et la taille
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Format non supporté",
+        description: "Veuillez utiliser une image au format JPG, PNG ou WebP",
+        variant: "destructive"
+      });
+      return;
     }
-  }, [toast]);
 
-  const handleShare = async () => {
+    if (file.size > maxSize) {
+      toast({
+        title: "Image trop volumineuse",
+        description: "La taille maximale est de 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setImage(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+
     try {
-      setIsSharing(true);
-      await onShare({ image, comment, rating, recipeId });
+      setIsSubmitting(true);
+      await onShare({
+        image,
+        comment,
+        rating,
+        recipeId
+      });
+      
       toast({
         title: "Partage réussi !",
-        description: "Votre réalisation a été partagée avec succès.",
+        description: "Votre réalisation a été partagée avec succès."
       });
+      
       onClose();
     } catch (error) {
       console.error('Erreur lors du partage:', error);
       toast({
-        title: "Erreur lors du partage",
-        description: "Une erreur est survenue lors du partage de votre réalisation.",
-        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue lors du partage",
+        variant: "destructive"
       });
     } finally {
-      setIsSharing(false);
+      setIsSubmitting(false);
     }
   };
 
-  const removeImage = () => {
-    setImage(null);
-    setImagePreview(null);
-  };
-
   return (
-    <>
-      {showConfetti && <Confetti width={width} height={height} recycle={false} />}
-      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-        <Card className="w-full max-w-2xl mx-auto bg-white shadow-xl relative">
-          <ScrollArea className="max-h-[90vh]">
-            <motion.div 
-              className="p-6 space-y-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="flex justify-between items-center sticky top-0 bg-white z-10">
-                <motion.h3 
-                  className="text-2xl font-semibold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent"
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  Partagez votre réalisation
-                </motion.h3>
+    <Card className="fixed inset-4 md:inset-auto md:fixed md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[600px] md:h-auto bg-background p-6 overflow-y-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold">Partager ma réalisation</h3>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="h-8 w-8"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Partagez votre version de "{recipeTitle}" avec la communauté !
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Photo de votre réalisation
+            </label>
+            {imagePreview ? (
+              <div className="relative aspect-video rounded-lg overflow-hidden">
+                <OptimizedImage
+                  src={imagePreview}
+                  alt="Prévisualisation"
+                  className="object-cover"
+                  width={600}
+                  height={400}
+                />
                 <Button
-                  variant="ghost"
+                  type="button"
+                  variant="destructive"
                   size="icon"
-                  onClick={onClose}
-                  className="h-8 w-8 hover:bg-pink-50"
+                  className="absolute top-2 right-2 h-8 w-8"
+                  onClick={() => {
+                    setImage(null);
+                    setImagePreview('');
+                  }}
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
-
-              <motion.p 
-                className="text-muted-foreground"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                Partagez votre version de <span className="font-medium text-pink-500">"{recipeTitle}"</span> avec la communauté !
-              </motion.p>
-
-              {/* Zone de dépôt d'image avec animation améliorée */}
-              <motion.div 
-                className="space-y-4"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                <label
-                  htmlFor="recipe-image"
-                  className={cn(
-                    "block w-full aspect-video rounded-lg border-2 border-dashed relative cursor-pointer transition-all duration-300",
-                    "hover:border-pink-400 hover:bg-pink-50/50",
-                    imagePreview ? "border-primary" : "border-muted-foreground"
-                  )}
-                >
-                  <AnimatePresence mode="wait">
-                    {imagePreview ? (
-                      <motion.div
-                        key="preview"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="relative w-full h-full group"
-                      >
-                        <Image
-                          src={imagePreview}
-                          alt="Aperçu"
-                          fill
-                          className="object-cover rounded-lg"
-                        />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                          <p className="text-white text-sm">Cliquez pour changer l'image</p>
-                        </div>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            removeImage();
-                          }}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="upload"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="text-center p-12"
-                      >
-                        <Camera className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                        <p className="text-muted-foreground">
-                          Cliquez ou déposez une photo de votre réalisation
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          PNG, JPG ou GIF jusqu'à 5MB
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                  <Input
-                    id="recipe-image"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageChange}
-                  />
-                </label>
-              </motion.div>
-
-              {/* Notation */}
-              <motion.div 
-                className="space-y-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                <label className="text-sm font-medium text-muted-foreground">
-                  Notez votre expérience
-                </label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setRating(star)}
-                      onMouseEnter={() => setHoverRating(star)}
-                      onMouseLeave={() => setHoverRating(0)}
-                      className="transition-transform hover:scale-110"
-                    >
-                      <Star
-                        className={cn(
-                          "w-6 h-6 transition-colors",
-                          (hoverRating || rating) >= star
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
-                        )}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Commentaire avec animation */}
-              <motion.div 
-                className="space-y-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                <label
-                  htmlFor="comment"
-                  className="text-sm font-medium text-muted-foreground"
-                >
-                  Commentaire (optionnel)
-                </label>
-                <Textarea
-                  id="comment"
-                  placeholder="Partagez vos impressions, modifications ou conseils..."
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="min-h-[100px] focus:border-pink-400 focus:ring-pink-400"
-                />
-              </motion.div>
-
-              {/* Actions avec animation */}
-              <motion.div 
-                className="flex justify-end gap-4 sticky bottom-0 bg-white pt-4 border-t mt-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.6 }}
-              >
-                <Button
-                  variant="outline"
-                  onClick={onClose}
-                  className="hover:bg-pink-50"
-                >
-                  Annuler
-                </Button>
-                <Button
-                  onClick={handleShare}
-                  disabled={!image || isSharing}
-                  className="gap-2 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
-                >
-                  {isSharing ? (
-                    <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      >
-                        <Upload className="h-4 w-4" />
-                      </motion.div>
-                      Partage en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Share2 className="h-4 w-4" />
-                      Partager
-                    </>
-                  )}
-                </Button>
-              </motion.div>
-
-              {/* Badge de récompense */}
-              {image && (
-                <motion.div
-                  className="absolute top-4 right-4"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.7, type: "spring" }}
-                >
-                  <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-2 rounded-full">
-                    <Award className="h-6 w-6 text-white" />
+            ) : (
+              <label className="block">
+                <div className="flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
+                  <div className="text-center">
+                    <Camera className="mx-auto h-8 w-8 text-muted-foreground" />
+                    <span className="mt-2 block text-sm text-muted-foreground">
+                      Cliquez pour ajouter une photo
+                    </span>
                   </div>
-                </motion.div>
-              )}
-            </motion.div>
-          </ScrollArea>
-        </Card>
-      </div>
-    </>
+                </div>
+                <Input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+              </label>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Note
+            </label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <Button
+                  key={value}
+                  type="button"
+                  variant={rating >= value ? 'default' : 'outline'}
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setRating(value)}
+                >
+                  <Star
+                    className={cn(
+                      "h-4 w-4",
+                      rating >= value ? "fill-current" : "fill-none"
+                    )}
+                  />
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Commentaire
+            </label>
+            <Textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Partagez votre expérience..."
+              className="resize-none"
+              rows={4}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+          >
+            Annuler
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Partage en cours...' : 'Partager'}
+          </Button>
+        </div>
+      </form>
+    </Card>
   );
 } 

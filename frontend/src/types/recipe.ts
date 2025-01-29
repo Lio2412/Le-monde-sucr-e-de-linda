@@ -36,8 +36,7 @@ export interface Recipe {
   servings: number;
   difficulty: 'facile' | 'moyen' | 'difficile';
   category: string;
-  image?: string;
-  mainImage?: string;
+  mainImage: string;
   slug: string;
   tags: string[];
   comments?: Comment[];

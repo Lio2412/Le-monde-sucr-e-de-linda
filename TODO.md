@@ -45,6 +45,8 @@
 - [x] Indicateurs d'étapes interactifs
 - [x] Tests du système de progression
 - [x] Composant Progress réutilisable
+
+### Système de Partage
 - [x] Ajout de la possibilité de partager sa réalisation
 - [x] Interface de partage avec upload d'image
 - [x] Tests du composant de partage
@@ -55,6 +57,10 @@
 - [x] Validation des images (taille et format)
 - [x] Système de notation des réalisations
 - [x] Gestion des commentaires sur les réalisations
+- [x] Affichage des partages sur la page de recette
+- [x] Composant RecipeShares pour afficher les réalisations
+- [x] Intégration avec le système d'authentification
+- [x] Nettoyage automatique du cache d'images
 
 ### Base de Données et API
 - [x] Configuration de PostgreSQL
@@ -72,10 +78,17 @@
 - [ ] Historique des modifications personnelles
 - [ ] Support des unités de mesure internationales
 
+### Système de Partage
+- [ ] Pagination des partages
+- [ ] Filtrage des partages par date/note
+- [ ] Galerie des réalisations en mode grille/liste
+- [ ] Système de likes sur les partages
+- [ ] Notifications des nouveaux partages
+
 ### Base de Données
-- [ ] Intégration complète avec PostgreSQL
-- [ ] Modèles Prisma pour les partages
-- [ ] Migration des données existantes
+- [ ] Optimisation des requêtes Prisma
+- [ ] Mise en cache des requêtes fréquentes
+- [ ] Système de backup automatique
 
 ### Fonctionnalités Principales
 - [ ] Système d'authentification complet

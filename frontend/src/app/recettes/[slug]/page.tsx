@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 import type { MotionComponents } from '@/components/providers';
 import { useRecipe } from '@/hooks/useRecipe';
 import { RecipeCookingMode } from '@/components/recipe/cooking-mode/RecipeCookingMode';
+import Image from 'next/image';
 
 // Chargement différé des composants non-critiques
 const RatingSection = lazy(() => import('@/components/recipes/RatingSection'));
@@ -90,18 +91,17 @@ export default function RecipePage({ params }: { params: { slug: string } }) {
               {/* En-tête de la recette */}
               <MotionHeader className="relative h-[60vh] min-h-[400px] mb-8 overflow-hidden">
                 <div className="absolute inset-0">
-                  <OptimizedImage
+                  <Image
                     src={recipe.mainImage || '/images/default-recipe.jpg'}
                     alt={recipe.title}
                     fill
-                    variant="hero"
+                    className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 1200px, 2400px"
-                    quality={90}
                     priority
-                    containerClassName="absolute inset-0"
+                    quality={90}
                   />
+                  <MotionGradient className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                 </div>
-                <MotionGradient className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                 <motion.div 
                   className="absolute bottom-0 left-0 right-0 p-8"
                   initial={{ opacity: 0, y: 30 }}

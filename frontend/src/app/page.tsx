@@ -10,33 +10,43 @@ import { NewsletterForm } from '@/components/ui/newsletter-form';
 
 const playfair = Playfair_Display({ subsets: ['latin'] });
 
+interface Recipe {
+  id: number;
+  title: string;
+  description: string;
+  mainImage: string;
+  category: string;
+  difficulty: string;
+  time: string;
+}
+
 const featuredRecipes = [
   {
     id: 1,
     title: "Tarte au Citron Meringuée",
     description: "Une tarte au citron traditionnelle, surmontée d'une meringue légère et aérienne.",
-    image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=1200&h=1200&fit=crop",
-    category: "Desserts",
-    difficulty: "Intermédiaire",
+    mainImage: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=1200&h=1200&fit=crop",
+    category: "Tartes",
+    difficulty: "Moyen",
     time: "1h30"
   },
   {
     id: 2,
     title: "Macarons à la Vanille",
     description: "Des macarons délicats à la vanille de Madagascar, avec une ganache onctueuse.",
-    image: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?q=80&w=1200&h=1200&fit=crop",
-    category: "Petits Gâteaux",
-    difficulty: "Avancé",
+    mainImage: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?q=80&w=1200&h=1200&fit=crop",
+    category: "Macarons",
+    difficulty: "Difficile",
     time: "2h"
   },
   {
     id: 3,
-    title: "Gâteau au Chocolat",
-    description: "Un gâteau au chocolat moelleux et intense, parfait pour les amateurs de cacao.",
-    image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1200&h=1200&fit=crop",
-    category: "Gâteaux",
-    difficulty: "Facile",
-    time: "45min"
+    title: "Croissants au Beurre",
+    description: "Des croissants feuilletés et croustillants, préparés avec du beurre AOP.",
+    mainImage: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=1200&h=1200&fit=crop",
+    category: "Viennoiseries",
+    difficulty: "Difficile",
+    time: "3h"
   }
 ];
 
@@ -86,8 +96,10 @@ export default function Home() {
                 <Image
                   src="https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=800&h=800&fit=crop"
                   alt="Gâteaux"
-                  fill
+                  width={800}
+                  height={800}
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
                 />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
                 <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-light">Gâteaux</span>
@@ -98,35 +110,41 @@ export default function Home() {
                 <Image
                   src="https://images.unsplash.com/photo-1519915028121-7d3463d20b13?q=80&w=800&h=800&fit=crop"
                   alt="Tartes"
-                  fill
+                  width={800}
+                  height={800}
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
                 />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
                 <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-light">Tartes</span>
               </div>
             </Link>
-            <Link href="/recettes/viennoiseries" className="group">
-              <div className="aspect-square relative overflow-hidden bg-white">
-                <Image
-                  src="https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=800&h=800&fit=crop"
-                  alt="Viennoiseries"
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
-                <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-light">Viennoiseries</span>
-              </div>
-            </Link>
             <Link href="/recettes/biscuits" className="group">
               <div className="aspect-square relative overflow-hidden bg-white">
                 <Image
-                  src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?q=80&w=800&h=800&fit=crop"
+                  src="https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=800&h=800&fit=crop"
                   alt="Biscuits"
-                  fill
+                  width={800}
+                  height={800}
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
                 />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
                 <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-light">Biscuits</span>
+              </div>
+            </Link>
+            <Link href="/recettes/viennoiseries" className="group">
+              <div className="aspect-square relative overflow-hidden bg-white">
+                <Image
+                  src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?q=80&w=800&h=800&fit=crop"
+                  alt="Viennoiseries"
+                  width={800}
+                  height={800}
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors"></div>
+                <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-light">Viennoiseries</span>
               </div>
             </Link>
           </div>
@@ -148,10 +166,11 @@ export default function Home() {
                 <Link href={`/recettes/${recipe.id}`}>
                   <div className="aspect-square relative overflow-hidden mb-4">
                     <Image
-                      src={recipe.image}
+                      src={recipe.mainImage}
                       alt={recipe.title}
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
                   <h3 className={`text-xl mb-2 group-hover:text-pink-400 transition-colors ${playfair.className}`}>
