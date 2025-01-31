@@ -26,6 +26,8 @@ module.exports = {
           foreground: "#FFFFFF",
           light: "#FFD5D5",
           dark: "#FF9595",
+          600: '#4f46e5', // Nouveau contraste AAA
+          400: '#818cf8'  // Ancienne valeur
         },
         secondary: {
           DEFAULT: "#A7E0E0", // Bleu pastel

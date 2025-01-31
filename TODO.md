@@ -1,5 +1,87 @@
 # TODO List
 
+## 🎯 Priorités Actuelles
+
+### Haute Priorité
+1. Optimisation des images avec sharp
+2. Système d'authentification complet
+3. Tests d'intégration
+4. Documentation API
+
+### Moyenne Priorité
+1. Pagination des partages
+2. Système de likes
+3. Amélioration de l'accessibilité
+4. Optimisation des performances
+
+### Basse Priorité
+1. Internationalisation (i18n)
+2. Support des thèmes sombres/clairs
+3. Système de newsletter
+4. Page de profil utilisateur
+
+## 📋 Par Catégorie
+
+### 🔒 Authentification & Sécurité
+- [ ] Système d'authentification complet
+- [ ] Gestion des rôles utilisateurs
+- [ ] Protection des routes sensibles
+- [ ] Validation des tokens JWT
+
+### 🖼️ Gestion des Images
+- [ ] Optimisation des images uploadées avec sharp
+- [ ] Compression automatique
+- [ ] Génération de thumbnails
+- [ ] Validation améliorée des formats
+
+### 💾 Base de Données
+- [ ] Optimisation des requêtes Prisma
+- [ ] Mise en cache des requêtes fréquentes
+- [ ] Système de backup automatique
+- [ ] Indexation pour la recherche
+
+### 🧪 Tests
+- [ ] Tests d'intégration frontend/backend
+- [ ] Tests de performance
+- [ ] Tests de charge
+- [ ] Tests d'accessibilité
+
+### 📱 Interface Utilisateur
+- [ ] Support des thèmes sombres/clairs
+- [ ] Amélioration de la navigation mobile
+- [ ] Animations optimisées
+- [ ] Meilleure gestion des erreurs UI
+
+### 📚 Documentation
+- [ ] Documentation API complète
+- [ ] Guide de contribution
+- [ ] Documentation utilisateur
+- [ ] Guide des raccourcis clavier
+
+### ⚡ Performance
+- [ ] Optimisation du bundle size
+- [ ] Mise en cache avancée
+- [ ] Lazy loading amélioré
+- [ ] Optimisation des requêtes API
+
+### 🌍 Internationalisation
+- [ ] Support multilingue
+- [ ] Adaptation des unités de mesure
+- [ ] Formats de date localisés
+- [ ] RTL support
+
+## 🔄 En Cours
+- Optimisation des images avec sharp
+- Mise en place des tests d'intégration
+- Documentation de l'API
+- Amélioration de l'accessibilité
+
+## ✅ Récemment Complété
+- [x] Configuration ESLint/Prettier
+- [x] Nettoyage de la structure du projet
+- [x] Mise à jour des READMEs
+- [x] Organisation des tests
+
 ## ✅ Fonctionnalités Complétées
 
 ### Structure et Configuration
@@ -73,25 +155,21 @@
 ## 🚧 En Cours de Développement
 
 ### Mode Cuisine
-- [ ] Optimisation des images uploadées avec sharp
 - [ ] Mode hors-ligne avec synchronisation
 - [ ] Historique des modifications personnelles
 - [ ] Support des unités de mesure internationales
 
 ### Système de Partage
-- [ ] Pagination des partages
 - [ ] Filtrage des partages par date/note
 - [ ] Galerie des réalisations en mode grille/liste
 - [ ] Système de likes sur les partages
 - [ ] Notifications des nouveaux partages
 
 ### Base de Données
-- [ ] Optimisation des requêtes Prisma
 - [ ] Mise en cache des requêtes fréquentes
 - [ ] Système de backup automatique
 
 ### Fonctionnalités Principales
-- [ ] Système d'authentification complet
 - [ ] Gestion des favoris
 - [ ] Système de commentaires global
 - [ ] Recherche de recettes
@@ -164,7 +242,6 @@
 - [ ] Mettre en place le lazy loading
 
 ## Fonctionnalités
-- [ ] Système d'authentification
 - [ ] Gestion des favoris
 - [ ] Système de commentaires
 - [ ] Recherche et filtrage des recettes

@@ -122,7 +122,7 @@ cd frontend && npm run cypress
 
 Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-## 📝 Gestion des Images
+## �� Gestion des Images et Slugs
 
 ### Structure des Images
 ```
@@ -140,6 +140,18 @@ frontend/
 - Format recommandé : JPG
 - Résolution recommandée : 1200x800 pixels
 - Taille maximale : 500KB
+
+### Configuration des Images
+- Les images sont servies via le backend depuis le dossier `/uploads`
+- Configuration CORS pour permettre l'accès aux images
+- Optimisation automatique avec next/image
+- Cache-control pour améliorer les performances
+
+### Gestion des Slugs
+- Les slugs sont générés automatiquement à partir du titre de la recette
+- Support des caractères accentués dans les URLs
+- Normalisation des slugs pour la cohérence
+- Validation côté serveur et client
 
 ### Ajout d'une Nouvelle Image
 1. Placer l'image dans `frontend/public/images/recipes/`

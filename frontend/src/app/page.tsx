@@ -25,7 +25,7 @@ const featuredRecipes = [
     id: 1,
     title: "Tarte au Citron Meringuée",
     description: "Une tarte au citron traditionnelle, surmontée d'une meringue légère et aérienne.",
-    mainImage: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=1200&h=1200&fit=crop",
+    mainImage: "/images/recipes/tarte-citron-meringuee.jpg",
     category: "Tartes",
     difficulty: "Moyen",
     time: "1h30"
@@ -65,6 +65,7 @@ export default function Home() {
               fill
               className="object-cover"
               priority
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
           <div className="text-center md:text-left">
@@ -163,7 +164,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {featuredRecipes.map((recipe) => (
               <article key={recipe.id} className="group">
-                <Link href={`/recettes/${recipe.id}`}>
+                <Link href={`/recettes/${recipe.title.toLowerCase().replace(/ /g, '-')}`}>
                   <div className="aspect-square relative overflow-hidden mb-4">
                     <Image
                       src={recipe.mainImage}

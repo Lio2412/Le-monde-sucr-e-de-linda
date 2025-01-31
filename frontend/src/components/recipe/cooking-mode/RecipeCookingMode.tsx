@@ -543,7 +543,6 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
     <div
       ref={containerRef}
       className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex flex-col"
-      data-testid="cooking-mode"
     >
       {/* En-tête */}
       <div className="flex items-center justify-between p-4 border-b">
@@ -552,8 +551,6 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
             variant="ghost"
             size="icon"
             onClick={handleClose}
-            className="shrink-0"
-            data-testid="close-cooking-mode-button"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -565,8 +562,6 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
               variant="ghost"
               size="icon"
               onClick={toggleFullscreen}
-              className="shrink-0"
-              data-testid="fullscreen-button"
             >
               {isFullscreen ? (
                 <Minimize2 className="h-4 w-4" />
@@ -588,7 +583,6 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
             onServingsChange={setServings}
           >
             <Button
-              data-testid="start-recipe"
               className="bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:shadow-xl h-12 px-8 py-2"
               onClick={() => setShowPreparation(false)}
             >
@@ -607,8 +601,6 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={toggleIngredientsVisibility}
-                    className="relative"
-                    data-testid="toggle-ingredients"
                   >
                     <ChefHat className="h-4 w-4" />
                   </Button>
@@ -616,8 +608,6 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
                     variant="ghost"
                     size="icon"
                     onClick={toggleNotesVisibility}
-                    className="relative"
-                    data-testid="toggle-notes"
                   >
                     <StickyNote className="h-4 w-4" />
                     {hasNotes && (
@@ -657,14 +647,12 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
                 className="flex justify-between items-center mt-6 gap-4" 
                 role="navigation"
                 aria-label="Navigation des étapes"
-                data-testid="step-navigation"
               >
                 <Button
                   onClick={goToPreviousStep}
                   disabled={currentStepIndex === 0}
                   variant="outline"
                   className="flex items-center gap-2 min-w-[120px]"
-                  data-testid="previous-step-button"
                 >
                   <ChevronLeft className="h-4 w-4" aria-hidden="true" />
                   <span>Précédent</span>
@@ -685,7 +673,6 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
                   disabled={currentStepIndex === recipe.steps.length - 1}
                   variant="outline"
                   className="flex items-center gap-2 min-w-[120px]"
-                  data-testid="next-step-button"
                 >
                   <span>Suivant</span>
                   <ChevronRight className="h-4 w-4" aria-hidden="true" />
@@ -732,7 +719,6 @@ export const RecipeCookingMode: React.FC<RecipeCookingModeProps> = ({
                         size="icon"
                         onClick={() => setShowIngredients(false)}
                         className="absolute top-2 right-2 h-8 w-8"
-                        data-testid="close-ingredients"
                       >
                         <X className="h-4 w-4" />
                       </Button>

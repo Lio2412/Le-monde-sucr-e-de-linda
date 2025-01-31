@@ -58,8 +58,7 @@ export function StepNotes({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-8 w-8"
-            data-testid="close-notes"
+            className="absolute top-2 right-2"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -73,7 +72,6 @@ export function StepNotes({
           onKeyDown={handleKeyDown}
           placeholder="Ajoutez vos notes ici..."
           className="flex-1 min-h-[200px] resize-none font-mono text-sm"
-          data-testid="note-input"
         />
 
         <div className="mt-4 space-y-1">

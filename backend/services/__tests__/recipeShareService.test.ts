@@ -16,7 +16,14 @@ describe('RecipeShareService', () => {
       data: {
         id: 'test-recipe-id',
         title: 'Test Recipe',
-        slug: 'test-recipe'
+        slug: 'test-recipe',
+        description: 'Test recipe description',
+        preparationTime: 30,
+        cookingTime: 45,
+        difficulty: 'MEDIUM',
+        servings: 4,
+        category: 'DESSERT',
+        authorId: 'test-user-id'
       }
     });
 

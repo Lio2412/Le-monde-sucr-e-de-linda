@@ -1,46 +1,41 @@
 export interface Ingredient {
   name: string;
-  quantity: number;
+  quantity: string;
   unit: string;
-  optional?: boolean;
-  adjustedQuantity?: number;
 }
 
-export interface RecipeStep {
+export interface Step {
   description: string;
-  duration?: number; // en minutes
-  temperature?: number;
-}
-
-export interface Comment {
-  id: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  content: string;
-  date: string;
-  likes: number;
-  isLiked?: boolean;
-  replies?: Comment[];
+  duration: string;
 }
 
 export interface Recipe {
   id: string;
+  slug: string;
   title: string;
   description: string;
-  ingredients: Ingredient[];
-  steps: RecipeStep[];
+  mainImage: string;
   preparationTime: number;
   cookingTime: number;
+  difficulty: string;
   servings: number;
-  difficulty: 'facile' | 'moyen' | 'difficile';
   category: string;
-  mainImage: string;
-  slug: string;
   tags: string[];
+  ingredients: Ingredient[];
+  equipment: string[];
+  steps: Step[];
   comments?: Comment[];
-  equipment?: string[]; // Liste optionnelle des équipements nécessaires
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+  };
 }
 
 export interface ShareData {

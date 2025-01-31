@@ -6,49 +6,65 @@ import { Star, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-
-interface Share {
-  id: string;
-  comment: string;
-  rating: number;
-  imagePath: string | null;
-  createdAt: string;
-  user: {
-    name: string | null;
-    image: string | null;
-  } | null;
-}
+import { Share } from '@/types/share';
+import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
 
 interface RecipeSharesProps {
   recipeId: string;
+}
+
+interface PaginatedShares {
+  items: Share[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasMore: boolean;
 }
 
 export function RecipeShares({ recipeId }: RecipeSharesProps) {
   const [shares, setShares] = useState<Share[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchShares = async (pageNumber: number) => {
+    try {
+      const response = await fetch(`/api/recipes/share?recipeId=${recipeId}&page=${pageNumber}&limit=10`);
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des partages');
+      }
+      const data: PaginatedShares = await response.json();
+      if (pageNumber === 1) {
+        setShares(data.items);
+      } else {
+        setShares(prev => [...prev, ...data.items]);
+      }
+      setHasMore(data.hasMore);
+      setTotalPages(data.totalPages);
+    } catch (err) {
+      setError('Impossible de charger les partages');
+      console.error('Erreur:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchShares = async () => {
-      try {
-        const response = await fetch(`/api/recipes/share?recipeId=${recipeId}`);
-        if (!response.ok) {
-          throw new Error('Erreur lors de la récupération des partages');
-        }
-        const data = await response.json();
-        setShares(data);
-      } catch (err) {
-        setError('Impossible de charger les partages');
-        console.error('Erreur:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchShares();
+    fetchShares(1);
   }, [recipeId]);
 
-  if (isLoading) {
+  const loadMore = () => {
+    if (hasMore && !isLoading) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchShares(nextPage);
+    }
+  };
+
+  if (isLoading && page === 1) {
     return (
       <div className="animate-pulse space-y-4">
         {[...Array(3)].map((_, i) => (
@@ -151,6 +167,18 @@ export function RecipeShares({ recipeId }: RecipeSharesProps) {
           </article>
         ))}
       </div>
+
+      {hasMore && (
+        <div className="text-center mt-6">
+          <Button
+            onClick={loadMore}
+            variant="outline"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Chargement...' : 'Charger plus'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 } 

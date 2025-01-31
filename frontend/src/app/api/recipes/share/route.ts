@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -90,11 +93,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Configuration pour augmenter la limite de taille des fichiers
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-}; 
+} 

@@ -44,13 +44,12 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <Button
             variant="outline"
             onClick={onClose}
-            data-testid="cancel-button"
           >
             {cancelLabel}
           </Button>
           <Button
+            variant="destructive"
             onClick={handleConfirm}
-            data-testid="confirm-button"
           >
             {confirmLabel}
           </Button>

@@ -1,49 +1,31 @@
-import { prisma } from '@/lib/prisma';
+import { Recipe } from '@/types/recipe';
 
-export interface Recipe {
-  id: string;
-  title: string;
-  description: string;
-  mainImage: string;
-  time: string;
-  difficulty: string;
-  servings: number;
-  ingredients: string[];
-  equipment: string[];
-  steps: string[];
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-export async function getRecipeById(id: string): Promise<Recipe | null> {
+const fetchOptions = {
+  credentials: 'include' as const,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+};
+
+export async function getRecipeBySlug(slug: string): Promise<Recipe | null> {
   try {
-    const recipe = await prisma.recipe.findUnique({
-      where: { id },
-      include: {
-        ingredients: true,
-        equipment: true,
-        steps: {
-          orderBy: {
-            order: 'asc'
-          }
-        }
+    // Décode le slug pour gérer les caractères spéciaux
+    const decodedSlug = decodeURIComponent(slug);
+    console.log('Fetching recipe with slug:', decodedSlug);
+    
+    const response = await fetch(`${API_URL}/recipes/${decodedSlug}`, fetchOptions);
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.log('Recipe not found');
+        return null;
       }
-    });
-
-    if (!recipe) {
-      return null;
+      throw new Error('Erreur lors de la récupération de la recette');
     }
-
-    return {
-      id: recipe.id,
-      title: recipe.title,
-      description: recipe.description,
-      mainImage: recipe.mainImage,
-      time: recipe.time,
-      difficulty: recipe.difficulty,
-      servings: recipe.servings,
-      ingredients: recipe.ingredients.map(i => i.text),
-      equipment: recipe.equipment.map(e => e.name),
-      steps: recipe.steps.map(s => s.text)
-    };
+    const recipe = await response.json();
+    console.log('Recipe found:', recipe);
+    return recipe;
   } catch (error) {
     console.error('Erreur lors de la récupération de la recette:', error);
     return null;
@@ -52,34 +34,12 @@ export async function getRecipeById(id: string): Promise<Recipe | null> {
 
 export async function getLatestRecipes(limit: number = 6): Promise<Recipe[]> {
   try {
-    const recipes = await prisma.recipe.findMany({
-      take: limit,
-      orderBy: {
-        createdAt: 'desc'
-      },
-      include: {
-        ingredients: true,
-        equipment: true,
-        steps: {
-          orderBy: {
-            order: 'asc'
-          }
-        }
-      }
-    });
-
-    return recipes.map(recipe => ({
-      id: recipe.id,
-      title: recipe.title,
-      description: recipe.description,
-      mainImage: recipe.mainImage,
-      time: recipe.time,
-      difficulty: recipe.difficulty,
-      servings: recipe.servings,
-      ingredients: recipe.ingredients.map(i => i.text),
-      equipment: recipe.equipment.map(e => e.name),
-      steps: recipe.steps.map(s => s.text)
-    }));
+    const response = await fetch(`${API_URL}/recipes?limit=${limit}`, fetchOptions);
+    if (!response.ok) {
+      throw new Error('Erreur lors de la récupération des recettes');
+    }
+    const recipes = await response.json();
+    return recipes;
   } catch (error) {
     console.error('Erreur lors de la récupération des recettes:', error);
     return [];

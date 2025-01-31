@@ -1,25 +1,33 @@
+export interface Step {
+  id: string;
+  order: number;
+  description: string;
+  duration: number;
+  image?: string;
+}
+
 export interface Ingredient {
+  id: string;
   name: string;
   quantity: number;
   unit: string;
 }
 
-export interface RecipeStep {
-  description: string;
-  duration?: number; // en minutes
-  temperature?: number;
-}
-
 export interface Recipe {
   id: string;
+  slug: string;
   title: string;
   description: string;
-  ingredients: Ingredient[];
-  steps: RecipeStep[];
+  mainImage?: string;
   preparationTime: number;
   cookingTime: number;
+  difficulty: string;
   servings: number;
-  difficulty: 'facile' | 'moyen' | 'difficile';
   category: string;
-  image?: string;
-} 
+  tags: string[];
+  ingredients: Ingredient[];
+  steps: Step[];
+  authorId: string;
+  createdAt: string;
+  updatedAt: string;
+}

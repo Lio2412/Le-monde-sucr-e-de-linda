@@ -25,8 +25,10 @@ export default function RecipeCard({
   time,
   rating
 }: RecipeCardProps) {
+  const slug = title.toLowerCase().replace(/ /g, '-');
+  
   return (
-    <Link href={`/recettes/${id}`} className="group">
+    <Link href={`/recettes/${slug}`} className="group">
       <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
         <div className="aspect-square relative">
           <Image

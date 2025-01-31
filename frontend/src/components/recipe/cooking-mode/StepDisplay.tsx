@@ -100,10 +100,7 @@ export function StepDisplay({
 
         {/* Description de l'étape */}
         <div className="space-y-4">
-          <p 
-            className="text-lg leading-relaxed"
-            data-testid="step-description"
-          >
+          <p className="text-lg">
             {description}
           </p>
           

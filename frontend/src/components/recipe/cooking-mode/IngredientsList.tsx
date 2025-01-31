@@ -94,7 +94,7 @@ export function IngredientsList({
   }
 
   return (
-    <div className="space-y-4" data-testid="ingredients-list">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold">Ingrédients</h3>
@@ -105,10 +105,9 @@ export function IngredientsList({
         {onClose && (
           <Button
             variant="ghost"
-            size="icon"
+            size="sm"
             onClick={onClose}
-            className="h-8 w-8"
-            data-testid="close-ingredients"
+            className="absolute top-2 right-2"
           >
             <X className="h-4 w-4" />
           </Button>

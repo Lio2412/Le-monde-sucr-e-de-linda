@@ -23,7 +23,7 @@ const recipes = [
     id: 1,
     title: "Tarte au Citron Meringuée",
     description: "Une tarte au citron traditionnelle, surmontée d'une meringue légère et aérienne.",
-    image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?q=80&w=1200&h=1200&fit=crop",
+    image: "/images/recipes/tarte-citron-meringuee.jpg",
     category: "Tartes",
     difficulty: "Intermédiaire",
     time: "1h30",

@@ -67,12 +67,10 @@ export function PreparationMode({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
               onClick={() => adjustServings(false)}
               disabled={servings <= 1}
-              className="h-8 w-8"
-              data-testid="decrease-servings"
             >
               <Minus className="h-4 w-4" />
             </Button>
@@ -80,11 +78,9 @@ export function PreparationMode({
               {servings} {servings > 1 ? 'parts' : 'part'}
             </span>
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
               onClick={() => adjustServings(true)}
-              className="h-8 w-8"
-              data-testid="increase-servings"
             >
               <Plus className="h-4 w-4" />
             </Button>
@@ -129,8 +125,7 @@ export function PreparationMode({
       >
         {children || (
           <Button
-            data-testid="start-recipe"
-            className="bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 hover:shadow-xl h-12 px-8 py-2"
+            className="w-full"
             onClick={onStart}
           >
             Commencer la recette
