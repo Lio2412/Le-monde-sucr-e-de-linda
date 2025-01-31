@@ -12,158 +12,137 @@ Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node
 - Raccourcis clavier avec boîte de dialogue
 - Indicateur de progression
 
-### Système de Partage
+### Système de Partage et Images
 - Partage de photos des réalisations
-- Notation des recettes (1-5 étoiles)
-- Commentaires et retours d'expérience
+- Gestion des images de recettes dans `/public/images/recipes/`
+- Format d'image recommandé : JPG
+- Nommage des images : slug-de-la-recette.jpg (ex: tarte-citron-meringuee.jpg)
+- Optimisation automatique des images avec next/image
 - Galerie des réalisations de la communauté
-- Optimisation automatique des images
 - Nettoyage automatique du cache d'images
 
 ### Interface & Design
 - Design responsive et moderne avec Tailwind CSS
 - Animations fluides avec Framer Motion
 - SEO optimisé avec métadonnées dynamiques
-- Optimisation des images avec next/image
 - Mode d'impression des recettes
 - Système de partage social
 
-## 🚧 État d'Avancement
+## 📁 Structure du Projet
 
-### ✅ Fonctionnalités Complétées
-- Configuration complète de Next.js avec TypeScript et SWC
-- Mise en place de TailwindCSS et Framer Motion
-- Composants UI réutilisables avec Shadcn/ui
-- Optimisation des images et gestion du SEO
-- Configuration CORS sécurisée
-- Mode cuisine avec timer et notes
-- Tests unitaires des composants principaux
-- Système de partage des réalisations
-- Gestion des uploads d'images
-- Intégration avec PostgreSQL et Prisma
+```
+project/
+├── frontend/                 # Application Next.js
+│   ├── src/                 # Code source frontend
+│   ├── public/              # Fichiers statiques
+│   ├── cypress/             # Tests E2E
+│   └── README.md           # Documentation frontend
+│
+├── backend/                 # Serveur Node.js
+│   ├── src/                # Code source backend
+│   ├── prisma/             # Configuration Prisma
+│   ├── scripts/            # Scripts utilitaires
+│   ├── config/             # Configurations
+│   └── README.md          # Documentation backend
+│
+└── docs/                   # Documentation générale
+```
 
-### 🔄 En Développement
-- Pagination des partages
-- Filtrage des réalisations
-- Système de likes
-- Notifications des nouveaux partages
-- Amélioration de l'accessibilité
-- Support des raccourcis clavier pour tablettes
-
-## 🛠 Technologies
-
-### Frontend
-- Next.js 14
-- TypeScript 5
-- TailwindCSS 3
-- Framer Motion
-- Shadcn/ui
-- Lucide React
-- SWR pour la gestion du cache
-
-### Backend
-- Node.js avec Express
-- PostgreSQL avec Prisma
-- JWT pour l'authentification
-- Multer pour la gestion des fichiers
-- Jest pour les tests
-
-### Outils de Développement
-- ESLint
-- Prettier
-- Husky
-- Jest
-- GitHub Actions
-
-## 📦 Installation
-
-### Prérequis
-- Node.js >= 18.0.0
-- PostgreSQL >= 15.0
-- npm >= 9.0.0 ou yarn >= 1.22.0
-- Git
-
-### Configuration
+## 🚀 Démarrage Rapide
 
 1. Cloner le projet :
 ```bash
-git clone https://github.com/Lio2412/Le-monde-sucr-e-de-linda.git
+git clone https://github.com/votre-username/le-monde-sucre-de-linda.git
 cd le-monde-sucre-de-linda
 ```
 
-2. Configuration du Backend :
+2. Installation des dépendances :
 ```bash
-cd backend
-npm install
-cp .env.example .env
-# Configurer les variables dans .env :
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/le-monde-sucre?schema=public"
-PORT=5000
-NODE_ENV=development
-JWT_SECRET=votre_secret_jwt_super_securise
-JWT_EXPIRES_IN=7d
-FRONTEND_URL=http://localhost:3000
+npm run setup
 ```
 
-3. Configuration du Frontend :
-```bash
-cd ../frontend
-npm install
-cp .env.example .env.local
-# Configurer les variables dans .env.local :
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-```
+3. Configuration :
+- Copier `.env.example` vers `.env` dans le dossier backend
+- Copier `.env.example` vers `.env.local` dans le dossier frontend
+- Configurer les variables d'environnement
 
-## 🚀 Démarrage
-
-1. Démarrer PostgreSQL :
+4. Lancer le projet :
 ```bash
-# Windows
-net start postgresql-x64-15
-# Linux/MacOS
-sudo systemctl start postgresql
-```
-
-2. Démarrer le projet (frontend et backend) :
-```bash
-# Dans le dossier racine du projet
 npm run dev
 ```
 
-## 🔧 Notes de Configuration
+## 🛠 Technologies Utilisées
 
-### Configuration CORS
-Le backend est configuré pour accepter les requêtes du frontend en développement (`http://localhost:3000`). Si vous changez le port du frontend, mettez à jour la variable `FRONTEND_URL` dans le fichier `.env` du backend.
+### Frontend
+- Next.js 14
+- TypeScript
+- TailwindCSS
+- Shadcn/ui
+- Framer Motion
+- SWR
 
-### Configuration des Images
-Le projet utilise `next/image` pour l'optimisation des images. Les domaines suivants sont autorisés :
-- images.unsplash.com
-- source.unsplash.com
-- picsum.photos
-- via.placeholder.com
+### Backend
+- Node.js avec Express
+- TypeScript
+- PostgreSQL avec Prisma
+- Jest pour les tests
 
-Pour ajouter d'autres domaines d'images, modifiez le fichier `next.config.mjs`.
+## 📚 Documentation
 
-### Commandes PowerShell
-Pour Windows, utilisez le point-virgule (`;`) comme séparateur de commandes au lieu de `&&` :
-```powershell
-cd backend; npm run dev
-```
+- [Documentation Frontend](frontend/README.md)
+- [Documentation Backend](backend/README.md)
+- [Documentation Mode Cuisine](docs/mode-cuisine.md)
 
-## 🐛 Résolution des Problèmes Courants
+## 🧪 Tests
 
-1. **Port déjà utilisé** :
-```powershell
-# Trouver le processus
-netstat -ano | findstr :[PORT]
-# Arrêter le processus
-taskkill /F /PID [PID]
-```
-
-2. **Erreurs de compilation Next.js** :
 ```bash
-# Nettoyer le cache
-cd frontend
-rm -r -force .next
-npm run dev
+# Tests unitaires
+npm test
+
+# Tests E2E
+cd frontend && npm run cypress
 ```
+
+## 📝 Conventions de Code
+
+- ESLint et Prettier pour la qualité du code
+- TypeScript strict
+- Tests unitaires pour les composants principaux
+- Documentation des fonctions et composants
+
+## 🤝 Contribution
+
+1. Fork le projet
+2. Créer une branche (`git checkout -b feature/AmazingFeature`)
+3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrir une Pull Request
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## 📝 Gestion des Images
+
+### Structure des Images
+```
+frontend/
+└── public/
+    └── images/
+        ├── recipes/           # Images des recettes
+        ├── maintenance.png    # Image de maintenance
+        ├── 404-cake.png      # Image 404
+        └── icons/            # Icônes du site
+```
+
+### Conventions de Nommage
+- Images de recettes : `slug-de-la-recette.jpg`
+- Format recommandé : JPG
+- Résolution recommandée : 1200x800 pixels
+- Taille maximale : 500KB
+
+### Ajout d'une Nouvelle Image
+1. Placer l'image dans `frontend/public/images/recipes/`
+2. Nommer l'image selon le slug de la recette
+3. Mettre à jour le mock data avec le chemin correct
+4. Vérifier l'affichage sur la page de la recette
