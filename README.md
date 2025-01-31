@@ -34,18 +34,21 @@ Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node
 project/
 ├── frontend/                 # Application Next.js
 │   ├── src/                 # Code source frontend
-│   ├── public/              # Fichiers statiques
-│   ├── cypress/             # Tests E2E
-│   └── README.md           # Documentation frontend
+│   │   ├── app/            # Pages et composants
+│   │   ├── components/     # Composants réutilisables
+│   │   ├── lib/           # Utilitaires et hooks
+│   │   └── types/         # Types TypeScript
+│   ├── public/             # Fichiers statiques
+│   └── README.md          # Documentation frontend
 │
 ├── backend/                 # Serveur Node.js
 │   ├── src/                # Code source backend
-│   ├── prisma/             # Configuration Prisma
-│   ├── scripts/            # Scripts utilitaires
-│   ├── config/             # Configurations
+│   │   ├── routes/        # Routes de l'API
+│   │   ├── types/         # Types TypeScript
+│   │   └── server.ts      # Point d'entrée
 │   └── README.md          # Documentation backend
 │
-└── docs/                   # Documentation générale
+└── README.md               # Documentation générale
 ```
 
 ## 🚀 Démarrage Rapide
@@ -58,7 +61,9 @@ cd le-monde-sucre-de-linda
 
 2. Installation des dépendances :
 ```bash
-npm run setup
+npm install
+cd frontend && npm install
+cd ../backend && npm install
 ```
 
 3. Configuration :
@@ -70,6 +75,9 @@ npm run setup
 ```bash
 npm run dev
 ```
+
+Le frontend sera accessible sur http://localhost:3000
+L'API backend sera accessible sur http://localhost:5000
 
 ## 🛠 Technologies Utilisées
 
@@ -122,39 +130,7 @@ cd frontend && npm run cypress
 
 Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-## �� Gestion des Images et Slugs
+## 📄 Gestion des Images et Slugs
 
 ### Structure des Images
 ```
-frontend/
-└── public/
-    └── images/
-        ├── recipes/           # Images des recettes
-        ├── maintenance.png    # Image de maintenance
-        ├── 404-cake.png      # Image 404
-        └── icons/            # Icônes du site
-```
-
-### Conventions de Nommage
-- Images de recettes : `slug-de-la-recette.jpg`
-- Format recommandé : JPG
-- Résolution recommandée : 1200x800 pixels
-- Taille maximale : 500KB
-
-### Configuration des Images
-- Les images sont servies via le backend depuis le dossier `/uploads`
-- Configuration CORS pour permettre l'accès aux images
-- Optimisation automatique avec next/image
-- Cache-control pour améliorer les performances
-
-### Gestion des Slugs
-- Les slugs sont générés automatiquement à partir du titre de la recette
-- Support des caractères accentués dans les URLs
-- Normalisation des slugs pour la cohérence
-- Validation côté serveur et client
-
-### Ajout d'une Nouvelle Image
-1. Placer l'image dans `frontend/public/images/recipes/`
-2. Nommer l'image selon le slug de la recette
-3. Mettre à jour le mock data avec le chemin correct
-4. Vérifier l'affichage sur la page de la recette

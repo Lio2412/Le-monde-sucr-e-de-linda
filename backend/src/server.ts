@@ -5,25 +5,9 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import prisma from './lib/prisma.js';
 
 // Routes
 import recipeRoutes from './routes/recipes.js';
-import { authRoutes } from './routes/auth.js';
-import { userRoutes } from './routes/users.js';
-
-// Types
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string;
-        email?: string;
-        name?: string;
-      };
-    }
-  }
-}
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -62,8 +46,6 @@ app.use(express.json());
 
 // Routes
 app.use('/api/recipes', recipeRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
 
 // Error handling
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -73,13 +55,6 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
     return res.status(400).json({
       status: 'error',
       message: err.message
-    });
-  }
-
-  if (err.name === 'UnauthorizedError') {
-    return res.status(401).json({
-      status: 'error',
-      message: 'Non autorisé'
     });
   }
 
@@ -98,5 +73,4 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
-// Export pour les tests
-export { app, prisma };
+export { app }; 

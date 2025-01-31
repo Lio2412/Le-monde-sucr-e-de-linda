@@ -1,53 +1,36 @@
-export enum RecipeDifficulty {
-  EASY = 'EASY',
-  MEDIUM = 'MEDIUM',
-  HARD = 'HARD'
+export interface Recipe {
+  id: string;
+  title: string;
+  description: string;
+  slug: string;
+  preparationTime: number;
+  cookingTime: number;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  servings: number;
+  category: 'STARTER' | 'MAIN' | 'DESSERT' | 'DRINK';
+  imageUrl?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  ingredients: Ingredient[];
+  steps: Step[];
+  tags: string[];
 }
 
-export enum RecipeCategory {
-  STARTER = 'STARTER',
-  MAIN = 'MAIN',
-  DESSERT = 'DESSERT',
-  DRINK = 'DRINK'
-}
-
-export interface RecipeIngredient {
+export interface Ingredient {
+  id: string;
   name: string;
   quantity: number;
   unit: string;
+  recipeId: string;
 }
 
-export interface RecipeStep {
+export interface Step {
+  id: string;
   description: string;
   duration: number;
   order: number;
-  image?: string;
-}
-
-export interface RecipeAuthor {
-  id: string;
-  email: string;
-  name: string;
-}
-
-export interface RecipeWithRelations {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  mainImage?: string | null;
-  preparationTime: number;
-  cookingTime: number;
-  difficulty: RecipeDifficulty;
-  servings: number;
-  category: RecipeCategory;
-  tags: string[];
-  ingredients: Array<RecipeIngredient & { id: string; recipeId: string }>;
-  steps: Array<RecipeStep & { id: string; recipeId: string }>;
-  author: RecipeAuthor;
-  authorId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  imageUrl?: string;
+  recipeId: string;
 }
 
 export interface CreateRecipeInput {
@@ -55,32 +38,10 @@ export interface CreateRecipeInput {
   description: string;
   preparationTime: number;
   cookingTime: number;
-  difficulty: RecipeDifficulty;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   servings: number;
-  category: RecipeCategory;
-  tags?: string[];
-  ingredients: RecipeIngredient[];
-  steps: RecipeStep[];
-}
-
-export interface UpdateRecipeInput extends Partial<CreateRecipeInput> {
-  mainImage?: string | null;
-}
-
-export interface PaginationParams {
-  page?: number;
-  limit?: number;
-}
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  totalPages: number;
-}
-
-export interface RecipeFilters {
-  category?: RecipeCategory;
-  difficulty?: RecipeDifficulty;
-  search?: string;
+  category: 'STARTER' | 'MAIN' | 'DESSERT' | 'DRINK';
+  ingredients: Omit<Ingredient, 'id' | 'recipeId'>[];
+  steps: Omit<Step, 'id' | 'recipeId'>[];
+  tags: string[];
 } 
