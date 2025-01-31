@@ -1,5 +1,7 @@
 {
   "name": "Le Monde Sucré de Linda",
+  "version": "1.0.2",
+  "lastUpdated": "2024-01-31",
   "description": "Règles de développement pour le projet Le Monde Sucré de Linda",
   "rules": [
     {
