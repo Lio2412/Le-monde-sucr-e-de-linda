@@ -31,10 +31,11 @@ Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node
 ## 🚧 État d'Avancement
 
 ### ✅ Fonctionnalités Complétées
-- Configuration complète de Next.js avec TypeScript
+- Configuration complète de Next.js avec TypeScript et SWC
 - Mise en place de TailwindCSS et Framer Motion
 - Composants UI réutilisables avec Shadcn/ui
 - Optimisation des images et gestion du SEO
+- Configuration CORS sécurisée
 - Mode cuisine avec timer et notes
 - Tests unitaires des composants principaux
 - Système de partage des réalisations
@@ -62,7 +63,7 @@ Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node
 
 ### Backend
 - Node.js avec Express
-- MongoDB avec Mongoose
+- PostgreSQL avec Prisma
 - JWT pour l'authentification
 - Multer pour la gestion des fichiers
 - Jest pour les tests
@@ -78,7 +79,7 @@ Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node
 
 ### Prérequis
 - Node.js >= 18.0.0
-- MongoDB >= 6.0
+- PostgreSQL >= 15.0
 - npm >= 9.0.0 ou yarn >= 1.22.0
 - Git
 
@@ -96,9 +97,12 @@ cd backend
 npm install
 cp .env.example .env
 # Configurer les variables dans .env :
-# MONGODB_URI=mongodb://localhost:27017/le-monde-sucre
-# JWT_SECRET=votre_secret_jwt
-# PORT=5000
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/le-monde-sucre?schema=public"
+PORT=5000
+NODE_ENV=development
+JWT_SECRET=votre_secret_jwt_super_securise
+JWT_EXPIRES_IN=7d
+FRONTEND_URL=http://localhost:3000
 ```
 
 3. Configuration du Frontend :
@@ -107,101 +111,59 @@ cd ../frontend
 npm install
 cp .env.example .env.local
 # Configurer les variables dans .env.local :
-# NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
 
 ## 🚀 Démarrage
 
-1. Démarrer MongoDB :
+1. Démarrer PostgreSQL :
 ```bash
 # Windows
-net start MongoDB
+net start postgresql-x64-15
 # Linux/MacOS
-sudo systemctl start mongod
+sudo systemctl start postgresql
 ```
 
-2. Démarrer le backend :
+2. Démarrer le projet (frontend et backend) :
 ```bash
-cd backend
+# Dans le dossier racine du projet
 npm run dev
 ```
 
-3. Dans un nouveau terminal, démarrer le frontend :
+## 🔧 Notes de Configuration
+
+### Configuration CORS
+Le backend est configuré pour accepter les requêtes du frontend en développement (`http://localhost:3000`). Si vous changez le port du frontend, mettez à jour la variable `FRONTEND_URL` dans le fichier `.env` du backend.
+
+### Configuration des Images
+Le projet utilise `next/image` pour l'optimisation des images. Les domaines suivants sont autorisés :
+- images.unsplash.com
+- source.unsplash.com
+- picsum.photos
+- via.placeholder.com
+
+Pour ajouter d'autres domaines d'images, modifiez le fichier `next.config.mjs`.
+
+### Commandes PowerShell
+Pour Windows, utilisez le point-virgule (`;`) comme séparateur de commandes au lieu de `&&` :
+```powershell
+cd backend; npm run dev
+```
+
+## 🐛 Résolution des Problèmes Courants
+
+1. **Port déjà utilisé** :
+```powershell
+# Trouver le processus
+netstat -ano | findstr :[PORT]
+# Arrêter le processus
+taskkill /F /PID [PID]
+```
+
+2. **Erreurs de compilation Next.js** :
 ```bash
+# Nettoyer le cache
 cd frontend
+rm -r -force .next
 npm run dev
 ```
-
-L'application sera accessible à :
-- Frontend : http://localhost:3000
-- Backend : http://localhost:5000
-- API Documentation : http://localhost:5000/api-docs
-
-## 🏗 Structure du Projet
-
-```
-le-monde-sucre-de-linda/
-├── backend/              # API Node.js/Express
-│   ├── src/             # Code source
-│   │   ├── controllers/ # Contrôleurs
-│   │   ├── models/     # Modèles Mongoose
-│   │   ├── routes/     # Routes API
-│   │   └── utils/      # Utilitaires
-│   ├── tests/          # Tests unitaires et d'intégration
-│   └── package.json    # Dépendances backend
-└── frontend/           # Application Next.js
-    ├── src/
-    │   ├── app/       # Pages et routes Next.js
-    │   ├── components/ # Composants React
-    │   ├── hooks/     # Custom hooks
-    │   ├── lib/       # Utilitaires
-    │   ├── types/     # Types TypeScript
-    │   └── styles/    # Styles et configurations
-    ├── public/        # Assets statiques
-    └── package.json   # Dépendances frontend
-```
-
-## 🧪 Tests
-
-```bash
-# Lancer les tests unitaires
-npm run test
-
-# Lancer les tests avec couverture
-npm run test:coverage
-```
-
-## 📚 Documentation
-
-- [Guide de Contribution](./CONTRIBUTING.md)
-- [Documentation API](./API.md)
-- [Guide de Style](./STYLE_GUIDE.md)
-
-## 🔄 Dernières Mises à Jour
-
-- Optimisation du mode cuisine avec meilleure gestion des effets et des états
-- Correction des problèmes de boucles infinies dans RecipeCookingMode
-- Amélioration de la gestion des images avec next/image
-- Optimisation des performances avec useCallback et useMemo
-- Meilleure gestion des dépendances dans les effets
-- Correction des problèmes de typage pour les images
-- Amélioration de la stabilité générale du mode cuisine
-- Mise à jour de la documentation et de la TODO list
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/amelioration`)
-3. Commit (`git commit -m 'feat: ajout nouvelle fonctionnalité'`)
-4. Push (`git push origin feature/amelioration`)
-5. Créer une Pull Request
-
-## 📝 Licence
-
-Ce projet est sous licence ISC. Voir le fichier `LICENSE` pour plus de détails.
-
-## 📧 Contact
-
-Linda - [linda@lemondesucre.fr](mailto:linda@lemondesucre.fr)
-
-Projet : [https://github.com/Lio2412/Le-monde-sucr-e-de-linda](https://github.com/Lio2412/Le-monde-sucr-e-de-linda) 
