@@ -12,7 +12,9 @@
         "Utiliser TypeScript pour le typage statique",
         "Suivre les conventions ESLint et Prettier",
         "Utiliser des noms de variables et fonctions explicites en français",
-        "Commenter le code complexe en français"
+        "Commenter le code complexe en français",
+        "Toujours exporter correctement les services (export const serviceName)",
+        "Vérifier les imports dans les hooks personnalisés"
       ]
     },
     {
@@ -22,7 +24,9 @@
         "Organiser les composants par fonctionnalité",
         "Utiliser les layouts Next.js appropriés",
         "Séparer la logique métier des composants UI",
-        "Utiliser les hooks personnalisés pour la réutilisation de code"
+        "Utiliser les hooks personnalisés pour la réutilisation de code",
+        "Vérifier la cohérence des exports/imports entre les services",
+        "Documenter les changements d'API dans le CHANGELOG"
       ]
     },
     {
@@ -32,7 +36,9 @@
         "Utiliser le SSR quand approprié",
         "Implémenter le lazy loading pour les composants lourds",
         "Minimiser les re-renders inutiles",
-        "Optimiser les requêtes API"
+        "Optimiser les requêtes API",
+        "Maintenir les temps de réponse API sous les seuils définis",
+        "Implémenter le cache HTTP approprié"
       ]
     },
     {
@@ -42,7 +48,9 @@
         "Utiliser des tokens CSRF",
         "Implémenter une authentification sécurisée",
         "Protéger les routes sensibles",
-        "Suivre les bonnes pratiques OWASP"
+        "Suivre les bonnes pratiques OWASP",
+        "Gérer correctement les erreurs d'authentification",
+        "Logger les tentatives de connexion échouées"
       ]
     },
     {
@@ -54,7 +62,9 @@
         "Vérifier la couverture de code et ajouter des tests si nécessaire",
         "Exécuter les vérifications de qualité et de sécurité",
         "Vérifier les performances et la charge",
-        "Effectuer des tests manuels ou UAT si nécessaire"
+        "Effectuer des tests manuels ou UAT si nécessaire",
+        "Vérifier les imports et exports des services",
+        "Tester les scénarios d'erreur d'authentification"
       ]
     },
     {
@@ -67,7 +77,20 @@
         "Fournir un résumé concis des validations",
         "Récapituler la liste TODO mise à jour",
         "Mettre en place la surveillance post-déploiement",
-        "Signaler les anomalies et créer des tâches correspondantes"
+        "Signaler les anomalies et créer des tâches correspondantes",
+        "Surveiller les métriques de performance API",
+        "Documenter les erreurs courantes et leurs solutions"
+      ]
+    },
+    {
+      "name": "Monitoring & Métriques",
+      "rules": [
+        "Surveiller les temps de réponse API (Login < 100ms, GET /me < 10ms)",
+        "Maintenir un taux de cache > 90% pour les endpoints fréquents",
+        "Optimiser la taille des réponses API",
+        "Suivre les erreurs d'authentification",
+        "Monitorer les pics de latence",
+        "Alerter sur les dépassements de seuils de performance"
       ]
     }
   ]

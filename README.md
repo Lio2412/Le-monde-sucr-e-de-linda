@@ -1,6 +1,84 @@
 # Le Monde Sucré de Linda
 
-Une plateforme de partage de recettes de pâtisserie élégante et moderne.
+Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node.js, mettant en valeur des recettes gourmandes dans un design minimaliste et raffiné.
+
+## ⚠️ État Actuel
+- Correction en cours de l'erreur d'import authService
+- Performance API : Login ~51ms, GET /me ~3ms
+- Taux de cache : 95% pour GET /me
+
+## 📚 Documentation
+
+Toute la documentation du projet est disponible dans le [dossier docs](./docs/README.md).
+
+Vous y trouverez :
+- [Documentation API](./docs/API.md)
+- [Guide des tests](./docs/TEST_SCENARIOS.md)
+- [TODO List](./docs/TODO.md)
+- [Changelog](./docs/CHANGELOG.md)
+- [Guide de Dépannage](./docs/TROUBLESHOOTING.md)
+
+## 🚀 Démarrage Rapide
+
+1. Installation :
+```bash
+npm install
+cd frontend && npm install
+cd ../backend && npm install
+```
+
+2. Configuration :
+- Copier `.env.example` vers `.env` dans le dossier backend
+- Copier `.env.example` vers `.env.local` dans le dossier frontend
+- Configurer les variables d'environnement selon votre environnement
+
+3. Lancer le projet :
+```bash
+# Backend (http://localhost:5000)
+cd backend && npm run dev
+
+# Frontend (http://localhost:3000)
+cd frontend && npm run dev
+```
+
+## 🛠 Technologies Utilisées
+
+### Frontend
+- Next.js 14
+- TypeScript
+- TailwindCSS
+- Shadcn/ui
+- Framer Motion
+
+### Backend
+- Node.js avec Express
+- TypeScript
+- PostgreSQL avec Prisma
+- Jest pour les tests
+
+## 🔒 Sécurité et Performance
+
+### Sécurité
+- Authentification JWT complète
+- Gestion des rôles (ADMIN, PATISSIER, USER)
+- Protection CSRF
+- Validation des données avec Zod
+
+### Performance
+- Temps de réponse API optimisés
+  - Login: ~51ms (max 173ms)
+  - GET /me: ~3ms (max 274ms)
+- Cache efficace (95% hit rate)
+- Compression gzip activée
+
+## 🐛 Problèmes Connus
+- Erreur d'import authService dans le frontend
+- Pics occasionnels de latence sur GET /me
+- Quelques warnings de compilation Next.js
+
+## 📝 Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](./LICENSE) pour plus de détails.
 
 ## 🚀 Technologies Utilisées
 
@@ -113,14 +191,6 @@ L'application sera disponible sur http://localhost:3000
 - Animations fluides
 - Gestion des erreurs
 - Protection des routes
-
-## 🔒 Sécurité
-
-- Hachage des mots de passe avec bcrypt
-- Protection CSRF
-- Validation des données
-- Authentification JWT
-- Headers de sécurité avec Helmet
 
 ## 📝 Documentation API
 
