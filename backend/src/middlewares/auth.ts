@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../config/constants.js';
+import { JWT_SECRET } from '../config/constants';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -9,18 +9,28 @@ interface JwtPayload {
   userId: string;
 }
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        userId: string;
+      };
+    }
+  }
+}
+
 /**
  * Middleware d'authentification
  * Vérifie le token JWT dans les en-têtes et ajoute l'utilisateur à la requête
  */
-export const auth = async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Récupérer le token du header Authorization
+    // Vérifier si le token est présent dans les headers
     const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        message: 'Token d\'authentification manquant'
+        message: 'Token manquant'
       });
     }
 
@@ -29,29 +39,8 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
       // Vérifier et décoder le token
-      const decoded = jwt.verify(token, JWT_SECRET as jwt.Secret) as JwtPayload;
-
-      // Récupérer l'utilisateur
-      const user = await prisma.user.findUnique({
-        where: { id: decoded.userId },
-        include: {
-          roles: {
-            include: {
-              role: true
-            }
-          }
-        }
-      });
-
-      if (!user) {
-        return res.status(401).json({
-          success: false,
-          message: 'Utilisateur non trouvé'
-        });
-      }
-
-      // Ajouter l'utilisateur à la requête
-      (req as any).user = user;
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      req.user = { userId: decoded.userId };
       next();
     } catch (error) {
       return res.status(401).json({

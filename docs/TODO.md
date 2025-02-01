@@ -1,217 +1,239 @@
-# 📋 TODO List
+# 📋 TODO - Le Monde Sucré de Linda
+Mise à jour : 2024-02-01
 
-## 🎯 Priorités Actuelles
+## 🚨 Priorité Haute
 
-### Haute Priorité
-1. ⚠️ Correction des erreurs d'import authService
-   - Résoudre le problème d'export dans authService.ts
-   - Corriger les imports dans useAuth.ts
-2. 🔍 Tests d'intégration
-   - Mettre en place les tests E2E
-   - Ajouter des tests de performance
-3. 📱 Optimisation mobile
-   - Améliorer la réactivité
-   - Optimiser les performances sur mobile
+### Tests
+- [ ] Résoudre les problèmes de gestion du rôle USER dans les tests d'intégration
+- [ ] Améliorer la couverture des tests (objectif : >80% branch coverage)
+- [ ] Corriger les tests d'authentification échoués
 
-### Moyenne Priorité
-1. 📊 Système de pagination
-   - Implémentation pour les listes de recettes
-   - Optimisation des requêtes
-2. ❤️ Système de likes
-   - Backend: API pour les likes
-   - Frontend: Composant de like
-3. ♿ Amélioration de l'accessibilité
-   - Audit WCAG
-   - Corrections des problèmes identifiés
+### Performance
+- [ ] Optimiser les temps de réponse API
+- [ ] Améliorer le cache des requêtes fréquentes
+- [ ] Réduire la taille des réponses API
 
-### Basse Prioritité
-1. 🌍 Internationalisation (i18n)
-2. 📨 Système de newsletter
-3. 👤 Page de profil utilisateur
-
-## 📋 Par Catégorie
-
-### 🔒 Authentification & Sécurité
-✅ Système d'authentification complet
-✅ Gestion des rôles (ADMIN, PATISSIER, USER)
-✅ Protection des routes sensibles
-✅ Validation des tokens JWT
-- [ ] Amélioration de la gestion des erreurs
-- [ ] Système de récupération de mot de passe
-
-### 🖼️ Gestion des Images
-✅ Configuration initiale de sharp
-- [ ] Optimisation automatique des images
-- [ ] Génération de thumbnails
-- [ ] Validation des formats
-
-### 💾 Base de Données
-✅ Configuration de PostgreSQL
-✅ Schéma Prisma initial
-- [ ] Optimisation des requêtes
-- [ ] Système de cache avancé
-- [ ] Backup automatique
-
-### 🧪 Tests
-✅ Tests unitaires de base
-- [ ] Tests d'intégration frontend/backend
-- [ ] Tests de performance
-- [ ] Tests de charge
-
-### 📱 Interface Utilisateur
-✅ Composants de base (Header, Footer)
-✅ Mode cuisine
-✅ Système de partage
-- [ ] Amélioration de la navigation mobile
-- [ ] Optimisation des animations
-
-### 📚 Documentation
-✅ Documentation API de base
-✅ Guide de contribution
-✅ Documentation utilisateur
-- [ ] Guide des raccourcis clavier
-- [ ] Documentation technique complète
-
-### ⚡ Performance
-✅ Configuration de base Next.js
-✅ Optimisation initiale des images
-- [ ] Optimisation du bundle size
-- [ ] Lazy loading amélioré
-- [ ] Cache avancé
+### Sécurité
+- [ ] Mettre à jour les dépendances npm
+- [ ] Renforcer la validation des entrées
+- [ ] Améliorer la gestion des erreurs
 
 ## 🔄 En Cours
-- 🐛 Correction des erreurs d'import authService
-- 🧪 Mise en place des tests d'intégration
-- 📱 Optimisation mobile
-- 📊 Implémentation de la pagination
+
+### Développement
+- [ ] Refactoring du service d'authentification
+- [ ] Optimisation des requêtes à la base de données
+- [ ] Documentation des nouvelles fonctionnalités
+
+### Tests
+- [ ] Mise en place de nouveaux scénarios de test
+- [ ] Amélioration des tests de performance
+- [ ] Documentation des procédures de test
+
+### Documentation
+- [ ] Mise à jour des guides d'utilisation
+- [ ] Documentation des API
+- [ ] Guides de déploiement
+
+## 📋 Backlog
+
+### Fonctionnalités
+- [ ] Implémentation du 2FA
+- [ ] Système de notifications
+- [ ] Export des données utilisateur
+
+### Améliorations
+- [ ] UI/UX responsive
+- [ ] Optimisation des images
+- [ ] Support multilingue
+
+### Infrastructure
+- [ ] Mise en place de CI/CD
+- [ ] Monitoring avancé
+- [ ] Backup automatisé
+
+## 📅 Planning
+
+### Sprint Actuel (Février 2024)
+1. Résolution des problèmes de tests
+2. Optimisation des performances
+3. Mise à jour de la documentation
+
+### Prochain Sprint
+1. Implémentation des nouvelles fonctionnalités
+2. Amélioration de la sécurité
+3. Déploiement des optimisations
+
+### Long Terme
+1. Audit de sécurité complet
+2. Certification des processus
+3. Expansion des fonctionnalités
+
+## 📊 Métriques Cibles
+
+### Performance
+- Temps de réponse API < 100ms
+- Cache hit rate > 90%
+- Taille des réponses < 100KB
+
+### Tests
+- Couverture globale > 90%
+- Branch coverage > 80%
+- Zéro test échoué
+
+### Sécurité
+- Zéro vulnérabilité critique
+- Temps de réponse aux incidents < 1h
+- 100% de conformité RGPD
+
+## 🔍 Points d'Attention
+
+### Technique
+- Optimisation des requêtes N+1
+- Gestion de la mémoire
+- Scalabilité des services
+
+### Sécurité
+- Protection contre les injections
+- Validation des données
+- Gestion des sessions
+
+### Qualité
+- Code review systématique
+- Documentation à jour
+- Tests automatisés
+
+## 📝 Notes
+
+### Développement
+- Suivre les conventions de code
+- Documenter les changements
+- Tester avant de déployer
+
+### Déploiement
+- Vérifier les variables d'environnement
+- Sauvegarder avant mise à jour
+- Tester en staging
+
+### Maintenance
+- Surveiller les logs
+- Mettre à jour régulièrement
+- Vérifier les sauvegardes
+
+## 🎯 Priorités Immédiates
+
+### Tests et Qualité
+- [ ] Améliorer la couverture de code (actuellement 0.58%)
+  - [ ] Services d'authentification (objectif > 90%)
+  - [ ] Composants UI (objectif > 70%)
+  - [ ] Hooks personnalisés (objectif > 80%)
+- [ ] Optimiser les tests de scénarios mixtes
+- [ ] Implémenter les tests E2E manquants
+- [ ] Ajouter des tests de résilience réseau
+
+### Performance
+- [ ] Optimiser les temps de réponse API
+  - [ ] Login : réduire à < 30ms (actuellement ~37ms)
+  - [ ] Register : maintenir < 15ms (actuellement ~12ms)
+  - [ ] GetMe : maintenir < 10ms (actuellement ~9ms)
+- [ ] Améliorer le taux de cache (objectif > 95%, actuellement > 90%)
+- [ ] Optimiser la gestion des sessions concurrentes
+
+### Documentation
+- [ ] Mettre à jour la documentation technique
+- [ ] Compléter le guide des tests
+- [ ] Documenter les métriques de performance
+- [ ] Créer des guides de débogage
+
+## 🚀 En Cours
+
+### Tests
+- [x] Tests d'authentification (16/16 passés)
+- [x] Tests de charge (jusqu'à 100 utilisateurs)
+- [x] Configuration du rate limiting
+- [ ] Tests de scénarios mixtes en cours d'optimisation
+- [ ] Amélioration de la couverture de code
+
+### Performance
+- [x] Optimisation des temps de réponse API
+- [x] Configuration du cache pour GetMe
+- [x] Tests de résilience réseau
+- [ ] Optimisation des requêtes concurrentes
+- [ ] Amélioration du monitoring
+
+### Sécurité
+- [x] Authentification JWT
+- [x] Protection contre les surcharges
+- [x] Rate limiting
+- [ ] Tests de sécurité automatisés
+- [ ] Audit de sécurité complet
+
+## 📈 Objectifs Q1 2024
+
+### Couverture de Code
+- [ ] Global : 70% (actuellement 0.58%)
+- [ ] Services : 90%
+- [ ] Composants : 80%
+- [ ] Hooks : 85%
+
+### Performance
+- [ ] Temps de réponse API < 50ms
+- [ ] Taux de cache > 95%
+- [ ] Score Core Web Vitals > 90
+- [ ] Temps de build < 5 minutes
+
+### Sécurité
+- [ ] Tests de pénétration automatisés
+- [ ] Détection des vulnérabilités
+- [ ] Rotation des tokens
+- [ ] Protection contre les attaques par force brute
 
 ## ✅ Récemment Complété
-- [x] Système d'authentification complet
-- [x] Gestion des rôles utilisateurs
-- [x] Protection des routes sensibles
+
+### Tests
+- [x] Tests d'authentification (16/16)
+- [x] Tests de charge réussis
+- [x] Tests de résilience validés
+- [x] Configuration du rate limiting
+- [x] Optimisation des temps de réponse
+
+### Performance
+- [x] Optimisation API initiale
+- [x] Configuration du cache
+- [x] Tests de charge validés
+- [x] Monitoring de base
+
+### Documentation
 - [x] Documentation API de base
-- [x] Configuration ESLint/Prettier
+- [x] Guide des tests initial
+- [x] Documentation des métriques
+- [x] Guide de contribution
 
-## 📈 Métriques Actuelles
-- Temps de réponse API:
-  - Login: ~51ms (max 173ms)
-  - GET /me: ~3ms (max 274ms)
-  - Register: ~2ms
-- Taux de cache: 95% pour GET /me
-- Taille des réponses optimisées:
-  - Login: 1266 bytes
-  - User Info: 1054 bytes
+## 📊 Métriques à Surveiller
 
-## 🎯 Objectifs Court Terme
-1. Résoudre les erreurs d'import authService
-2. Améliorer les performances mobiles
-3. Compléter les tests d'intégration
-4. Optimiser la gestion des images
+### Performance
+- [ ] Temps de réponse API < seuils définis
+  - Login : < 500ms
+  - Register : < 800ms
+  - GetMe : < 200ms
+- [ ] Taux de succès des tests > 99%
+- [ ] Couverture de code > 70%
+- [ ] Taux de cache > 95%
 
-## 🌟 Objectifs Long Terme
-1. Internationalisation complète
-2. PWA avec support hors-ligne
-3. Système de recommandations
-4. Analytics avancés
+### Qualité
+- [ ] Zéro vulnérabilité critique
+- [ ] Dette technique < 5 jours
+- [ ] Documentation à jour
+- [ ] Tests verts sur toutes les branches
 
-## 🚧 En Cours de Développement
+## 🐛 Bugs Connus
+- [ ] Couverture de code insuffisante
+- [ ] Tests de scénarios mixtes instables
+- [ ] Quelques avertissements TypeScript
+- [ ] Optimisation des tests d'inscription nécessaire
 
-### Mode Cuisine
-- [ ] Mode hors-ligne avec synchronisation
-- [ ] Historique des modifications personnelles
-- [ ] Support des unités de mesure internationales
-
-### Système de Partage
-- [ ] Filtrage des partages par date/note
-- [ ] Galerie des réalisations en mode grille/liste
-- [ ] Système de likes sur les partages
-- [ ] Notifications des nouveaux partages
-
-### Base de Données
-- [ ] Mise en cache des requêtes fréquentes
-- [ ] Système de backup automatique
-
-### Fonctionnalités Principales
-- [ ] Gestion des favoris
-- [ ] Système de commentaires global
-- [ ] Recherche de recettes
-- [ ] Filtrage par catégories
-
-### Tests et Documentation
-- [ ] Tests d'intégration
-- [ ] Tests de performance
-- [ ] Documentation utilisateur complète
-- [ ] Guide des raccourcis clavier
-- [ ] Documentation API
-- [ ] Guide de contribution
-
-## 🐛 Bugs Résolus
-- [x] Correction des erreurs de typage dans RecipeMetadata
-- [x] Optimisation des images et gestion du ratio d'aspect
-- [x] Gestion du Wake Lock dans le mode plein écran
-- [x] Correction des warnings d'images Next.js
-- [x] Correction des problèmes de rendu côté serveur
-- [x] Amélioration de l'accessibilité des dialogues
-- [x] Correction des tests du KeyboardShortcutsDialog
-- [x] Résolution des conflits de dépendances
-- [x] Correction des erreurs de typage dans StepNotes
-- [x] Correction des tests du RecipeCookingMode
-- [x] Amélioration des mocks des hooks
-- [x] Gestion des timeouts dans les tests
-- [x] Correction des boucles infinies dans RecipeCookingMode
-- [x] Optimisation des effets et des états
-- [x] Correction des problèmes de typage des images
-- [x] Amélioration de la gestion des dépendances
-- [x] Correction des erreurs lors du partage des réalisations
-
-## 📈 Améliorations Futures
-- [ ] Amélioration des performances (Core Web Vitals)
-- [ ] Optimisation du bundle size
-- [ ] Mise en cache des recettes
-- [ ] Mode hors-ligne (PWA)
-- [ ] Internationalisation (i18n)
-- [ ] Support des thèmes sombres/clairs
-- [ ] Système de newsletter
-- [ ] Page de profil utilisateur
-- [ ] Système de suggestions de recettes
-
-## 📋 Prochaines Étapes
-1. Optimisation des images avec sharp
-2. Intégration complète avec PostgreSQL
-3. Système d'authentification
-4. Tests d'intégration
-
-## Tests
-- [x] Correction des tests du RecipeCookingMode
-- [x] Amélioration des mocks des hooks
-- [x] Gestion des timeouts dans les tests
-- [ ] Tests d'intégration
-- [ ] Tests de performance
-- [ ] Tests de charge
-
-## Accessibilité
-- [x] Ajouter DialogTitle aux DialogContent
-- [x] Ajouter des descriptions aux dialogues
-- [ ] Améliorer la navigation au clavier
-- [ ] Tester avec des lecteurs d'écran
-- [ ] Ajouter des aria-labels manquants
-
-## Performance
-- [ ] Optimiser les animations
-- [ ] Réduire les temps de chargement
-- [ ] Améliorer le SSR
-- [ ] Optimiser les images
-- [ ] Mettre en place le lazy loading
-
-## Fonctionnalités
-- [ ] Gestion des favoris
-- [ ] Système de commentaires
-- [ ] Recherche et filtrage des recettes
-- [ ] Support des raccourcis clavier pour tablettes
-
-## Documentation
-- [x] Mise à jour du README
-- [x] Documentation des tests
-- [ ] Documentation de l'API
-- [ ] Guide de style
-- [ ] Guide de contribution 
+## 📝 Notes
+- Maintenir la surveillance des métriques de performance
+- Continuer l'amélioration de la documentation
+- Planifier des revues de code régulières
+- Suivre les meilleures pratiques de test 

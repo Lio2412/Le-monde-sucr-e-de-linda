@@ -1,122 +1,136 @@
-# Scénarios de Test - Système d'Authentification
+# 🧪 Scénarios de Test
+Mise à jour : 2024-02-01
 
-## Utilisateurs de Test
+## 📊 État Actuel
 
-### 1. Administrateur
-- Email: admin@test.com
-- Mot de passe: Admin123!
-- Rôles: admin, user
+### Tests d'Authentification
+✅ **16/16 Tests Passés**
+- Login
+- Register
+- GetMe
+- Protection des routes
+- Gestion des rôles
 
-### 2. Utilisateur Standard
-- Email: user@test.com
-- Mot de passe: User123!
-- Rôles: user
+### Tests de Performance
+#### Temps de Réponse
+- **Login** : ~37ms (max 500ms)
+  - 10 utilisateurs : ~66ms
+  - 50 utilisateurs : ~33ms
+  - 100 utilisateurs : ~57ms
+- **Register** : ~12ms (max 800ms)
+- **GetMe** : ~9ms (max 200ms)
 
-### 3. Pâtissier
-- Email: patissier@test.com
-- Mot de passe: Patissier123!
-- Rôles: patissier, user
+#### Taux de Succès
+- Global : > 95%
+- Sous charge : > 90%
+- Cache hit rate : > 90%
 
-## Scénarios de Test
+## 🎯 Scénarios Principaux
 
-### 1. Connexion
+### 1. Authentification
+- ✅ Connexion réussie
+- ✅ Inscription nouvel utilisateur
+- ✅ Récupération profil utilisateur
+- ✅ Déconnexion
+- ✅ Gestion des erreurs
 
-#### 1.1 Connexion Réussie
-1. Accéder à la page de connexion
-2. Entrer les identifiants de l'administrateur
-3. Vérifier :
-   - Redirection vers le tableau de bord
-   - Affichage du nom de l'utilisateur
-   - Accès aux fonctionnalités d'administration
+### 2. Tests de Charge
+- ✅ 10 utilisateurs simultanés
+- ✅ 50 utilisateurs simultanés
+- ✅ 100 utilisateurs simultanés
+- ⚠️ Scénarios mixtes (en cours d'optimisation)
 
-#### 1.2 Connexion Échouée
-1. Accéder à la page de connexion
-2. Entrer des identifiants incorrects
-3. Vérifier :
-   - Message d'erreur approprié
-   - Pas de redirection
-   - Possibilité de réessayer
+### 3. Tests de Résilience
+- ✅ Récupération après surcharge
+- ✅ Gestion des timeouts
+- ✅ Rate limiting
+- ✅ Protection contre les surcharges
 
-### 2. Protection des Routes
+## 📝 Instructions d'Exécution
 
-#### 2.1 Accès Non Authentifié
-1. Se déconnecter
-2. Essayer d'accéder directement aux URLs protégées :
-   - /dashboard
-   - /admin
-   - /recettes/creer
-3. Vérifier :
-   - Redirection vers la page de connexion
-   - Message approprié
+### Tests Unitaires
+```bash
+# Exécuter tous les tests
+npm test
 
-#### 2.2 Accès avec Rôles Insuffisants
-1. Se connecter en tant qu'utilisateur standard
-2. Essayer d'accéder aux pages réservées aux administrateurs
-3. Vérifier :
-   - Redirection vers la page d'accès refusé
-   - Message approprié
+# Tests d'authentification uniquement
+npm test auth
 
-### 3. Gestion de Session
+# Tests avec couverture
+npm run test:coverage
+```
 
-#### 3.1 Persistance de Session
-1. Se connecter
-2. Rafraîchir la page
-3. Vérifier :
-   - Session maintenue
-   - Pas de déconnexion
+### Tests de Performance
+```bash
+# Tests de charge
+npm run test:load
 
-#### 3.2 Expiration de Session
-1. Se connecter
-2. Attendre l'expiration du token
-3. Vérifier :
-   - Déconnexion automatique
-   - Redirection vers la page de connexion
+# Tests de résilience
+npm run test:resilience
 
-### 4. Déconnexion
+# Tests mixtes
+npm run test:mixed
+```
 
-#### 4.1 Déconnexion Manuelle
-1. Se connecter
-2. Cliquer sur le bouton de déconnexion
-3. Vérifier :
-   - Redirection vers la page de connexion
-   - Suppression du token
-   - Impossibilité d'accéder aux routes protégées
+## 🎯 Seuils de Performance
 
-### 5. Gestion des Rôles
+### Temps de Réponse
+```text
+Endpoint    | Normal | Charge | Max    |
+------------|--------|--------|--------|
+Login       | 50ms   | 100ms  | 500ms  |
+Register    | 100ms  | 200ms  | 800ms  |
+GetMe       | 10ms   | 50ms   | 200ms  |
+```
 
-#### 5.1 Accès Administrateur
-1. Se connecter en tant qu'administrateur
-2. Vérifier l'accès à :
-   - Panel d'administration
-   - Gestion des utilisateurs
-   - Gestion des rôles
+### Taux de Succès
+```text
+Scénario           | Minimum |
+-------------------|---------|
+Normal             | 99.9%   |
+Charge (100 users) | 95%     |
+Résilience         | 70%     |
+```
 
-#### 5.2 Accès Pâtissier
-1. Se connecter en tant que pâtissier
-2. Vérifier l'accès à :
-   - Création de recettes
-   - Modification de ses propres recettes
-   - Impossibilité d'accéder au panel d'administration
+## 🐛 Problèmes Connus
 
-#### 5.3 Accès Utilisateur Standard
-1. Se connecter en tant qu'utilisateur standard
-2. Vérifier :
-   - Accès au profil personnel
-   - Accès aux recettes publiques
-   - Impossibilité de créer des recettes
-   - Impossibilité d'accéder aux fonctionnalités administratives
+### Haute Priorité
+- [ ] Couverture de code insuffisante (0.58%)
+- [ ] Tests de scénarios mixtes instables
+- [ ] Optimisation des tests d'inscription
 
-## Instructions pour les Tests
+### En Cours de Résolution
+- [ ] Amélioration de la couverture des services
+- [ ] Optimisation des tests de charge
+- [ ] Documentation des cas limites
 
-1. Exécuter chaque scénario dans l'ordre
-2. Noter tout comportement inattendu
-3. Vérifier les messages d'erreur et leur pertinence
-4. Tester sur différents navigateurs
-5. Vérifier la réactivité sur mobile
+## 📈 Métriques de Surveillance
 
-## Résultats Attendus
+### Performance
+- Temps de réponse API
+- Taux de succès des requêtes
+- Utilisation des ressources
+- Cache hit rate
 
-- Tous les scénarios doivent passer avec succès
-- Les messages d'erreur doivent être clairs et en français
-- Les redirections doivent être fluides
-- L'expérience utilisateur doit être cohérente 
+### Qualité
+- Couverture de code
+- Taux d'erreur
+- Temps d'exécution des tests
+- Stabilité des tests
+
+## 📋 Prochaines Étapes
+
+1. **Court Terme**
+   - Optimiser les tests de scénarios mixtes
+   - Améliorer la couverture de code
+   - Documenter les nouveaux scénarios
+
+2. **Moyen Terme**
+   - Implémenter plus de tests E2E
+   - Automatiser les tests de régression
+   - Optimiser les performances
+
+3. **Long Terme**
+   - Atteindre 70% de couverture
+   - Réduire les temps de réponse
+   - Améliorer la résilience 

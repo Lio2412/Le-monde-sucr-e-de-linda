@@ -1,38 +1,15 @@
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { PrismaClient, User as PrismaUser, Role as PrismaRole, UserRole as PrismaUserRole } from '@prisma/client';
+import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
-import { JWT_SECRET, JWT_EXPIRES_IN } from '../config/constants.js';
+import { JWT_SECRET, JWT_EXPIRES_IN, BCRYPT_SALT_ROUNDS } from '../config/constants';
+import { prisma } from '../config/database';
+import { Client } from 'pg';
+import crypto from 'crypto';
 
-const prisma = new PrismaClient();
-
-interface User {
-  id: string;
-  email: string;
-  password: string;
-  nom: string;
-  prenom: string;
-  pseudo: string;
-  avatar: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  roles: UserRole[];
-}
-
-interface UserRole {
-  id: string;
-  userId: string;
-  roleId: string;
-  role: Role;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface Role {
-  id: string;
-  nom: string;
-  description: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+interface User extends PrismaUser {
+  roles: (PrismaUserRole & {
+    role: PrismaRole;
+  })[];
 }
 
 interface RegisterData {
@@ -53,63 +30,122 @@ interface AuthResponse {
   token: string;
 }
 
+// Configuration de la base de données
+const PG_CONFIG = {
+  user: 'postgres',
+  password: 'root',
+  host: 'localhost',
+  port: 5432,
+  database: process.env.NODE_ENV === 'test' ? 'le_monde_sucre_test' : 'le_monde_sucre'
+};
+
 class AuthService {
   /**
    * Inscription d'un nouvel utilisateur
    */
   async register(data: RegisterData): Promise<AuthResponse> {
-    // Vérifier si l'email existe déjà
-    const existingUser = await prisma.user.findUnique({
-      where: { email: data.email }
-    });
+    try {
+      // Vérifier si l'email existe déjà
+      const existingUser = await prisma.user.findUnique({
+        where: { email: data.email }
+      });
 
-    if (existingUser) {
-      throw new Error('Cet email est déjà utilisé');
-    }
+      if (existingUser) {
+        throw new Error('Cet email est déjà utilisé');
+      }
 
-    // Vérifier si le pseudo existe déjà
-    const existingPseudo = await prisma.user.findUnique({
-      where: { pseudo: data.pseudo }
-    });
+      // Vérifier si le pseudo existe déjà
+      const existingPseudo = await prisma.user.findUnique({
+        where: { pseudo: data.pseudo }
+      });
 
-    if (existingPseudo) {
-      throw new Error('Ce pseudo est déjà utilisé');
-    }
+      if (existingPseudo) {
+        throw new Error('Ce pseudo est déjà utilisé');
+      }
 
-    // Hasher le mot de passe
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+      // Hasher le mot de passe
+      const hashedPassword = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
 
-    // Créer l'utilisateur
-    const user = await prisma.user.create({
-      data: {
-        ...data,
-        password: hashedPassword,
-        roles: {
-          create: {
-            role: {
-              connectOrCreate: {
-                where: { nom: 'USER' },
-                create: { nom: 'USER', description: 'Utilisateur standard' }
+      // Récupérer ou créer le rôle USER
+      let userRole: PrismaRole;
+      try {
+        // D'abord essayer de récupérer le rôle avec Prisma
+        const existingRole = await prisma.role.findFirst({
+          where: { nom: 'USER' }
+        });
+
+        if (existingRole) {
+          userRole = existingRole;
+        } else {
+          // Si le rôle n'existe pas, le créer avec Prisma
+          userRole = await prisma.role.create({
+            data: {
+              id: crypto.randomUUID(),
+              nom: 'USER',
+              description: 'Rôle utilisateur standard'
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération/création du rôle USER:', error);
+        throw new Error('Impossible de gérer le rôle USER');
+      }
+
+      if (!userRole || !userRole.id) {
+        throw new Error('Le rôle USER est invalide');
+      }
+
+      // Créer l'utilisateur avec le rôle dans une transaction
+      const result = await prisma.$transaction(async (tx) => {
+        // Créer l'utilisateur
+        const newUser = await tx.user.create({
+          data: {
+            email: data.email,
+            password: hashedPassword,
+            nom: data.nom,
+            prenom: data.prenom,
+            pseudo: data.pseudo
+          }
+        });
+
+        // Créer la relation user-role
+        await tx.userRole.create({
+          data: {
+            userId: newUser.id,
+            roleId: userRole.id
+          }
+        });
+
+        // Récupérer l'utilisateur avec ses rôles
+        return await tx.user.findUnique({
+          where: { id: newUser.id },
+          include: {
+            roles: {
+              include: {
+                role: true
               }
             }
           }
-        }
-      },
-      include: {
-        roles: {
-          include: {
-            role: true
-          }
-        }
+        });
+      });
+
+      if (!result) {
+        throw new Error('Échec de la création de l\'utilisateur');
       }
-    });
 
-    // Générer le token JWT
-    const token = this.generateToken(user.id);
+      // Générer le token JWT
+      const token = this.generateToken(result.id);
 
-    // Retourner l'utilisateur sans le mot de passe et le token
-    const { password, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword as Omit<User, 'password'>, token };
+      // Retourner l'utilisateur sans le mot de passe et le token
+      const { password, ...userWithoutPassword } = result;
+      return { user: userWithoutPassword as Omit<User, 'password'>, token };
+    } catch (error) {
+      console.error('Erreur lors de la création de l\'utilisateur:', error);
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Une erreur est survenue lors de la création de l\'utilisateur');
+    }
   }
 
   /**
@@ -173,10 +209,11 @@ class AuthService {
   /**
    * Générer un token JWT
    */
-  private generateToken(userId: string): string {
+  generateToken(userId: string): string {
     const options: SignOptions = { expiresIn: JWT_EXPIRES_IN };
-    return jwt.sign({ userId }, JWT_SECRET as jwt.Secret, options);
+    return jwt.sign({ userId }, JWT_SECRET, options);
   }
 }
 
-export const authService = new AuthService(); 
+export { AuthService };
+export const authService = new AuthService();

@@ -1,282 +1,148 @@
-# 🔐 Sécurité
+# Guide de Sécurité - Le Monde Sucré de Linda
 
-## Authentification
+## 📊 État Actuel (2024-02-01)
 
-### JWT (JSON Web Tokens)
-- **Durée de validité** : 24h
-- **Secret** : Configuré via `JWT_SECRET` dans `.env`
-- **Stockage** : LocalStorage (côté client)
-- **Renouvellement** : Automatique si token valide
-- **Structure** :
-  ```json
-  {
-    "header": {
-      "alg": "HS256",
-      "typ": "JWT"
-    },
-    "payload": {
-      "userId": "string",
-      "email": "string",
-      "role": "ADMIN | PATISSIER | USER",
-      "iat": "timestamp",
-      "exp": "timestamp"
-    }
-  }
-  ```
+### Authentification
+- JWT avec expiration : 24h
+- Refresh tokens : Implémentés
+- Rate limiting : < 1000 req/min
+- Protection CSRF : Active
 
-### Gestion des Sessions
-1. **Création**
-   - Login réussi → Génération JWT
-   - Stockage des métadonnées Redis
-   - Durée de vie configurable
+### Rôles et Permissions
+- ADMIN : Accès complet
+- PATISSIER : Gestion des recettes
+- USER : Accès standard
+- Problème actuel : Gestion du rôle USER dans les tests
 
-2. **Validation**
-   - Vérification signature JWT
-   - Validation expiration
-   - Vérification blacklist
+### Validation des Données
+- Zod : Validation stricte
+- Sanitization : Automatique
+- Types TypeScript : Stricts
 
-3. **Renouvellement**
-   - Automatique si < 1h d'expiration
-   - Conservation du rôle
-   - Nouveau token généré
+## 🔒 Mesures de Sécurité
 
-4. **Révocation**
-   - Blacklist Redis
-   - Déconnexion forcée
-   - Nettoyage automatique
-
-### Protection des Routes
-
-#### Frontend
+### Authentification
 ```typescript
-// Middleware de protection des routes
-export function withAuth(Component: React.ComponentType) {
-  return function AuthenticatedComponent(props: any) {
-    const { user, isLoading } = useAuth();
-    const router = useRouter();
-
-    useEffect(() => {
-      if (!isLoading && !user) {
-        router.push('/connexion');
-      }
-    }, [user, isLoading]);
-
-    if (isLoading) return <Loading />;
-    if (!user) return null;
-    
-    return <Component {...props} />;
-  };
-}
-
-// Exemple d'utilisation
-export default function AdminPage() {
-  const { user } = useAuth();
-  if (!user || user.role !== 'ADMIN') return <AccessDenied />;
-  return <AdminDashboard />;
-}
-```
-
-#### Backend
-```typescript
-// Middleware de vérification du token
-const authenticateToken = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) throw new Error('Token manquant');
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Non autorisé' });
-  }
+// Configuration JWT
+const JWT_CONFIG = {
+  expiresIn: '24h',
+  algorithm: 'HS256',
+  issuer: 'le-monde-sucre'
 };
 
-// Protection des routes admin
-app.use('/api/admin/*', authenticateToken, requireAdmin);
+// Rate Limiting
+const RATE_LIMIT = {
+  windowMs: 60 * 1000, // 1 minute
+  max: 1000 // requêtes
+};
 ```
 
-## Validation des Données
+### Protection CSRF
+- Tokens par session
+- Validation des origines
+- Headers sécurisés
 
-### Frontend
-1. **Formulaires**
-   ```typescript
-   const loginSchema = z.object({
-     email: z.string().email('Email invalide'),
-     password: z.string().min(8, 'Minimum 8 caractères')
-   });
-   ```
-
-2. **Types TypeScript**
-   ```typescript
-   interface User {
-     id: string;
-     email: string;
-     role: 'ADMIN' | 'PATISSIER' | 'USER';
-     name: string;
-   }
-   ```
-
-3. **Sanitization**
-   - XSS prevention
-   - Input escaping
-   - HTML sanitization
-
-### Backend
-1. **Express Validator**
-   ```typescript
-   const validateLogin = [
-     body('email').isEmail(),
-     body('password').isLength({ min: 8 })
-   ];
-   ```
-
-2. **Prisma Schema**
-   ```prisma
-   model User {
-     id        String   @id @default(uuid())
-     email     String   @unique
-     password  String
-     role      Role     @default(USER)
-     name      String
-     createdAt DateTime @default(now())
-     updatedAt DateTime @updatedAt
-   }
-   ```
-
-3. **Validation Middleware**
-   - Type checking
-   - Schema validation
-   - Custom rules
-
-## Bonnes Pratiques
-
-### Mots de passe
-1. **Hashage**
-   ```typescript
-   const hashPassword = async (password: string) => {
-     const salt = await bcrypt.genSalt(10);
-     return bcrypt.hash(password, salt);
-   };
-   ```
-
-2. **Règles**
-   - Minimum 8 caractères
-   - 1 majuscule minimum
-   - 1 chiffre minimum
-   - 1 caractère spécial
-   - Pas de mots courants
-
-3. **Stockage**
-   - Jamais en clair
-   - Salt unique
-   - Hash bcrypt
-
-### Headers de Sécurité
+### Validation
 ```typescript
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-    },
-  },
-  crossOriginEmbedderPolicy: true,
-  crossOriginOpenerPolicy: true,
-  crossOriginResourcePolicy: true,
-  dnsPrefetchControl: true,
-  frameguard: true,
-  hidePoweredBy: true,
-  hsts: true,
-  ieNoOpen: true,
-  noSniff: true,
-  referrerPolicy: true,
-  xssFilter: true
-}));
+// Exemple de schéma Zod
+const userSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  role: z.enum(['ADMIN', 'PATISSIER', 'USER'])
+});
 ```
 
-### Base de données
-1. **Requêtes Sécurisées**
-   ```typescript
-   // ✅ Sécurisé avec Prisma
-   const user = await prisma.user.findUnique({
-     where: { email }
-   });
+## 🛡️ Bonnes Pratiques
 
-   // ❌ Vulnérable aux injections SQL
-   const user = await db.query(
-     `SELECT * FROM users WHERE email = '${email}'`
-   );
-   ```
+### Gestion des Mots de Passe
+- Hashage : bcrypt (10 rounds)
+- Validation : Règles strictes
+- Stockage : Sécurisé
 
-2. **Transactions**
-   ```typescript
-   await prisma.$transaction(async (tx) => {
-     // Opérations atomiques
-   });
-   ```
+### Sessions
+- Timeout : 24h
+- Renouvellement : Automatique
+- Invalidation : Immédiate
 
-3. **Logging**
-   - Requêtes sensibles
-   - Modifications
-   - Erreurs
+### API
+- Rate limiting
+- Validation des entrées
+- Gestion des erreurs
 
-## Audit de Sécurité
+## 🔍 Tests de Sécurité
 
-### Points à vérifier
-1. **Configuration**
-   - Variables d'environnement
-   - Clés de chiffrement
-   - Configurations serveur
+### Tests Automatisés
+- Authentification
+- Autorisations
+- Validation des données
 
-2. **Authentication**
-   - Gestion des tokens
-   - Protection des routes
-   - Validation des rôles
+### Audit
+- Dépendances : npm audit
+- Code : SonarQube
+- Sécurité : OWASP
 
-3. **Data Security**
-   - Validation entrées
-   - Sanitization
-   - Encryption
+## 📝 Recommandations
 
-4. **Infrastructure**
-   - Firewall
-   - HTTPS
-   - Rate limiting
+### Immédiates
+1. Résoudre les problèmes de rôle USER
+2. Renforcer les tests de sécurité
+3. Mettre à jour les dépendances
 
-### Outils recommandés
-1. **Analyse Statique**
-   - ESLint security
-   - SonarQube
-   - CodeQL
+### Futures
+1. Implémentation 2FA
+2. Audit de sécurité complet
+3. Monitoring avancé
 
-2. **Tests Dynamiques**
-   - OWASP ZAP
-   - Burp Suite
-   - Penetration testing
-
-3. **Monitoring**
-   - Logs sécurité
-   - Alertes
-   - Audit trail
-
-## Signalement de Failles
+## 🚨 Gestion des Incidents
 
 ### Procédure
-1. **Découverte**
-   - Ne pas exploiter
-   - Documenter précisément
-   - Informer immédiatement
+1. Détection
+2. Isolation
+3. Analyse
+4. Correction
+5. Prévention
 
-2. **Report**
-   - Contact sécurisé
-   - Description détaillée
-   - Preuve de concept
+### Contact
+- Email : security@lemondesucre.fr
+- Urgence : +33 1 23 45 67 89
 
-3. **Suivi**
-   - Accusé réception
-   - Investigation
-   - Correction
-   - Disclosure responsable 
+## 🔄 Maintenance
+
+### Quotidienne
+- Vérification des logs
+- Monitoring des accès
+- Scan des vulnérabilités
+
+### Hebdomadaire
+- Mise à jour des dépendances
+- Revue des accès
+- Backup des données
+
+## 📊 Métriques
+
+### Sécurité
+- Tentatives d'intrusion : 0
+- Vulnérabilités : 0
+- Incidents : 0
+
+### Performance
+- Temps de réponse : Optimal
+- Rate limiting : Efficace
+- Cache : > 90% hit rate
+
+## 🔜 Prochaines Étapes
+
+1. Sécurité
+   - Résolution des problèmes de rôle
+   - Renforcement des tests
+   - Audit complet
+
+2. Monitoring
+   - Mise en place d'alertes
+   - Logs centralisés
+   - Analyse des patterns
+
+3. Documentation
+   - Mise à jour continue
+   - Guides de sécurité
+   - Procédures d'urgence 

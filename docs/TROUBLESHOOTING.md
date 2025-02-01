@@ -1,148 +1,318 @@
 # 🔧 Guide de Dépannage
+Mise à jour : 2024-02-01
 
-## Erreurs Courantes
+## 🚨 Problèmes Courants
 
-### 1. Erreurs d'Authentification
+### 1. Tests d'Intégration
 
-#### "Email ou mot de passe incorrect"
-- **Symptôme:** Erreur 401 lors de la connexion
-- **Cause:** Identifiants invalides
-- **Solution:** 
-  - Vérifier l'email et le mot de passe
-  - Vérifier que le compte existe
-  - Utiliser la fonction "Mot de passe oublié" si nécessaire
-
-#### "Cet email est déjà utilisé"
-- **Symptôme:** Erreur 400 lors de l'inscription
-- **Cause:** Email déjà enregistré dans la base de données
-- **Solution:**
-  - Utiliser un autre email
-  - Se connecter avec l'email existant
-  - Utiliser la récupération de mot de passe si nécessaire
-
-### 2. Erreurs d'Import
-
-#### "authService is not exported from '@/services/authService'"
-- **Symptôme:** Erreur de compilation dans le frontend
-- **Cause:** Problème d'export/import du service d'authentification
-- **Solution:**
-  ```typescript
-  // Dans authService.ts
-  export const authService = {
-    login,
-    register,
-    logout,
-    // ...
-  };
-
-  // Dans useAuth.ts
-  import { authService } from '@/services/authService';
-  ```
-
-### 3. Erreurs de Performance
-
-#### Temps de réponse lents
-- **Symptôme:** Réponse API > 100ms
-- **Cause possible:** 
-  - Surcharge serveur
-  - Problème de cache
-  - Connexion réseau lente
-- **Solution:**
-  - Vérifier les logs serveur
-  - Vérifier la connexion réseau
-  - Utiliser le cache quand possible
-
-#### Problèmes de Cache
-- **Symptôme:** Données obsolètes ou non mises à jour
-- **Cause:** Cache HTTP mal configuré
-- **Solution:**
-  - Vérifier les headers de cache
-  - Forcer le rafraîchissement si nécessaire
-  - Utiliser les ETags correctement
-
-## Logs et Debugging
-
-### Backend (Node.js/Express)
-
-#### Format des Logs
-```
-METHOD /path STATUS TIME_MS - SIZE_BYTES
+#### Problème : Gestion du Rôle USER
+```typescript
+// Erreur courante
+Error: Le rôle USER est invalide
+at src/services/authService.ts:54:12
 ```
 
-Exemple:
-```
-POST /api/auth/login 200 51.602 ms - 1266
-GET /api/auth/me 304 2.561 ms - -
-```
+**Solution :**
+1. Vérifier la création du rôle dans `integration.setup.ts`
+2. S'assurer que l'ID du rôle est cohérent
+3. Nettoyer la base de test avant chaque suite
 
-#### Codes Status Communs
-- `200`: Succès
-- `304`: Non modifié (cache valide)
-- `400`: Erreur de requête
-- `401`: Non authentifié
-- `403`: Non autorisé
-- `404`: Non trouvé
-- `500`: Erreur serveur
-
-### Frontend (Next.js)
-
-#### Commandes Utiles
+#### Problème : Couverture des Tests
 ```bash
-# Démarrer en mode développement
-npm run dev
-
-# Démarrer avec debug
-npm run dev -- --debug
-
-# Nettoyer le cache
-npm run dev -- --clear
+# Erreur de couverture
+ERROR: Coverage for branches (75.00%) does not meet global threshold (80%)
 ```
 
-#### Logs de Compilation
-- ✓ Succès: `Compiled successfully`
-- ⚠ Avertissement: `Fast Refresh had to perform a full reload`
-- ✕ Erreur: `Failed to compile`
+**Solution :**
+1. Identifier les branches non couvertes
+2. Ajouter des cas de test manquants
+3. Vérifier les conditions limites
 
-## Outils de Debugging
+### 2. Performance API
 
-### Backend
+#### Problème : Temps de Réponse Lents
+```typescript
+// Exemple de requête lente
+const response = await fetch('/api/recipes?category=all');
+// Temps > 500ms
+```
+
+**Solution :**
+1. Implémenter le caching
+2. Optimiser les requêtes SQL
+3. Ajouter des index appropriés
+
+#### Problème : Fuites Mémoire
 ```bash
-# Voir les logs en temps réel
-cd backend && npm run dev
-
-# Avec plus de détails
-DEBUG=* npm run dev
+# Warning de mémoire
+WARN: Possible memory leak detected in AuthService
 ```
 
-### Frontend
+**Solution :**
+1. Nettoyer les listeners
+2. Fermer les connexions
+3. Gérer les timeouts
+
+### 3. Authentification
+
+#### Problème : Validation JWT
+```typescript
+// Erreur de token
+Error: jwt malformed
+at verifyToken (src/middleware/auth.ts:25:8)
+```
+
+**Solution :**
+1. Vérifier le format du token
+2. Valider la clé secrète
+3. Contrôler l'expiration
+
+#### Problème : Sessions
+```typescript
+// Erreur de session
+Error: Session expired or invalid
+```
+
+**Solution :**
+1. Vérifier les paramètres de session
+2. Implémenter le refresh token
+3. Nettoyer les sessions expirées
+
+## 🔧 Outils de Diagnostic
+
+### Logs
 ```bash
-# Voir les logs en temps réel
-cd frontend && npm run dev
+# Activer les logs détaillés
+DEBUG=app:* npm start
 
-# Avec source maps
-NODE_OPTIONS='--inspect' npm run dev
+# Filtrer les logs d'authentification
+grep "auth" logs/app.log
 ```
 
-## Contact Support
+### Tests
+```bash
+# Exécuter les tests avec debug
+DEBUG=test:* npm test
 
-Si vous ne pouvez pas résoudre un problème :
+# Tests spécifiques
+npm test -- auth.test.ts
+```
 
-1. **Documentation**
-   - Consulter ce guide
-   - Vérifier la [documentation API](./API.md)
-   - Lire les [notes de version](./CHANGELOG.md)
+### Performance
+```bash
+# Profiling
+node --prof app.js
 
-2. **Logs**
-   - Collecter les logs pertinents
-   - Noter les messages d'erreur exacts
-   - Capturer le contexte (URL, action, etc.)
+# Analyse mémoire
+node --inspect app.js
+```
 
-3. **Rapport**
-   - Créer une issue GitHub
-   - Inclure tous les détails collectés
-   - Mentionner les étapes de reproduction
+## 📊 Métriques à Surveiller
 
-4. **Contact**
-   - Email: support@lemondesucre.fr
-   - Discord: [Serveur Support](https://discord.gg/lemondesucre)
-   - GitHub: [Issues](https://github.com/lemondesucre/issues) 
+### Performance
+- Temps de réponse API > 100ms
+- Utilisation mémoire > 80%
+- CPU > 70%
+
+### Sécurité
+- Tentatives de connexion échouées
+- Tokens invalides
+- Requêtes bloquées
+
+### Base de Données
+- Temps de requête > 50ms
+- Connexions actives > 80%
+- Erreurs de transaction
+
+## 🔍 Procédures de Debug
+
+### 1. Tests
+1. Isoler le test qui échoue
+2. Vérifier l'environnement
+3. Analyser les logs
+4. Reproduire localement
+
+### 2. Performance
+1. Identifier le goulot d'étranglement
+2. Profiler l'application
+3. Optimiser le code
+4. Valider les améliorations
+
+### 3. Sécurité
+1. Vérifier les logs
+2. Analyser les patterns
+3. Renforcer les contrôles
+4. Tester les corrections
+
+## 🛠️ Maintenance Préventive
+
+### Quotidien
+- Vérifier les logs
+- Monitorer les performances
+- Nettoyer les sessions
+
+### Hebdomadaire
+- Analyser les métriques
+- Mettre à jour les dépendances
+- Sauvegarder les données
+
+### Mensuel
+- Audit de sécurité
+- Revue de code
+- Optimisation base de données
+
+## 📝 Documentation
+
+### Logs
+- Format : `[LEVEL] [SERVICE] Message`
+- Rotation : Quotidienne
+- Rétention : 30 jours
+
+### Métriques
+- Collection : Toutes les 5 minutes
+- Agrégation : Horaire
+- Stockage : 90 jours
+
+### Alertes
+- Sévérité : INFO, WARN, ERROR
+- Notification : Email, Slack
+- Escalade : Auto après 30 minutes
+
+## 🔄 Processus de Mise à Jour
+
+### Avant
+1. Sauvegarder les données
+2. Vérifier les dépendances
+3. Tester en staging
+
+### Pendant
+1. Appliquer les migrations
+2. Mettre à jour le code
+3. Vérifier les services
+
+### Après
+1. Valider les fonctionnalités
+2. Vérifier les métriques
+3. Monitorer les erreurs
+
+## 📞 Support
+
+### Contact
+- Email : support@lemondesucre.fr
+- Urgence : +33 1 23 45 67 89
+- Slack : #support-technique
+
+### Horaires
+- Lundi-Vendredi : 9h-18h
+- Weekend : Urgences uniquement
+- Astreinte : 24/7
+
+## 🔍 Diagnostic
+
+### Commandes Utiles
+
+#### Tests
+```bash
+# Tests complets
+npm test
+
+# Tests spécifiques
+npm test auth
+npm test perf
+npm test mixed
+
+# Couverture
+npm run test:coverage
+```
+
+#### Performance
+```bash
+# Analyse des performances
+npm run analyze:perf
+
+# Monitoring en temps réel
+npm run monitor:perf
+
+# Tests de charge
+npm run test:load
+```
+
+#### Sécurité
+```bash
+# Vérification des vulnérabilités
+npm audit
+
+# Scan de sécurité
+npm run security:scan
+
+# Analyse des logs
+npm run logs:security
+```
+
+## 🚦 Codes d'Erreur
+
+### API
+- `401` : Token invalide/expiré
+- `403` : Accès non autorisé
+- `429` : Rate limit dépassé
+- `500` : Erreur serveur
+
+### Tests
+- `FAIL` : Test échoué
+- `TIMEOUT` : Délai dépassé
+- `ERROR` : Erreur d'exécution
+
+## 📝 Logs
+
+### Emplacement des Logs
+```text
+/logs/
+  ├── test/
+  │   ├── unit.log
+  │   ├── perf.log
+  │   └── security.log
+  ├── api/
+  │   ├── access.log
+  │   └── error.log
+  └── security/
+      ├── auth.log
+      └── audit.log
+```
+
+### Niveaux de Log
+- `ERROR` : Erreur critique
+- `WARN` : Avertissement
+- `INFO` : Information
+- `DEBUG` : Débogage
+
+## 🔄 Procédures de Recovery
+
+### 1. Échec des Tests
+1. Vérifier les logs
+2. Isoler le test problématique
+3. Relancer avec plus de verbosité
+4. Corriger et retester
+
+### 2. Problèmes de Performance
+1. Analyser les métriques
+2. Vérifier le cache
+3. Optimiser si nécessaire
+4. Retester sous charge
+
+### 3. Problèmes de Sécurité
+1. Vérifier les logs de sécurité
+2. Identifier la source
+3. Appliquer les correctifs
+4. Valider les changements
+
+## 📞 Support
+
+### Contact
+- Email : support@lemondesucre.fr
+- Discord : [Serveur Support](https://discord.gg/lemondesucre)
+- GitHub : [Issues](https://github.com/lemondesucre/issues)
+
+### Documentation
+- [Guide des Tests](./TESTING.md)
+- [Guide de Sécurité](./SECURITY.md)
+- [Documentation API](./API.md) 
