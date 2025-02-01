@@ -1,6 +1,11 @@
+## Mise à Jour Récentes
+Optimisation de la gestion du rôle USER : Le backend a été modifié pour charger l'utilisateur complet avec ses rôles via Prisma, améliorant ainsi la fiabilité des contrôles d'accès. Les tests d'intégration ont été ajustés pour garantir l'unicité des emails lors des inscriptions.
+
+---
+
 # Guide de Sécurité - Le Monde Sucré de Linda
 
-## 📊 État Actuel (2024-02-01)
+## État Actuel (2024-02-01)
 
 ### Authentification
 - JWT avec expiration : 24h
@@ -19,7 +24,7 @@
 - Sanitization : Automatique
 - Types TypeScript : Stricts
 
-## 🔒 Mesures de Sécurité
+## Mesures de Sécurité
 
 ### Authentification
 ```typescript
@@ -52,7 +57,7 @@ const userSchema = z.object({
 });
 ```
 
-## 🛡️ Bonnes Pratiques
+## Bonnes Pratiques
 
 ### Gestion des Mots de Passe
 - Hashage : bcrypt (10 rounds)
@@ -69,7 +74,7 @@ const userSchema = z.object({
 - Validation des entrées
 - Gestion des erreurs
 
-## 🔍 Tests de Sécurité
+## Tests de Sécurité
 
 ### Tests Automatisés
 - Authentification
@@ -81,7 +86,7 @@ const userSchema = z.object({
 - Code : SonarQube
 - Sécurité : OWASP
 
-## 📝 Recommandations
+## Recommandations
 
 ### Immédiates
 1. Résoudre les problèmes de rôle USER
@@ -93,7 +98,7 @@ const userSchema = z.object({
 2. Audit de sécurité complet
 3. Monitoring avancé
 
-## 🚨 Gestion des Incidents
+## Gestion des Incidents
 
 ### Procédure
 1. Détection
@@ -106,7 +111,7 @@ const userSchema = z.object({
 - Email : security@lemondesucre.fr
 - Urgence : +33 1 23 45 67 89
 
-## 🔄 Maintenance
+## Maintenance
 
 ### Quotidienne
 - Vérification des logs
@@ -118,7 +123,7 @@ const userSchema = z.object({
 - Revue des accès
 - Backup des données
 
-## 📊 Métriques
+## Métriques
 
 ### Sécurité
 - Tentatives d'intrusion : 0
@@ -130,7 +135,7 @@ const userSchema = z.object({
 - Rate limiting : Efficace
 - Cache : > 90% hit rate
 
-## 🔜 Prochaines Étapes
+## Prochaines Étapes
 
 1. Sécurité
    - Résolution des problèmes de rôle

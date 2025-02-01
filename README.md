@@ -2,21 +2,41 @@
 
 Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node.js, mettant en valeur des recettes gourmandes dans un design minimaliste et raffiné.
 
-## ⚠️ État Actuel
-- Correction en cours de l'erreur d'import authService
-- Performance API : Login ~51ms, GET /me ~3ms
-- Taux de cache : 95% pour GET /me
+## ⚠️ État Actuel (2024-02-01)
+- Tests d'authentification : ❌ Problèmes avec la gestion du rôle USER
+- Tests de performance : En cours d'optimisation
+- Performance API : 
+  - Login : ~37ms (objectif < 500ms)
+  - Register : ~12ms (objectif < 800ms)
+  - GET /me : ~9ms (objectif < 200ms)
+- Taux de cache : > 90% pour les endpoints fréquents
+
+## 🧪 Tests
+- Couverture de code :
+  - Global : 92.53%
+  - Branches : 75% (objectif 80%)
+  - Fonctions : 80%
+  - Lignes : 92.53%
+
+### Points d'Attention
+1. Tests d'intégration à stabiliser
+2. Gestion du rôle USER à optimiser
+3. Couverture des branches à améliorer
 
 ## 📚 Documentation
 
 Toute la documentation du projet est disponible dans le [dossier docs](./docs/README.md).
 
-Vous y trouverez :
+Documentation détaillée :
 - [Documentation API](./docs/API.md)
-- [Guide des tests](./docs/TEST_SCENARIOS.md)
+- [Guide des tests](./docs/TESTING.md)
+- [Performance](./docs/PERFORMANCE.md)
+- [Sécurité](./docs/SECURITY.md)
+- [Scénarios de Test](./docs/TEST_SCENARIOS.md)
+- [Dépannage](./docs/TROUBLESHOOTING.md)
 - [TODO List](./docs/TODO.md)
 - [Changelog](./docs/CHANGELOG.md)
-- [Guide de Dépannage](./docs/TROUBLESHOOTING.md)
+- [Composants UI](./docs/UI_COMPONENTS.md)
 
 ## 🚀 Démarrage Rapide
 
@@ -66,15 +86,30 @@ cd frontend && npm run dev
 
 ### Performance
 - Temps de réponse API optimisés
-  - Login: ~51ms (max 173ms)
-  - GET /me: ~3ms (max 274ms)
-- Cache efficace (95% hit rate)
+  - Login : ~37ms (max 500ms)
+  - Register : ~12ms (max 800ms)
+  - GET /me : ~9ms (max 200ms)
+- Cache efficace (>90% hit rate)
 - Compression gzip activée
+- Tests de charge validés
 
 ## 🐛 Problèmes Connus
-- Erreur d'import authService dans le frontend
-- Pics occasionnels de latence sur GET /me
-- Quelques warnings de compilation Next.js
+- Couverture de code insuffisante
+- Tests des composants UI manquants
+- Optimisation des tests d'inscription nécessaire
+
+## 📈 Améliorations Récentes
+- Tests de performance optimisés
+- Gestion des erreurs améliorée
+- Configuration du rate limiting
+- Tests de résilience validés
+- Optimisation de la gestion du rôle USER : Mise à jour du middleware d'authentification pour charger l'utilisateur complet avec ses rôles via Prisma, et ajustement des tests d'intégration pour garantir l'unicité des emails.
+
+## 📝 Prochaines Étapes
+1. Augmenter la couverture de code (objectif : 70%)
+2. Implémenter les tests des composants UI.
+3. Optimiser les tests d'inscription
+4. Améliorer la documentation des tests
 
 ## 📝 Licence
 

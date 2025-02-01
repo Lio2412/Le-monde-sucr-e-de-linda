@@ -9,42 +9,40 @@ import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { playfair } from '@/app/fonts';
 import { useAuth } from '@/hooks/useAuth';
 
+interface FormData {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
     rememberMe: false
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      console.log('Tentative de connexion avec:', formData.email);
-      const result = await login(formData.email, formData.password);
-      console.log('Résultat de la connexion:', result);
-      
-      if (!result.success) {
-        console.error('Échec de la connexion:', result.message);
-        setError(result.message || 'Une erreur est survenue lors de la connexion');
-      } else if (result.redirectPath) {
-        console.log('Connexion réussie, redirection vers:', result.redirectPath);
-        // Forcer la redirection
-        window.location.href = result.redirectPath;
+      await login(formData);
+      router.push('/dashboard');
+    } catch (error: any) {
+      if (error.message.includes('expired')) {
+        setError('Session expirée');
+      } else if (error.message.includes('invalid')) {
+        setError('Session invalide');
       } else {
-        console.error('Chemin de redirection manquant');
-        setError('Une erreur est survenue lors de la redirection');
+        setError('Problème de connexion');
       }
-    } catch (error) {
-      console.error('Erreur lors de la connexion:', error);
-      setError(error instanceof Error ? error.message : 'Une erreur est survenue lors de la connexion');
     } finally {
       setLoading(false);
     }
@@ -96,7 +94,7 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg" data-testid="error-message">
                   {error}
                 </div>
               )}
@@ -118,6 +116,7 @@ export default function LoginPage() {
                       className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
                       placeholder="exemple@email.com"
                       disabled={loading}
+                      data-testid="email"
                     />
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   </div>
@@ -139,6 +138,7 @@ export default function LoginPage() {
                       className="w-full pl-10 pr-12 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
                       placeholder="••••••••"
                       disabled={loading}
+                      data-testid="password"
                     />
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <button
@@ -189,6 +189,7 @@ export default function LoginPage() {
                     loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-pink-500'
                   }`}
                   disabled={loading}
+                  data-testid="submit"
                 >
                   {loading ? 'Connexion en cours...' : 'Se connecter'}
                 </motion.button>

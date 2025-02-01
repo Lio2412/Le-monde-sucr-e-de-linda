@@ -1,25 +1,13 @@
 import { AuthService } from '../../services/authService';
 import { prisma } from '../../config/database';
+import { getDatabaseStatus, prepareTest, cleanupTests } from '../integration.setup';
+import { User, Role } from '@prisma/client';
 import { describe, it, expect, beforeAll, beforeEach, afterAll } from '@jest/globals';
-const generateUniqueEmail = (prefix: string): string => `${prefix}_${Date.now()}_${Math.floor(Math.random()*10000)}@example.com`;
-
-beforeAll(async () => {
-  await prismaCleanup.user.deleteMany({
-    where: {
-      OR: [
-        { email: { startsWith: 'test_' } },
-        { email: { startsWith: 'duplicate_' } },
-        { email: { startsWith: 'unique_' } },
-        { email: { startsWith: 'login_' } },
-        { email: { startsWith: 'wrongpass_' } },
-        { email: { startsWith: 'current_' } }
-      ]
-    }
-  });
-});
+import crypto from 'crypto';
 
 describe('AuthService - Tests d\'intégration', () => {
   let authService: AuthService;
+  let userRoleId: string;
 
   beforeAll(async () => {
     // Initialiser la base de données de test
@@ -29,21 +17,55 @@ describe('AuthService - Tests d\'intégration', () => {
       await prisma.user.deleteMany();
       await prisma.role.deleteMany();
 
-      // Créer le rôle USER
-      await prisma.role.create({
+      // Créer le rôle USER avec un ID fixe pour les tests
+      const userRole = await prisma.role.create({
         data: {
+          id: '00000000-0000-0000-0000-000000000001',
           nom: 'USER',
           description: 'Utilisateur standard'
         }
       });
+
+      userRoleId = userRole.id;
+      
+      // Vérifier que le rôle a bien été créé
+      const roleCheck = await prisma.role.findUnique({
+        where: { id: userRoleId }
+      });
+      
+      if (!roleCheck) {
+        throw new Error('Échec de la création du rôle USER');
+      }
+
+      console.log('Rôle USER créé avec succès:', roleCheck);
     } catch (error) {
       console.error('Erreur lors de l\'initialisation des tests:', error);
       throw error;
     }
   });
 
-  beforeEach(() => {
-    authService = new AuthService();
+  beforeEach(async () => {
+    try {
+      authService = new AuthService();
+      // Nettoyer uniquement les données utilisateur avant chaque test
+      await prisma.userRole.deleteMany();
+      await prisma.user.deleteMany();
+      
+      // Vérifier que le rôle USER existe toujours
+      const roleCheck = await prisma.role.findUnique({
+        where: { id: userRoleId }
+      });
+      
+      if (!roleCheck) {
+        console.error('Le rôle USER n\'existe pas avant le test');
+        throw new Error('Le rôle USER n\'existe pas avant le test');
+      }
+
+      console.log('Rôle USER vérifié avant le test:', roleCheck);
+    } catch (error) {
+      console.error('Erreur lors de la préparation du test:', error);
+      throw error;
+    }
   });
 
   afterAll(async () => {
@@ -62,7 +84,7 @@ describe('AuthService - Tests d\'intégration', () => {
   describe('register', () => {
     it('devrait créer un nouvel utilisateur avec succès', async () => {
       const userData = {
-        email: generateUniqueEmail('test'),
+        email: 'test@example.com',
         password: 'password123',
         nom: 'Test',
         prenom: 'User',
@@ -89,11 +111,11 @@ describe('AuthService - Tests d\'intégration', () => {
 
     it('devrait retourner une erreur si l\'email existe déjà', async () => {
       const userData = {
-        email: generateUniqueEmail('duplicate'),
+        email: 'duplicate@example.com',
         password: 'password123',
         nom: 'Test',
         prenom: 'User',
-        pseudo: 'duplicatepseudo'
+        pseudo: 'uniquepseudo'
       };
 
       // Créer un premier utilisateur
@@ -108,7 +130,7 @@ describe('AuthService - Tests d\'intégration', () => {
 
     it('devrait retourner une erreur si le pseudo existe déjà', async () => {
       const userData = {
-        email: generateUniqueEmail('unique'),
+        email: 'unique@example.com',
         password: 'password123',
         nom: 'Test',
         prenom: 'User',
@@ -121,7 +143,7 @@ describe('AuthService - Tests d\'intégration', () => {
       // Tenter de créer un deuxième utilisateur avec le même pseudo
       await expect(authService.register({
         ...userData,
-        email: generateUniqueEmail('different')
+        email: 'different@example.com'
       })).rejects.toThrow('Ce pseudo est déjà utilisé');
     });
   });
@@ -129,7 +151,7 @@ describe('AuthService - Tests d\'intégration', () => {
   describe('login', () => {
     it('devrait connecter un utilisateur avec succès', async () => {
       const userData = {
-        email: generateUniqueEmail('login'),
+        email: 'login@example.com',
         password: 'password123',
         nom: 'Test',
         prenom: 'User',
@@ -159,7 +181,7 @@ describe('AuthService - Tests d\'intégration', () => {
 
     it('devrait retourner une erreur si le mot de passe est incorrect', async () => {
       const userData = {
-        email: generateUniqueEmail('wrongpass'),
+        email: 'wrongpass@example.com',
         password: 'password123',
         nom: 'Test',
         prenom: 'User',
@@ -180,7 +202,7 @@ describe('AuthService - Tests d\'intégration', () => {
   describe('getCurrentUser', () => {
     it('devrait retourner l\'utilisateur actuel', async () => {
       const userData = {
-        email: generateUniqueEmail('current'),
+        email: 'current@example.com',
         password: 'password123',
         nom: 'Test',
         prenom: 'User',

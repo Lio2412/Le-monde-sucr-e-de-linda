@@ -14,6 +14,7 @@ declare global {
     interface Request {
       user?: {
         userId: string;
+        roles: { role: { nom: string } }[];
       };
     }
   }
@@ -40,7 +41,26 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     try {
       // Vérifier et décoder le token
       const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-      req.user = { userId: decoded.userId };
+      
+      // Récupérer l'utilisateur complet avec ses rôles
+      const userRecord = await prisma.user.findUnique({
+        where: { id: decoded.userId },
+        include: { roles: { include: { role: true } } }
+      });
+
+      if (!userRecord) {
+        return res.status(401).json({
+          success: false,
+          message: 'Utilisateur non trouvé'
+        });
+      }
+
+      // Attacher les informations complètes de l'utilisateur à la requête
+      req.user = {
+        userId: userRecord.id,
+        roles: userRecord.roles
+      };
+
       next();
     } catch (error) {
       return res.status(401).json({

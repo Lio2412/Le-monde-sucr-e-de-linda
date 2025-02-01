@@ -1,4 +1,16 @@
+## Mise à Jour Récentes
+Optimisation de la gestion du rôle USER : Le backend a été modifié pour charger l'utilisateur complet avec ses rôles via Prisma, améliorant ainsi la fiabilité des contrôles d'accès. Les tests d'intégration ont été ajustés pour garantir l'unicité des emails lors des inscriptions.
+
+---
+
 # 📝 Changelog
+
+## [Unreleased]
+### Added
+- Optimisation de la gestion du rôle USER
+  - Chargement complet de l'utilisateur avec ses rôles via Prisma
+  - Amélioration de la fiabilité des contrôles d'accès
+  - Tests d'intégration mis à jour pour l'unicité des emails
 
 ## [1.1.0] - 2024-02-01
 

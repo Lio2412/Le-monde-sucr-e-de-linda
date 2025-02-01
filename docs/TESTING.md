@@ -1,3 +1,8 @@
+## Mise à Jour Récentes
+Optimisation de la gestion du rôle USER : Le backend a été modifié pour charger l'utilisateur complet avec ses rôles via Prisma, améliorant ainsi la fiabilité des contrôles d'accès. Les tests d'intégration ont été ajustés pour garantir l'unicité des emails lors des inscriptions.
+
+---
+
 # 🧪 Tests et Qualité
 
 ## 📊 État Actuel (2024-02-01)
