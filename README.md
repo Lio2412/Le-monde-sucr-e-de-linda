@@ -310,3 +310,123 @@ cd frontend && npm run cypress
 
 ### Structure des Images
 ```
+```
+
+# 🍰 Le Monde Sucré de Linda
+
+Une application web moderne pour découvrir et partager des recettes de pâtisserie.
+
+## ✨ Fonctionnalités
+
+- 🔍 Recherche intelligente de recettes
+- 📱 Interface responsive et accessible
+- 💖 Système de favoris
+- 🔄 Suggestions en temps réel
+- 📊 Filtres avancés
+- 🌟 Historique des recherches
+
+## 🚀 Installation
+
+```bash
+# Cloner le dépôt
+git clone https://github.com/Lio2412/Le-monde-sucr-e-de-linda.git
+cd le-monde-sucre-de-linda
+
+# Installer les dépendances du frontend
+cd frontend
+npm install
+
+# Installer les dépendances du backend
+cd ../backend
+npm install
+```
+
+## 🛠️ Configuration
+
+### Frontend
+```bash
+# Créer un fichier .env.local
+cd frontend
+cp .env.example .env.local
+
+# Démarrer le serveur de développement
+npm run dev
+```
+
+### Backend
+```bash
+# Créer un fichier .env
+cd backend
+cp .env.example .env
+
+# Configurer la base de données
+npx prisma migrate dev
+
+# Démarrer le serveur
+npm run dev
+```
+
+## 🧪 Tests
+
+### Tests E2E (Cypress)
+```bash
+# Dans le dossier racine
+npm run test:e2e
+```
+
+✅ Tests d'Accessibilité (5/5)
+- Attributs ARIA
+- Navigation au clavier
+- Gestion du focus
+- Contraste des couleurs
+
+✅ Tests d'Interactions (5/5)
+- Recherche et filtres
+- Suggestions
+- Interactions avec les recettes
+- Navigation
+- Recherches récentes
+
+### Tests Unitaires
+```bash
+npm run test
+```
+
+## 📚 Documentation
+
+- [API](docs/API.md)
+- [Tests](docs/TESTING.md)
+- [UI Components](docs/UI_COMPONENTS.md)
+- [Performance](docs/PERFORMANCE.md)
+- [Sécurité](docs/SECURITY.md)
+
+## 🌟 Fonctionnalités à Venir
+
+- [ ] Authentification des utilisateurs
+- [ ] Création de recettes
+- [ ] Partage sur les réseaux sociaux
+- [ ] Mode hors ligne
+- [ ] Notifications
+
+## 🤝 Contribution
+
+1. Fork le projet
+2. Créer une branche (`git checkout -b feature/amazing-feature`)
+3. Commit les changements (`git commit -m 'feat: add amazing feature'`)
+4. Push sur la branche (`git push origin feature/amazing-feature`)
+5. Ouvrir une Pull Request
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## 👥 Équipe
+
+- Linda - Créatrice & Designer
+- [Contributeurs](https://github.com/Lio2412/Le-monde-sucr-e-de-linda/graphs/contributors)
+
+## 📞 Support
+
+Pour toute question ou suggestion :
+- [Ouvrir une issue](https://github.com/Lio2412/Le-monde-sucr-e-de-linda/issues)
+- Email : contact@lemondesucre.fr
