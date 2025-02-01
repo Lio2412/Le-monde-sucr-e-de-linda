@@ -934,3 +934,282 @@ const focusStyles = css`
     }
   }
 `;
+```
+
+## 🔍 SearchBar
+
+### Description
+Barre de recherche intelligente avec suggestions en temps réel et historique des recherches.
+
+### Props
+```typescript
+interface SearchBarProps {
+  onSearch: (query: string) => void;
+  onSuggestionClick: (suggestion: string) => void;
+  placeholder?: string;
+  maxSuggestions?: number;
+}
+```
+
+### Accessibilité
+- Role: `search`
+- ARIA: `aria-expanded`, `aria-controls`
+- Focus management
+- Keyboard navigation
+
+### Tests
+✅ Tests E2E (5/5)
+- Navigation au clavier
+- Suggestions
+- Historique
+- Accessibilité
+- Focus management
+
+## 🗃️ RecipeCard
+
+### Description
+Carte affichant les informations d'une recette avec bouton like.
+
+### Props
+```typescript
+interface RecipeCardProps {
+  recipe: {
+    id: string;
+    title: string;
+    description: string;
+    image: string;
+    difficulty: string;
+    time: number;
+    isLiked?: boolean;
+  };
+  onLike: (id: string) => void;
+  onShare?: (id: string) => void;
+}
+```
+
+### Accessibilité
+- ARIA: `aria-label`, `aria-pressed`
+- Focus visible
+- Keyboard interaction
+- Color contrast
+
+### Tests
+✅ Tests E2E (5/5)
+- Like functionality
+- Share functionality
+- Keyboard navigation
+- ARIA attributes
+- Visual feedback
+
+## 🔘 Button
+
+### Description
+Bouton réutilisable avec différentes variantes.
+
+### Props
+```typescript
+interface ButtonProps {
+  variant: 'primary' | 'secondary' | 'text';
+  size: 'small' | 'medium' | 'large';
+  disabled?: boolean;
+  loading?: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}
+```
+
+### Accessibilité
+- Role: `button`
+- ARIA: `aria-disabled`, `aria-busy`
+- Focus styles
+- Loading state
+
+### Variantes
+- Primary: Action principale
+- Secondary: Action secondaire
+- Text: Lien stylisé
+
+## 📝 Input
+
+### Description
+Champ de saisie avec validation et feedback.
+
+### Props
+```typescript
+interface InputProps {
+  type: 'text' | 'email' | 'password';
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
+}
+```
+
+### Accessibilité
+- ARIA: `aria-invalid`, `aria-describedby`
+- Label association
+- Error feedback
+
+## 🏷️ Tag
+
+### Description
+Étiquette pour catégories et filtres.
+
+### Props
+```typescript
+interface TagProps {
+  label: string;
+  color?: 'default' | 'success' | 'warning' | 'error';
+  size?: 'small' | 'medium';
+  onRemove?: () => void;
+}
+```
+
+### Accessibilité
+- Role: `status`
+- ARIA: `aria-label`
+- Interactive removal
+
+## 🎯 Styles Communs
+
+### Thème
+```typescript
+const theme = {
+  colors: {
+    primary: '#FF6B6B',
+    secondary: '#4ECDC4',
+    text: '#2D3436',
+    background: '#FFFFFF',
+    error: '#FF5252',
+    success: '#4CAF50'
+  },
+  typography: {
+    h1: '2.5rem',
+    h2: '2rem',
+    body: '1rem',
+    small: '0.875rem'
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem'
+  }
+};
+```
+
+### Breakpoints
+```typescript
+const breakpoints = {
+  mobile: '320px',
+  tablet: '768px',
+  desktop: '1024px',
+  wide: '1440px'
+};
+```
+
+## 📱 Responsive Design
+
+### Media Queries
+```typescript
+const media = {
+  mobile: `@media (min-width: ${breakpoints.mobile})`,
+  tablet: `@media (min-width: ${breakpoints.tablet})`,
+  desktop: `@media (min-width: ${breakpoints.desktop})`,
+  wide: `@media (min-width: ${breakpoints.wide})`
+};
+```
+
+### Grille
+```typescript
+const grid = {
+  container: '1200px',
+  gutter: '1rem',
+  columns: 12
+};
+```
+
+## 🎨 Animations
+
+### Transitions
+```typescript
+const transitions = {
+  default: '0.3s ease',
+  fast: '0.15s ease',
+  slow: '0.5s ease'
+};
+```
+
+### Keyframes
+```typescript
+const keyframes = {
+  fadeIn: `
+    from { opacity: 0; }
+    to { opacity: 1; }
+  `,
+  slideIn: `
+    from { transform: translateY(20px); }
+    to { transform: translateY(0); }
+  `
+};
+```
+
+## 🔒 Best Practices
+
+### Accessibilité
+1. Labels explicites
+2. ARIA attributes
+3. Focus management
+4. Keyboard navigation
+5. Color contrast
+
+### Performance
+1. Lazy loading
+2. Code splitting
+3. Memoization
+4. Bundle optimization
+5. Image optimization
+
+### Maintenance
+1. Documentation
+2. Tests
+3. Props validation
+4. Error boundaries
+5. Consistent naming
+
+## 📚 Usage
+
+### Installation
+```bash
+npm install @le-monde-sucre/ui
+```
+
+### Import
+```typescript
+import { Button, Input, RecipeCard } from '@le-monde-sucre/ui';
+```
+
+### Exemple
+```tsx
+const SearchPage = () => {
+  const [query, setQuery] = useState('');
+  
+  return (
+    <div>
+      <SearchBar
+        value={query}
+        onChange={setQuery}
+        placeholder="Rechercher une recette..."
+      />
+      <Button
+        variant="primary"
+        onClick={() => handleSearch(query)}
+      >
+        Rechercher
+      </Button>
+    </div>
+  );
+};

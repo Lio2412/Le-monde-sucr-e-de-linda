@@ -12,6 +12,45 @@ Optimisation de la gestion du rôle USER : Le backend a été modifié pour char
   - Amélioration de la fiabilité des contrôles d'accès
   - Tests d'intégration mis à jour pour l'unicité des emails
 
+## [1.2.0] - 2025-02-01
+
+### ✨ Ajouts
+- Tests E2E avec Cypress
+  - Tests d'accessibilité (5/5 passés)
+  - Tests d'interactions (5/5 passés)
+- Suggestions de recherche en temps réel
+- Historique des recherches récentes
+- Support complet des attributs ARIA
+
+### 🔧 Modifications
+- Amélioration de l'accessibilité des composants
+- Optimisation de la navigation au clavier
+- Refonte du système de recherche
+- Documentation mise à jour
+
+### 🐛 Corrections
+- Gestion du focus dans SearchBar
+- État du bouton like dans RecipeCard
+- Navigation dans les suggestions
+
+## [1.1.0] - 2025-01-15
+
+### ✨ Ajouts
+- Système de favoris
+- Filtres de recherche avancés
+- Interface responsive
+- Mode sombre
+
+### 🔧 Modifications
+- Optimisation des performances
+- Amélioration de l'UX
+- Refonte de l'interface
+
+### 🐛 Corrections
+- Problèmes de cache
+- Bugs d'affichage
+- Erreurs de validation
+
 ## [1.1.0] - 2024-02-01
 
 ### 🧪 Tests

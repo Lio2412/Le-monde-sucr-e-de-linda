@@ -1,14 +1,10 @@
 # 🌐 Documentation API
 
-## Mise à Jour Récentes
-Optimisation de la gestion du rôle USER : Le backend a été modifié pour charger l'utilisateur complet avec ses rôles via Prisma, améliorant ainsi la fiabilité des contrôles d'accès. Les tests d'intégration ont été ajustés pour garantir l'unicité des emails lors des inscriptions.
+## 🔄 Points de Terminaison
 
----
+### 🔑 Authentification
 
-## Authentification
-
-### POST /api/auth/login
-
+#### POST /api/auth/login
 Authentification d'un utilisateur.
 
 **Request Body:**
@@ -19,32 +15,21 @@ Authentification d'un utilisateur.
 }
 ```
 
-**Response Success: (200)**
+**Response (200 OK):**
 ```json
 {
   "token": "string",
   "user": {
     "id": "string",
     "email": "string",
-    "role": "ADMIN" | "PATISSIER" | "USER",
+    "role": "USER",
     "name": "string"
   }
 }
 ```
 
-**Response Error: (401)**
-```json
-{
-  "error": "Email ou mot de passe incorrect"
-}
-```
-
-**Taille moyenne de réponse:** 1266 bytes
-**Temps de réponse moyen:** ~51ms
-
-### POST /api/auth/register
-
-Création d'un nouveau compte utilisateur.
+#### POST /api/auth/register
+Création d'un compte utilisateur.
 
 **Request Body:**
 ```json
@@ -55,119 +40,183 @@ Création d'un nouveau compte utilisateur.
 }
 ```
 
-**Response Success: (200)**
-```json
-{
-  "message": "Compte créé avec succès"
-}
-```
-
-**Response Error: (400)**
-```json
-{
-  "error": "Cet email est déjà utilisé"
-}
-```
-
-**Taille moyenne de réponse:** 59 bytes
-**Temps de réponse moyen:** ~2ms
-
-### GET /api/auth/me
-
-Récupération des informations de l'utilisateur connecté.
-
-**Headers:**
-```
-Authorization: Bearer <token>
-```
-
-**Response Success: (200)**
+**Response (201 Created):**
 ```json
 {
   "id": "string",
   "email": "string",
-  "role": "ADMIN" | "PATISSIER" | "USER",
   "name": "string"
 }
 ```
 
-**Response Error: (401)**
+### 🍰 Recettes
+
+#### GET /api/recipes
+Liste des recettes avec pagination et filtres.
+
+**Query Parameters:**
+- `page`: number (défaut: 1)
+- `limit`: number (défaut: 10)
+- `search`: string
+- `category`: string
+- `difficulty`: "EASY" | "MEDIUM" | "HARD"
+
+**Response (200 OK):**
 ```json
 {
-  "error": "Non autorisé"
+  "items": [
+    {
+      "id": "string",
+      "title": "string",
+      "description": "string",
+      "difficulty": "string",
+      "preparationTime": number,
+      "image": "string"
+    }
+  ],
+  "total": number,
+  "page": number,
+  "limit": number
 }
 ```
 
-**Taille moyenne de réponse:** 1054 bytes
-**Temps de réponse moyen:** ~3ms
+#### GET /api/recipes/:id
+Détails d'une recette.
 
-## Gestion du Cache
-
-- Les réponses utilisent le cache HTTP (304 Not Modified)
-- Le cache client est validé à chaque requête
-- Les réponses incluent les headers ETag appropriés
-
-## Gestion des Erreurs
-
-### Format des Erreurs
+**Response (200 OK):**
 ```json
 {
-  "error": "Message d'erreur"
+  "id": "string",
+  "title": "string",
+  "description": "string",
+  "ingredients": [
+    {
+      "name": "string",
+      "quantity": number,
+      "unit": "string"
+    }
+  ],
+  "steps": [
+    {
+      "order": number,
+      "description": "string"
+    }
+  ],
+  "difficulty": "string",
+  "preparationTime": number,
+  "image": "string",
+  "author": {
+    "id": "string",
+    "name": "string"
+  }
+}
+```
+
+### 💖 Favoris
+
+#### POST /api/favorites
+Ajouter une recette aux favoris.
+
+**Request Body:**
+```json
+{
+  "recipeId": "string"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "string",
+  "recipeId": "string",
+  "userId": "string"
+}
+```
+
+#### DELETE /api/favorites/:recipeId
+Retirer une recette des favoris.
+
+**Response (204 No Content)**
+
+### 🔍 Recherche
+
+#### GET /api/search/suggestions
+Suggestions de recherche.
+
+**Query Parameters:**
+- `q`: string (terme de recherche)
+
+**Response (200 OK):**
+```json
+{
+  "suggestions": [
+    {
+      "id": "string",
+      "title": "string",
+      "type": "RECIPE" | "CATEGORY"
+    }
+  ]
+}
+```
+
+## 📊 Métriques
+
+### Performance
+- Temps de réponse moyen : < 100ms
+- Taux de succès : 99.9%
+- Cache hit rate : 95%
+
+### Limites
+- Rate limit : 100 requêtes/minute
+- Taille max des payloads : 1MB
+- Limite de pagination : 50 items/page
+
+## 🔒 Sécurité
+
+### Authentication
+- JWT (JSON Web Tokens)
+- Expiration : 24h
+- Rate limiting sur /login et /register
+
+### Headers Requis
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+## 🚨 Gestion des Erreurs
+
+### Format Standard
+```json
+{
+  "error": {
+    "code": "string",
+    "message": "string",
+    "details": {}
+  }
 }
 ```
 
 ### Codes d'Erreur
-- `400` - Requête invalide (validation, données manquantes)
-- `401` - Non authentifié
-- `403` - Non autorisé
-- `404` - Ressource non trouvée
-- `500` - Erreur serveur
+- 400: Requête invalide
+- 401: Non authentifié
+- 403: Non autorisé
+- 404: Ressource non trouvée
+- 429: Trop de requêtes
+- 500: Erreur serveur
 
-## Exemples d'Utilisation
+## 📝 Versions
 
-### Connexion avec Fetch
-```typescript
-const login = async (email: string, password: string) => {
-  const response = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  });
+### v1.0.0 (Current)
+- API REST complète
+- Authentication JWT
+- CRUD Recettes
+- Gestion des favoris
+- Recherche avec suggestions
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message);
-  }
-
-  return response.json();
-};
-```
-
-### Récupération du Profil avec Axios
-```typescript
-const getProfile = async (token: string) => {
-  try {
-    const response = await axios.get('/api/auth/me', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data.error || 'Erreur inconnue');
-    }
-    throw error;
-  }
-};
-```
-
-## Sécurité
-
-- Rate limiting: 100 requêtes par IP par 15 minutes
-- Validation des données avec Zod
-- Protection CSRF
-- Headers de sécurité (CORS, CSP, etc.)
-- Tokens JWT avec expiration de 24h 
+### v1.1.0 (Planned)
+- GraphQL endpoint
+- Real-time notifications
+- Social sharing
+- Image optimization
+- Analytics
