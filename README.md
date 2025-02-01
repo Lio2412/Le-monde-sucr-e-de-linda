@@ -1,6 +1,139 @@
 # Le Monde Sucré de Linda
 
-Un blog de pâtisserie élégant et interactif, développé avec Next.js et Node.js, mettant en valeur des recettes gourmandes dans un design minimaliste et raffiné.
+Une plateforme de partage de recettes de pâtisserie élégante et moderne.
+
+## 🚀 Technologies Utilisées
+
+### Frontend
+- Next.js 14
+- React
+- TypeScript
+- TailwindCSS
+- Framer Motion
+- Lucide Icons
+- Axios
+
+### Backend
+- Node.js
+- Express
+- TypeScript
+- Prisma
+- PostgreSQL
+- JWT
+- Bcrypt
+
+## 🛠 Installation
+
+### Prérequis
+- Node.js (v18 ou supérieur)
+- PostgreSQL
+- npm ou yarn
+
+### Configuration
+
+1. Cloner le repository :
+```bash
+git clone https://github.com/votre-username/le-monde-sucre-de-linda-V2.git
+cd le-monde-sucre-de-linda-V2
+```
+
+2. Installation des dépendances :
+
+Pour le backend :
+```bash
+cd backend
+npm install
+```
+
+Pour le frontend :
+```bash
+cd frontend
+npm install
+```
+
+3. Configuration des variables d'environnement :
+
+Backend (.env) :
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/le-monde-sucre"
+JWT_SECRET="votre-secret-jwt"
+JWT_EXPIRES_IN="24h"
+PORT=5000
+```
+
+Frontend (.env.local) :
+```env
+NEXT_PUBLIC_API_URL="http://localhost:5000/api"
+```
+
+4. Initialisation de la base de données :
+```bash
+cd backend
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+```
+
+## 🚀 Démarrage
+
+### Backend
+```bash
+cd backend
+npm run dev
+```
+Le serveur démarrera sur http://localhost:5000
+
+### Frontend
+```bash
+cd frontend
+npm run dev
+```
+L'application sera disponible sur http://localhost:3000
+
+## 👥 Comptes de Test
+
+### Admin
+- Email : admin@test.com
+- Mot de passe : Admin123!
+
+### Pâtissier
+- Email : patissier@test.com
+- Mot de passe : Patissier123!
+
+### Utilisateur Standard
+- Email : user@test.com
+- Mot de passe : User123!
+
+## 📱 Fonctionnalités
+
+- Authentification complète (inscription, connexion, déconnexion)
+- Gestion des rôles (Admin, Pâtissier, Utilisateur)
+- Système de recettes (création, modification, suppression)
+- Interface utilisateur responsive et moderne
+- Animations fluides
+- Gestion des erreurs
+- Protection des routes
+
+## 🔒 Sécurité
+
+- Hachage des mots de passe avec bcrypt
+- Protection CSRF
+- Validation des données
+- Authentification JWT
+- Headers de sécurité avec Helmet
+
+## 📝 Documentation API
+
+La documentation complète de l'API est disponible sur :
+http://localhost:5000/api-docs (quand le serveur est en cours d'exécution)
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou à soumettre une pull request.
+
+## 📄 Licence
+
+Ce projet est sous licence MIT.
 
 ## 🌟 Fonctionnalités
 
@@ -51,56 +184,6 @@ project/
 └── README.md               # Documentation générale
 ```
 
-## 🚀 Démarrage Rapide
-
-1. Cloner le projet :
-```bash
-git clone https://github.com/votre-username/le-monde-sucre-de-linda.git
-cd le-monde-sucre-de-linda
-```
-
-2. Installation des dépendances :
-```bash
-npm install
-cd frontend && npm install
-cd ../backend && npm install
-```
-
-3. Configuration :
-- Copier `.env.example` vers `.env` dans le dossier backend
-- Copier `.env.example` vers `.env.local` dans le dossier frontend
-- Configurer les variables d'environnement
-
-4. Lancer le projet :
-```bash
-npm run dev
-```
-
-Le frontend sera accessible sur http://localhost:3000
-L'API backend sera accessible sur http://localhost:5000
-
-## 🛠 Technologies Utilisées
-
-### Frontend
-- Next.js 14
-- TypeScript
-- TailwindCSS
-- Shadcn/ui
-- Framer Motion
-- SWR
-
-### Backend
-- Node.js avec Express
-- TypeScript
-- PostgreSQL avec Prisma
-- Jest pour les tests
-
-## 📚 Documentation
-
-- [Documentation Frontend](frontend/README.md)
-- [Documentation Backend](backend/README.md)
-- [Documentation Mode Cuisine](docs/mode-cuisine.md)
-
 ## 🧪 Tests
 
 ```bash
@@ -117,18 +200,6 @@ cd frontend && npm run cypress
 - TypeScript strict
 - Tests unitaires pour les composants principaux
 - Documentation des fonctions et composants
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
 ## 📄 Gestion des Images et Slugs
 

@@ -1,72 +1,67 @@
 # Dependencies
-node_modules/
-.pnp/
+node_modules
+.pnp
 .pnp.js
 
 # Testing
-coverage/
-.nyc_output/
-cypress/videos/
-cypress/screenshots/
+coverage
 
 # Next.js
 .next/
 out/
-
-# Production
-build/
-dist/
+build
+dist
 
 # Misc
 .DS_Store
 *.pem
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
 # Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Uploads
-backend/uploads/*
-!backend/uploads/.gitkeep
+# Vercel
+.vercel
 
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
 
-# Prisma
-backend/prisma/migrations/
-backend/prisma/*.db
-backend/prisma/.env
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
 
-# Cache
-.cache/
-.swc/
-**/.swc/
-**/__pycache__/
-*.pyc
+# Logs
+logs
+*.log
+
+# Database
+*.sqlite
+*.sqlite3
+prisma/migrations/
 
 # Build
 dist/
 build/
-out/
-.output/
 
-# Vercel
-.vercel
+# Cache
+.cache/
+.next/
+.nuxt/
+.vuepress/dist
+.docusaurus
 
-# Temp files
+# Temporary files
 *.tmp
 *.temp
 .DS_Store

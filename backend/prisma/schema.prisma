@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  nom          String
+  prenom       String
+  pseudo       String        @unique
+  avatar       String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  commentaires Commentaire[]
+  likes        Like[]
+  partages     Partage[]
+  recettes     Recette[]
+  roles        UserRole[]
+
+  @@map("users")
+}
+
+model Role {
+  id          String     @id @default(uuid())
+  nom         String     @unique
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  users       UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  id        String   @id @default(uuid())
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model Recette {
+  id           String        @id @default(uuid())
+  titre        String
+  description  String
+  ingredients  Json
+  etapes       Json
+  tempsPrep    Int
+  tempsCuisson Int?
+  difficulte   String
+  portions     Int
+  image        String?
+  auteurId     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  commentaires Commentaire[]
+  likes        Like[]
+  partages     Partage[]
+  auteur       User          @relation(fields: [auteurId], references: [id])
+
+  @@map("recettes")
+}
+
+model Commentaire {
+  id        String   @id @default(uuid())
+  contenu   String
+  recetteId String
+  auteurId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  auteur    User     @relation(fields: [auteurId], references: [id], onDelete: Cascade)
+  recette   Recette  @relation(fields: [recetteId], references: [id], onDelete: Cascade)
+
+  @@map("commentaires")
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  recetteId String
+  auteurId  String
+  createdAt DateTime @default(now())
+  auteur    User     @relation(fields: [auteurId], references: [id], onDelete: Cascade)
+  recette   Recette  @relation(fields: [recetteId], references: [id], onDelete: Cascade)
+
+  @@unique([recetteId, auteurId])
+  @@map("likes")
+}
+
+model Partage {
+  id          String   @id @default(uuid())
+  recetteId   String
+  auteurId    String
+  image       String
+  commentaire String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  auteur      User     @relation(fields: [auteurId], references: [id], onDelete: Cascade)
+  recette     Recette  @relation(fields: [recetteId], references: [id], onDelete: Cascade)
+
+  @@map("partages")
+}

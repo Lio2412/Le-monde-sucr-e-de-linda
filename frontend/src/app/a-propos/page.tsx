@@ -2,13 +2,10 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Playfair_Display } from 'next/font/google';
+import { playfair } from '@/app/fonts';
 import { Heart, Star, ChefHat } from 'lucide-react';
-import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { NewsletterForm } from '@/components/ui/newsletter-form';
-
-const playfair = Playfair_Display({ subsets: ['latin'] });
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -19,10 +16,7 @@ const fadeInUp = {
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-pink-50 to-white">
+      <div className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
             <motion.span
@@ -51,7 +45,7 @@ export default function AboutPage() {
             </motion.p>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Histoire Section */}
       <section className="py-16">
@@ -68,6 +62,8 @@ export default function AboutPage() {
                 alt="Linda en train de cuisiner"
                 fill
                 className="object-cover rounded-lg"
+                sizes="100vw"
+                priority
               />
             </motion.div>
             <motion.div

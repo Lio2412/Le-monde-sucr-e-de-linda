@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Playfair_Display } from 'next/font/google';
-import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { NewsletterForm } from '@/components/ui/newsletter-form';
 
@@ -53,8 +52,6 @@ const featuredRecipes = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-      
       {/* Hero Section - Style carré */}
       <section className="container mx-auto px-4 pt-24 pb-16">
         <div className="grid md:grid-cols-2 gap-12 items-center">

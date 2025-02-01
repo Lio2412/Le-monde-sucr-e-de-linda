@@ -1,14 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Playfair_Display } from 'next/font/google';
+import { playfair } from '@/app/fonts';
 import { Search, Filter } from 'lucide-react';
-import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import BlogCard from '@/components/blog/BlogCard';
-
-const playfair = Playfair_Display({ subsets: ['latin'] });
 
 // Données de démonstration
 const blogPosts = [
@@ -72,10 +70,7 @@ export default function BlogPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-pink-50 to-white">
+      <div className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
             <motion.h1
@@ -95,7 +90,7 @@ export default function BlogPage() {
             </motion.p>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Filtres et Recherche */}
       <section className="py-8 border-b">

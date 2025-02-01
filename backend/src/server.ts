@@ -8,6 +8,7 @@ import { dirname, join } from 'path';
 
 // Routes
 import recipeRoutes from './routes/recipes.js';
+import authRoutes from './routes/auth.js';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -46,6 +47,15 @@ app.use(express.json());
 
 // Routes
 app.use('/api/recipes', recipeRoutes);
+app.use('/api/auth', authRoutes);
+
+// Middleware catch-all pour les routes non trouvées
+app.use((req, res, next) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Ressource non trouvée'
+  });
+});
 
 // Error handling
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

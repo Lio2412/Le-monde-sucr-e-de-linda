@@ -2,12 +2,8 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Playfair_Display } from 'next/font/google';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-
-const playfair = Playfair_Display({ subsets: ['latin'] });
+import { playfair } from '@/app/fonts';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -32,10 +28,7 @@ export default function ContactPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-pink-50 to-white">
+      <div className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
             <motion.h1
@@ -56,7 +49,7 @@ export default function ContactPage() {
             </motion.p>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Contact Info */}
       <section className="py-16">
@@ -187,8 +180,6 @@ export default function ContactPage() {
           </motion.div>
         </div>
       </section>
-
-      <Footer />
     </main>
   );
 } 

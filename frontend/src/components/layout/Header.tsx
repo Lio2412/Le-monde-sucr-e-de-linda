@@ -4,10 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
-import { Playfair_Display } from 'next/font/google';
-
-const playfair = Playfair_Display({ subsets: ['latin'] });
+import { Menu, X, LogOut } from 'lucide-react';
+import { playfair } from '@/app/fonts';
+import { useAuth } from '@/hooks/useAuth';
 
 const navigation = [
   { name: 'Accueil', href: '/' },
@@ -20,6 +19,11 @@ const navigation = [
 export default function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <motion.header 
@@ -93,19 +97,29 @@ export default function Header() {
             ))}
           </motion.div>
 
-          {/* Desktop login button */}
+          {/* Desktop login/logout button */}
           <motion.div 
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="hidden lg:flex lg:flex-1 lg:justify-end"
           >
-            <Link
-              href="/connexion"
-              className="relative inline-flex items-center gap-x-2 text-sm font-medium leading-6 px-6 py-2.5 rounded-lg bg-pink-400 text-white hover:bg-pink-500 transition-colors duration-200"
-            >
-              <span>Connexion</span>
-              <span className="group-hover:translate-x-1 transition-transform duration-200">&rarr;</span>
-            </Link>
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="relative inline-flex items-center gap-x-2 text-sm font-medium leading-6 px-6 py-2.5 rounded-lg bg-pink-400 text-white hover:bg-pink-500 transition-colors duration-200"
+              >
+                <span>Déconnexion</span>
+                <LogOut className="h-4 w-4" />
+              </button>
+            ) : (
+              <Link
+                href="/connexion"
+                className="relative inline-flex items-center gap-x-2 text-sm font-medium leading-6 px-6 py-2.5 rounded-lg bg-pink-400 text-white hover:bg-pink-500 transition-colors duration-200"
+              >
+                <span>Connexion</span>
+                <span className="group-hover:translate-x-1 transition-transform duration-200">&rarr;</span>
+              </Link>
+            )}
           </motion.div>
         </div>
 
@@ -145,13 +159,28 @@ export default function Header() {
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <Link
-                href="/connexion"
-                className="block w-full text-center rounded-lg px-4 py-2.5 text-base font-medium bg-pink-400 text-white hover:bg-pink-500 transition-colors duration-200 mt-4"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Connexion
-              </Link>
+              {user ? (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-center rounded-lg px-4 py-2.5 text-base font-medium bg-pink-400 text-white hover:bg-pink-500 transition-colors duration-200 mt-4"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    Déconnexion
+                    <LogOut className="h-4 w-4" />
+                  </span>
+                </button>
+              ) : (
+                <Link
+                  href="/connexion"
+                  className="block w-full text-center rounded-lg px-4 py-2.5 text-base font-medium bg-pink-400 text-white hover:bg-pink-500 transition-colors duration-200 mt-4"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Connexion
+                </Link>
+              )}
             </motion.div>
           </div>
         </motion.div>

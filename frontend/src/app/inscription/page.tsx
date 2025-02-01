@@ -4,13 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Playfair_Display } from 'next/font/google';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
+import { playfair } from '@/app/fonts';
 import { useNewsletter } from '@/hooks/useNewsletter';
-
-const playfair = Playfair_Display({ subsets: ['latin'] });
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -47,8 +43,6 @@ export default function RegisterPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-
       <div className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
@@ -298,8 +292,6 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
     </main>
   );
 } 

@@ -2,13 +2,11 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Playfair_Display } from 'next/font/google';
-import { Search, Clock, ChefHat, Filter } from 'lucide-react';
-import Header from '@/components/layout/Header';
+import { Search } from 'lucide-react';
+import { playfair } from '@/app/fonts';
+import { Clock, ChefHat, Filter } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import RecipeCard from '@/components/recipes/RecipeCard';
-
-const playfair = Playfair_Display({ subsets: ['latin'] });
 
 // Données de démonstration
 const categories = [
@@ -51,8 +49,6 @@ export default function SearchPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-
       <div className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4">
           {/* En-tête */}

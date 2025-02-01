@@ -1,28 +1,53 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Playfair_Display } from 'next/font/google';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-
-const playfair = Playfair_Display({ subsets: ['latin'] });
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { playfair } from '@/app/fonts';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implémenter la connexion
-    console.log('Tentative de connexion:', formData);
+    setError(null);
+    setLoading(true);
+
+    try {
+      console.log('Tentative de connexion avec:', formData.email);
+      const result = await login(formData.email, formData.password);
+      console.log('Résultat de la connexion:', result);
+      
+      if (!result.success) {
+        console.error('Échec de la connexion:', result.message);
+        setError(result.message || 'Une erreur est survenue lors de la connexion');
+      } else if (result.redirectPath) {
+        console.log('Connexion réussie, redirection vers:', result.redirectPath);
+        // Forcer la redirection
+        window.location.href = result.redirectPath;
+      } else {
+        console.error('Chemin de redirection manquant');
+        setError('Une erreur est survenue lors de la redirection');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la connexion:', error);
+      setError(error instanceof Error ? error.message : 'Une erreur est survenue lors de la connexion');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,8 +60,6 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-
       <div className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
@@ -50,6 +73,8 @@ export default function LoginPage() {
                 src="https://images.unsplash.com/photo-1486427944299-d1955d23e34d?q=80&w=1200"
                 alt="Pâtisseries"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 to-transparent"></div>
@@ -70,6 +95,12 @@ export default function LoginPage() {
                 </p>
               </div>
 
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+                  {error}
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email */}
                 <div>
@@ -86,6 +117,7 @@ export default function LoginPage() {
                       required
                       className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
                       placeholder="exemple@email.com"
+                      disabled={loading}
                     />
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   </div>
@@ -106,12 +138,14 @@ export default function LoginPage() {
                       required
                       className="w-full pl-10 pr-12 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
                       placeholder="••••••••"
+                      disabled={loading}
                     />
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      disabled={loading}
                     >
                       {showPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -132,6 +166,7 @@ export default function LoginPage() {
                       checked={formData.rememberMe}
                       onChange={handleChange}
                       className="h-4 w-4 text-pink-500 focus:ring-pink-400 border-gray-300 rounded"
+                      disabled={loading}
                     />
                     <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700">
                       Se souvenir de moi
@@ -147,12 +182,15 @@ export default function LoginPage() {
 
                 {/* Bouton de connexion */}
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: loading ? 1 : 1.02 }}
+                  whileTap={{ scale: loading ? 1 : 0.98 }}
                   type="submit"
-                  className="w-full py-3 bg-pink-400 text-white rounded-lg hover:bg-pink-500 transition-colors"
+                  className={`w-full py-3 bg-pink-400 text-white rounded-lg transition-colors ${
+                    loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-pink-500'
+                  }`}
+                  disabled={loading}
                 >
-                  Se connecter
+                  {loading ? 'Connexion en cours...' : 'Se connecter'}
                 </motion.button>
 
                 {/* Lien d'inscription */}
@@ -179,7 +217,10 @@ export default function LoginPage() {
 
               {/* Boutons sociaux */}
               <div className="grid grid-cols-2 gap-4">
-                <button className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <button 
+                  className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  disabled={loading}
+                >
                   <Image
                     src="/images/google.svg"
                     alt="Google"
@@ -188,7 +229,10 @@ export default function LoginPage() {
                   />
                   <span className="text-sm font-medium">Google</span>
                 </button>
-                <button className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <button 
+                  className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  disabled={loading}
+                >
                   <Image
                     src="/images/facebook.svg"
                     alt="Facebook"
@@ -202,8 +246,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
     </main>
   );
 } 

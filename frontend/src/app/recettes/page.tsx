@@ -1,13 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Playfair_Display } from 'next/font/google';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import Header from '@/components/layout/Header';
+import { motion } from 'framer-motion';
+import { playfair } from '@/app/fonts';
 import Footer from '@/components/layout/Footer';
 import RecipeCard from '@/components/recipes/RecipeCard';
-
-const playfair = Playfair_Display({ subsets: ['latin'] });
 
 const categories = [
   { id: 'tous', name: 'Tous' },
@@ -64,19 +62,14 @@ export default function RecipesPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-      
-      {/* Hero Section */}
-      <section className="bg-pink-50 pt-24">
-        <div className="container mx-auto px-4 py-16">
-          <h1 className={`${playfair.className} text-4xl md:text-5xl font-bold text-center mb-6`}>
-            Nos Recettes
-          </h1>
-          <p className="text-center text-gray-600 max-w-2xl mx-auto">
-            Découvrez notre collection de recettes de pâtisserie française, des classiques intemporels aux créations modernes.
-          </p>
-        </div>
-      </section>
+      <div className="pt-32 pb-16">
+        <h1 className={`${playfair.className} text-4xl md:text-5xl font-bold text-center mb-6`}>
+          Nos Recettes
+        </h1>
+        <p className="text-center text-gray-600 max-w-2xl mx-auto">
+          Découvrez notre collection de recettes de pâtisserie française, des classiques intemporels aux créations modernes.
+        </p>
+      </div>
 
       {/* Filtres et Recherche */}
       <section className="container mx-auto px-4 py-8">

@@ -4,12 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Playfair_Display } from 'next/font/google';
 import { Mail, ArrowLeft } from 'lucide-react';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-
-const playfair = Playfair_Display({ subsets: ['latin'] });
+import { playfair } from '@/app/fonts';
+import { authService } from '@/services/authService';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -24,8 +21,6 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <Header />
-
       <div className="pt-32 pb-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
@@ -139,8 +134,6 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
     </main>
   );
 } 
