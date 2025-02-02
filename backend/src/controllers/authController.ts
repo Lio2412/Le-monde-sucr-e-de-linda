@@ -6,6 +6,9 @@ import { authService } from '../services/authService';
  */
 export const register = async (req: Request, res: Response) => {
   try {
+    console.log('=== Debug Register Controller ===');
+    console.log('Request body:', req.body);
+
     const { email, password, nom, prenom, pseudo } = req.body;
 
     // Valider les données d'entrée
@@ -17,16 +20,20 @@ export const register = async (req: Request, res: Response) => {
     }
 
     const result = await authService.register({ email, password, nom, prenom, pseudo });
+    console.log('Service result:', result);
 
-    return res.status(201).json({
+    const response = {
       success: true,
       data: result
-    });
-  } catch (error) {
-    console.error('Erreur lors de l\'inscription:', error);
+    };
+    console.log('Response to be sent:', response);
+
+    return res.status(201).json(response);
+  } catch (error: any) {
+    console.error('Register error:', error);
     return res.status(400).json({
       success: false,
-      message: error instanceof Error ? error.message : 'Une erreur est survenue lors de l\'inscription'
+      message: error.message
     });
   }
 };
@@ -79,7 +86,9 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      data: { user }
+      data: {
+        user
+      }
     });
   } catch (error) {
     console.error('Erreur lors de la récupération du profil:', error);
@@ -88,4 +97,4 @@ export const getCurrentUser = async (req: Request, res: Response) => {
       message: error instanceof Error ? error.message : 'Utilisateur non trouvé'
     });
   }
-}; 
+};

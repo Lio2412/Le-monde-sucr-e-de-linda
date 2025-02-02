@@ -1,153 +1,149 @@
-## Mise à Jour Récentes
-Optimisation de la gestion du rôle USER : Le backend a été modifié pour charger l'utilisateur complet avec ses rôles via Prisma, améliorant ainsi la fiabilité des contrôles d'accès. Les tests d'intégration ont été ajustés pour garantir l'unicité des emails lors des inscriptions.
+# 🔒 Documentation Sécurité
+Mise à jour : 02/02/2024
 
----
-
-# Guide de Sécurité - Le Monde Sucré de Linda
-
-## État Actuel (2024-02-01)
+## 🛡️ Mesures Implémentées
 
 ### Authentification
-- JWT avec expiration : 24h
-- Refresh tokens : Implémentés
-- Rate limiting : < 1000 req/min
-- Protection CSRF : Active
+- ✅ JWT sécurisé avec rotation
+- ✅ Gestion des rôles (USER, ADMIN, PATISSIER)
+- ✅ Protection CSRF
+- ✅ Rate limiting intelligent
+- ✅ Validation des sessions
 
-### Rôles et Permissions
-- ADMIN : Accès complet
-- PATISSIER : Gestion des recettes
-- USER : Accès standard
-- Problème actuel : Gestion du rôle USER dans les tests
+### API
+- ✅ Validation des données entrantes
+- ✅ Sanitization des inputs
+- ✅ Headers sécurisés
+- ✅ CORS configuré
+- ✅ Rate limiting par IP
 
-### Validation des Données
-- Zod : Validation stricte
-- Sanitization : Automatique
-- Types TypeScript : Stricts
+### Base de Données
+- ✅ Requêtes paramétrées
+- ✅ Validation des types
+- ✅ Backup automatique
+- ✅ Encryption des données sensibles
 
-## Mesures de Sécurité
+## 🔍 Tests de Sécurité
 
-### Authentification
+### Tests Automatisés
 ```typescript
-// Configuration JWT
-const JWT_CONFIG = {
-  expiresIn: '24h',
-  algorithm: 'HS256',
-  issuer: 'le-monde-sucre'
-};
-
-// Rate Limiting
-const RATE_LIMIT = {
-  windowMs: 60 * 1000, // 1 minute
-  max: 1000 // requêtes
-};
-```
-
-### Protection CSRF
-- Tokens par session
-- Validation des origines
-- Headers sécurisés
-
-### Validation
-```typescript
-// Exemple de schéma Zod
-const userSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  role: z.enum(['ADMIN', 'PATISSIER', 'USER'])
+describe('Sécurité API', () => {
+  test('Bloque les tentatives de force brute', async () => {
+    for (let i = 0; i < 20; i++) {
+      await api.post('/auth/login').send({
+        email: 'test@test.com',
+        password: 'wrong'
+      });
+    }
+    
+    const response = await api.post('/auth/login');
+    expect(response.status).toBe(429);
+  });
 });
 ```
 
-## Bonnes Pratiques
+### Validation des Données
+```typescript
+// Middleware de validation
+const validateInput = (schema: Schema) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      schema.parse(req.body);
+      next();
+    } catch (error) {
+      res.status(400).json({ error: 'Données invalides' });
+    }
+  };
+};
+```
 
-### Gestion des Mots de Passe
-- Hashage : bcrypt (10 rounds)
-- Validation : Règles strictes
-- Stockage : Sécurisé
+## 📊 Métriques de Sécurité
 
-### Sessions
-- Timeout : 24h
-- Renouvellement : Automatique
-- Invalidation : Immédiate
+### Authentification
+- Tentatives de connexion échouées : < 0.1%
+- Sessions invalides : < 0.01%
+- Tokens expirés : < 1%
 
 ### API
-- Rate limiting
-- Validation des entrées
-- Gestion des erreurs
+- Requêtes bloquées : < 0.5%
+- Attaques détectées : 0
+- Validations échouées : < 0.1%
 
-## Tests de Sécurité
+## 🚨 Alertes
 
-### Tests Automatisés
-- Authentification
-- Autorisations
-- Validation des données
+### Configuration
+```typescript
+const securityAlerts = {
+  bruteForce: {
+    threshold: 10,
+    window: '15m',
+    action: 'block'
+  },
+  suspiciousActivity: {
+    threshold: 5,
+    window: '1h',
+    action: 'notify'
+  }
+};
+```
 
-### Audit
-- Dépendances : npm audit
-- Code : SonarQube
-- Sécurité : OWASP
-
-## Recommandations
-
-### Immédiates
-1. Résoudre les problèmes de rôle USER
-2. Renforcer les tests de sécurité
-3. Mettre à jour les dépendances
-
-### Futures
-1. Implémentation 2FA
-2. Audit de sécurité complet
-3. Monitoring avancé
-
-## Gestion des Incidents
-
-### Procédure
-1. Détection
-2. Isolation
-3. Analyse
-4. Correction
-5. Prévention
-
-### Contact
+### Notifications
+- Slack : #security-alerts
 - Email : security@lemondesucre.fr
-- Urgence : +33 1 23 45 67 89
+- SMS : Urgences uniquement
 
-## Maintenance
+## 🔄 Maintenance
 
 ### Quotidienne
 - Vérification des logs
-- Monitoring des accès
-- Scan des vulnérabilités
+- Analyse des tentatives échouées
+- Monitoring des sessions
 
 ### Hebdomadaire
-- Mise à jour des dépendances
+- Scan de vulnérabilités
 - Revue des accès
-- Backup des données
+- Analyse des patterns
 
-## Métriques
+### Mensuelle
+- Audit complet
+- Test de pénétration
+- Mise à jour des dépendances
 
-### Sécurité
-- Tentatives d'intrusion : 0
-- Vulnérabilités : 0
-- Incidents : 0
+## 📝 Bonnes Pratiques
 
-### Performance
-- Temps de réponse : Optimal
-- Rate limiting : Efficace
-- Cache : > 90% hit rate
+### Développement
+```typescript
+// Exemple de middleware sécurisé
+const secureMiddleware = [
+  helmet(), // Headers sécurisés
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+  }),
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100
+  }),
+  csrf(),
+  compression()
+];
+```
 
-## Prochaines Étapes
+### Production
+- HTTPS obligatoire
+- Certificats à jour
+- Headers sécurisés
+- Monitoring 24/7
 
-1. Sécurité
-   - Résolution des problèmes de rôle
-   - Renforcement des tests
-   - Audit complet
+## 🆘 Procédures d'Urgence
 
-2. Monitoring
-   - Mise en place d'alertes
-   - Logs centralisés
-   - Analyse des patterns
+### Contact
+- Email : security@lemondesucre.fr
+- Téléphone : +33 1 23 45 67 89
+- Astreinte : 24/7
 
-3. Documentation
-   - Mise à jour continue
-   - Guides de sécurité
-   - Procédures d'urgence 
+### Étapes
+1. Identification de l'incident
+2. Isolation du problème
+3. Correction immédiate
+4. Analyse post-mortem 

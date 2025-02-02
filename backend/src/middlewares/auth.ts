@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/constants';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../config/database';
 
 interface JwtPayload {
   userId: string;
@@ -14,7 +12,6 @@ declare global {
     interface Request {
       user?: {
         userId: string;
-        roles: { role: { nom: string } }[];
       };
     }
   }
@@ -31,7 +28,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
-        message: 'Token manquant'
+        message: 'Accès non autorisé'
       });
     }
 
@@ -40,12 +37,11 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
     try {
       // Vérifier et décoder le token
-      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
       
-      // Récupérer l'utilisateur complet avec ses rôles
+      // Récupérer l'utilisateur
       const userRecord = await prisma.user.findUnique({
-        where: { id: decoded.userId },
-        include: { roles: { include: { role: true } } }
+        where: { id: decoded.userId }
       });
 
       if (!userRecord) {
@@ -55,10 +51,9 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         });
       }
 
-      // Attacher les informations complètes de l'utilisateur à la requête
+      // Ajouter l'utilisateur à la requête
       req.user = {
-        userId: userRecord.id,
-        roles: userRecord.roles
+        userId: decoded.userId
       };
 
       next();
@@ -69,7 +64,6 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
       });
     }
   } catch (error) {
-    console.error('Erreur dans le middleware d\'authentification:', error);
     return res.status(500).json({
       success: false,
       message: 'Erreur lors de l\'authentification'
@@ -82,9 +76,9 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
  * Vérifie si l'utilisateur a les rôles requis
  */
 export const hasRoles = (allowedRoles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = (req as any).user;
+      const user = req.user;
       
       if (!user) {
         return res.status(401).json({
@@ -93,7 +87,26 @@ export const hasRoles = (allowedRoles: string[]) => {
         });
       }
 
-      const userRoles = user.roles.map((userRole: any) => userRole.role.nom);
+      // Récupérer l'utilisateur avec ses rôles
+      const userWithRoles = await prisma.user.findUnique({
+        where: { id: user.userId },
+        include: {
+          roles: {
+            include: {
+              role: true
+            }
+          }
+        }
+      });
+
+      if (!userWithRoles) {
+        return res.status(401).json({
+          success: false,
+          message: 'Utilisateur non trouvé'
+        });
+      }
+
+      const userRoles = userWithRoles.roles.map(userRole => userRole.role.nom);
       const hasRequiredRole = allowedRoles.some(role => userRoles.includes(role));
 
       if (!hasRequiredRole) {
@@ -112,4 +125,4 @@ export const hasRoles = (allowedRoles: string[]) => {
       });
     }
   };
-}; 
+};

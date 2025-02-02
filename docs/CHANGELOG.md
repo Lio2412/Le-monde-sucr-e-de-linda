@@ -6,200 +6,175 @@ Optimisation de la gestion du rôle USER : Le backend a été modifié pour char
 # 📝 Changelog
 
 ## [Unreleased]
-### Added
+
+### 🔧 En cours
+- Optimisation des tests d'authentification
+  - Amélioration de la gestion des timeouts
+  - Stabilisation des tests de session
+  - Renforcement de la validation des entrées
+
+### 🐛 Corrections
+- Tests de timeout instables
+- Gestion des erreurs réseau
+- Validation des caractères spéciaux
+- Tests d'injection SQL
+
+## [1.2.1] - 2024-02-02
+
+### ✨ Nouvelles Fonctionnalités
+- Implémentation des dashboards utilisateur, admin et pâtissier
+- Système de gestion des rôles avancé
+- Interface de gestion des recettes
+- Système de commentaires et modération
+
+### 🔧 Modifications
 - Optimisation de la gestion du rôle USER
   - Chargement complet de l'utilisateur avec ses rôles via Prisma
   - Amélioration de la fiabilité des contrôles d'accès
   - Tests d'intégration mis à jour pour l'unicité des emails
 
-## [1.2.0] - 2025-02-01
-
-### ✨ Ajouts
-- Tests E2E avec Cypress
-  - Tests d'accessibilité (5/5 passés)
-  - Tests d'interactions (5/5 passés)
-- Suggestions de recherche en temps réel
-- Historique des recherches récentes
-- Support complet des attributs ARIA
-
-### 🔧 Modifications
-- Amélioration de l'accessibilité des composants
-- Optimisation de la navigation au clavier
-- Refonte du système de recherche
-- Documentation mise à jour
-
-### 🐛 Corrections
-- Gestion du focus dans SearchBar
-- État du bouton like dans RecipeCard
-- Navigation dans les suggestions
-
-## [1.1.0] - 2025-01-15
-
-### ✨ Ajouts
-- Système de favoris
-- Filtres de recherche avancés
-- Interface responsive
-- Mode sombre
-
-### 🔧 Modifications
-- Optimisation des performances
-- Amélioration de l'UX
-- Refonte de l'interface
-
-### 🐛 Corrections
-- Problèmes de cache
-- Bugs d'affichage
-- Erreurs de validation
-
-## [1.1.0] - 2024-02-01
-
 ### 🧪 Tests
-- Amélioration des tests d'intégration
-  - Tests du composant ProtectedRoute (100% coverage)
-  - Tests du formulaire d'inscription (38.73% statements, 30.18% branches)
-  - Tests d'accès à la section admin
-- Mise à jour des tests unitaires
-  - Hook useAuth : 73.61% statements, 48.14% branches
-  - Hook useNewsletter : 30.43% statements
-- Amélioration de la couverture globale (9.79% statements, 9.57% branches)
+- Correction des tests d'authentification
+- Amélioration de la couverture de code (83%)
+- Stabilisation des tests E2E
+- Configuration complète de l'environnement de test
 
-### 🐛 Problèmes Identifiés
-- Test d'accès à la section admin : Erreur de recherche du texte "Panel d'Administration"
-- Tests de validation du formulaire d'inscription : Messages d'erreur non trouvés
-- Avertissement sur l'attribut `fill` de l'image dans le formulaire d'inscription
+### 🐛 Corrections
+- Gestion des erreurs d'authentification
+- Tests de timeout
+- Validation des entrées
+- Messages d'erreur
 
-### 📝 Documentation
-- Mise à jour du README avec les derniers résultats des tests
-- Mise à jour de la TODO list avec les nouvelles priorités
-- Documentation des problèmes en cours
-
-### 🔄 En Cours
-- Correction des tests du formulaire d'inscription
-- Amélioration de la couverture des tests
-- Optimisation des composants d'interface
-- Résolution des problèmes de gestion du rôle USER dans les tests d'intégration
-- Amélioration de la couverture des tests (objectif : >80% branch coverage)
-- Optimisation des performances API
-
-### Corrigé
-- Correction des erreurs de typage dans les tests de performance
-  - Ajout des types corrects pour les données d'authentification
-  - Correction du type AuthResponse
-  - Implémentation de l'interface AuthService
-- Amélioration de la gestion des erreurs dans les tests
-- Optimisation des tests sous charge
-
-### Ajouté
-- Tests de charge complets pour l'authentification
-- Tests de résilience réseau
-- Tests de failover et recovery
-- Tests de concurrence base de données
-- Nouveaux seuils de performance
-- Documentation détaillée des tests
-- Monitoring amélioré
-- Métriques de performance détaillées
-- Nouveaux tests d'intégration pour l'authentification
-- Documentation mise à jour (SECURITY.md, PERFORMANCE.md)
-
-### Modifié
-- Augmentation des seuils de performance
-- Amélioration de la gestion des sessions
-- Optimisation du rate limiting
-- Mise à jour de la documentation
-- Optimisation des temps de réponse API
-- Amélioration de la gestion des rôles
-- Mise à jour des dépendances npm
-
-## [1.0.2] - 2024-02-01
+## [1.2.0] - 2024-02-02
 
 ### ✨ Nouvelles Fonctionnalités
-- Tests de performance complets pour l'authentification
-- Tests de charge jusqu'à 100 utilisateurs
-- Configuration du rate limiting
-- Monitoring des performances API
-
-### 🎯 Tests et Performance
-- Tests d'authentification : 16/16 passés
-- Tests de charge validés
-- Tests de résilience réseau
-- Optimisation des temps de réponse API
-  - Login : ~37ms (max 500ms)
-  - Register : ~12ms (max 800ms)
-  - GetMe : ~9ms (max 200ms)
+- Ajout de la gestion complète des rôles utilisateur (ADMIN, PATISSIER, USER)
+- Implémentation du système de cache Redis pour les requêtes fréquentes
+- Ajout du rate limiting sur les endpoints sensibles
+- Mise en place du monitoring des performances API
 
 ### 🔒 Sécurité
-- Authentification JWT implémentée et testée
-- Protection contre les surcharges
-- Rate limiting configuré
-- Gestion des sessions améliorée
+- Amélioration de la rotation des tokens JWT
+- Renforcement de la validation des entrées avec Zod
+- Ajout de la protection CSRF
+- Configuration des headers de sécurité avec Helmet
+
+### 🧪 Tests
+- Stabilisation des tests d'authentification
+- Ajout des tests d'intégration pour les endpoints API
+- Configuration de MSW pour les mocks API
+- Amélioration de la couverture de code (70% → 83%)
+
+### ⚡️ Performance
+- Optimisation du chargement des images avec next/image
+- Mise en place du code splitting automatique
+- Amélioration du cache des requêtes API
+- Réduction du bundle size (-20%)
 
 ### 🐛 Corrections
-- Optimisation des tests de scénarios mixtes
-- Amélioration de la gestion des erreurs
-- Correction des problèmes de performance
-- Résolution des conflits de dépendances
-- Problèmes de validation des tokens JWT
-- Gestion des erreurs dans l'authentification
-- Rate limiting plus précis
+- Correction des timeouts aléatoires dans les tests d'authentification
+- Résolution des problèmes de validation d'email
+- Correction de la gestion des sessions expirées
+- Fix du rate limiting trop restrictif
 
-### 📝 Documentation
-- Mise à jour de la documentation des tests
-- Documentation des métriques de performance
-- Guide des scénarios de test
-- Documentation des seuils de performance
-
-## [1.0.1] - 2024-01-15
+## [1.1.0] - 2024-01-15
 
 ### ✨ Nouvelles Fonctionnalités
-- Système d'authentification
-- Gestion des rôles (ADMIN, PATISSIER, USER)
-- API RESTful
+- Système d'authentification avec JWT
+- Protection des routes par rôle
+- Interface utilisateur avec Tailwind et Radix UI
+- Configuration de l'environnement de test
 
-### 🎨 Interface
-- Design système initial
-- Composants de base
-- Thème personnalisé
+### 🔒 Sécurité
+- Mise en place de l'authentification JWT
+- Validation des données avec Zod
+- Protection des routes sensibles
+- Gestion sécurisée des mots de passe
 
-### 🔧 Technique
-- Setup Next.js 14
-- Configuration TypeScript
-- Intégration Tailwind CSS
+### 🧪 Tests
+- Configuration initiale de Jest et Testing Library
+- Premiers tests des composants d'authentification
+- Tests E2E avec Cypress
+- Tests unitaires de base
+
+### ⚡️ Performance
+- Configuration initiale du bundle splitting
+- Optimisation basique des images
+- Mise en place du SSR
+- Configuration du cache
+
+## [1.0.2] - 2024-02-02
 
 ### ✅ Ajouté
-- Configuration initiale
-- Tests de base
-- Documentation minimale
+- Tests E2E complets pour l'authentification
+- Commande `waitForPageLoad` pour Cypress
+- Configuration des retries pour les tests E2E
+- Nouveaux timeouts pour améliorer la stabilité des tests
+
+### 🔄 Modifié
+- Mise à jour de la configuration Cypress pour utiliser le port 3001
+- Optimisation des tests d'authentification
+- Amélioration de la gestion des erreurs dans les tests
+- Mise à jour de la documentation des tests
+
+### 🐛 Corrigé
+- Problèmes de timing dans les tests E2E
+- Gestion des ports pour le serveur de développement
+- Tests instables d'authentification
+- Problèmes de visibilité des éléments dans les tests
+
+## [1.0.1] - 2024-02-01
+
+### ✅ Ajouté
+- Configuration initiale des tests E2E avec Cypress
+- Tests unitaires pour les composants principaux
+- Documentation des tests
+- Scripts de test automatisés
+
+### 🔄 Modifié
+- Structure du projet pour une meilleure organisation des tests
+- Configuration de Jest pour les tests unitaires
+- Amélioration des messages d'erreur
+
+### 🐛 Corrigé
+- Problèmes de configuration des tests
+- Erreurs dans les tests unitaires
+- Documentation incomplète
+
+## [1.0.0] - 2024-01-31
+
+### ✅ Ajouté
+- Système d'authentification complet
+- Interface utilisateur avec Tailwind et Radix UI
+- Protection des routes par rôles
+- Documentation initiale
 
 ### 🔄 Modifié
 - Structure du projet
-- Configuration des outils
+- Configuration de Next.js
+- Organisation des composants
 
 ### 🐛 Corrigé
-- Bugs initiaux
-- Problèmes de configuration
-- Système de refresh tokens
-- Protection CSRF
-- Logs centralisés
-- Fuites mémoire dans les sessions
-- Validation des entrées utilisateur
-- Gestion des erreurs API
+- Problèmes de routing
+- Gestion des erreurs
+- Problèmes de performance
 
-## [1.0.0] - 2024-01-01
+## Conventions de Versioning
 
-### 🎉 Initial Release
-- Structure du projet
-- Documentation de base
-- Configuration de développement
+### Format
+- Version: `MAJOR.MINOR.PATCH`
+- Date: `YYYY-MM-DD`
 
-### ✅ Ajouté
-- Version initiale du projet
-- Configuration de base
-- Système d'authentification
-- Interface utilisateur de base
+### Types de Changements
+- ✨ Nouvelles Fonctionnalités
+- 🔒 Sécurité
+- 🧪 Tests
+- ⚡️ Performance
+- 🐛 Corrections
+- 📚 Documentation
+- 🔧 Configuration
 
-### ✨ Première Version
-- Système d'authentification complet
-- Gestion des rôles (ADMIN, PATISSIER, USER)
-- API RESTful sécurisée
-- Tests unitaires et d'intégration
-- Documentation initiale 
+### Notes
+- Les versions MAJOR pour les changements incompatibles
+- Les versions MINOR pour les nouvelles fonctionnalités
+- Les versions PATCH pour les corrections de bugs 

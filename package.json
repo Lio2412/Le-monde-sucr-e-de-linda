@@ -8,11 +8,20 @@
     "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm start\"",
     "setup": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "test": "concurrently \"cd backend && npm test\" \"cd frontend && npm test\"",
-    "clean": "rimraf node_modules && cd backend && rimraf node_modules dist && cd ../frontend && rimraf node_modules .next"
+    "clean": "rimraf node_modules && cd backend && rimraf node_modules dist && cd ../frontend && rimraf node_modules .next",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test:e2e": "cypress run"
   },
   "devDependencies": {
+    "@testing-library/cypress": "^10.0.3",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/jest": "^29.5.14",
     "concurrently": "^8.2.2",
-    "rimraf": "^5.0.5"
+    "cypress": "^14.0.1",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "next-auth": "^4.24.11"

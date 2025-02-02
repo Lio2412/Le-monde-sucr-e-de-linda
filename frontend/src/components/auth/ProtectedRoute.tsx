@@ -14,14 +14,14 @@ export default function ProtectedRoute({ children, requiredRoles = [] }: Protect
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push('/connexion');
+      router.replace('/connexion');
       return;
     }
 
     if (!loading && requiredRoles.length > 0) {
       const hasRequiredRole = requiredRoles.some(role => hasRole(role));
       if (!hasRequiredRole) {
-        router.push('/acces-refuse');
+        router.replace('/acces-refuse');
       }
     }
   }, [loading, isAuthenticated, router, requiredRoles, hasRole]);

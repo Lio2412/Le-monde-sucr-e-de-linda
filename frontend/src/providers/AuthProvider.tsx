@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { authService } from '@/services/authService';
 
 interface User {
@@ -23,11 +23,13 @@ interface AuthContextType {
   login: (credentials: { email: string; password: string }) => Promise<any>;
   logout: () => void;
   hasRole: (roleName: string) => boolean;
+  register: (data: any) => Promise<any>;
+  getCurrentUser: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return user.roles.some(userRole => userRole.role.nom === roleName);
   };
 
-  const value = {
+  const auth = {
     user,
     loading,
     error,
@@ -93,15 +95,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     logout,
     hasRole,
+    register: async (data: any) => {
+      // Simulation d'une inscription réussie
+      return Promise.resolve({ message: 'Inscription réussie' });
+    },
+    getCurrentUser: async () => {
+      try {
+        const response = await authService.getCurrentUser();
+        if (response.success && response.data?.user) {
+          setUser(response.data.user);
+        }
+        return response;
+      } catch (error) {
+        console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+        throw error;
+      }
+    }
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+};
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth doit être utilisé à l\'intérieur d\'un AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
-} 
+}; 

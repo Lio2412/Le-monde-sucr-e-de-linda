@@ -1,15 +1,18 @@
-import { PrismaClient, User as PrismaUser, Role as PrismaRole, UserRole as PrismaUserRole } from '@prisma/client';
+import { PrismaClient, User as PrismaUser } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { JWT_SECRET, JWT_EXPIRES_IN, BCRYPT_SALT_ROUNDS } from '../config/constants';
 import { prisma } from '../config/database';
-import { Client } from 'pg';
-import crypto from 'crypto';
 
-interface User extends PrismaUser {
-  roles: (PrismaUserRole & {
-    role: PrismaRole;
-  })[];
+interface User extends Omit<PrismaUser, 'password'> {
+  id: string;
+  email: string;
+  nom: string;
+  prenom: string;
+  pseudo: string;
+  avatar: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface RegisterData {
@@ -26,31 +29,26 @@ interface LoginData {
 }
 
 interface AuthResponse {
-  user: Omit<User, 'password'>;
+  user: User;
   token: string;
 }
-
-// Configuration de la base de données
-const PG_CONFIG = {
-  user: 'postgres',
-  password: 'root',
-  host: 'localhost',
-  port: 5432,
-  database: process.env.NODE_ENV === 'test' ? 'le_monde_sucre_test' : 'le_monde_sucre'
-};
 
 class AuthService {
   /**
    * Inscription d'un nouvel utilisateur
    */
   async register(data: RegisterData): Promise<AuthResponse> {
+    console.log('=== Debug AuthService Register ===');
+    console.log('Input userData:', data);
+
     try {
       // Vérifier si l'email existe déjà
-      const existingUser = await prisma.user.findUnique({
+      const existingEmail = await prisma.user.findUnique({
         where: { email: data.email }
       });
-
-      if (existingUser) {
+      
+      if (existingEmail) {
+        console.log('Email déjà utilisé:', data.email);
         throw new Error('Cet email est déjà utilisé');
       }
 
@@ -58,93 +56,44 @@ class AuthService {
       const existingPseudo = await prisma.user.findUnique({
         where: { pseudo: data.pseudo }
       });
-
+      
       if (existingPseudo) {
+        console.log('Pseudo déjà utilisé:', data.pseudo);
         throw new Error('Ce pseudo est déjà utilisé');
       }
 
       // Hasher le mot de passe
+      console.log('Hashage du mot de passe...');
       const hashedPassword = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
 
-      // Récupérer ou créer le rôle USER
-      let userRole: PrismaRole;
-      try {
-        // D'abord essayer de récupérer le rôle avec Prisma
-        const existingRole = await prisma.role.findFirst({
-          where: { nom: 'USER' }
-        });
-
-        if (existingRole) {
-          userRole = existingRole;
-        } else {
-          // Si le rôle n'existe pas, le créer avec Prisma
-          userRole = await prisma.role.create({
-            data: {
-              id: crypto.randomUUID(),
-              nom: 'USER',
-              description: 'Rôle utilisateur standard'
-            }
-          });
+      console.log('Création de l\'utilisateur...');
+      const user = await prisma.user.create({
+        data: {
+          email: data.email,
+          password: hashedPassword,
+          nom: data.nom,
+          prenom: data.prenom,
+          pseudo: data.pseudo
         }
-      } catch (error) {
-        console.error('Erreur lors de la récupération/création du rôle USER:', error);
-        throw new Error('Impossible de gérer le rôle USER');
-      }
-
-      if (!userRole || !userRole.id) {
-        throw new Error('Le rôle USER est invalide');
-      }
-
-      // Créer l'utilisateur avec le rôle dans une transaction
-      const result = await prisma.$transaction(async (tx) => {
-        // Créer l'utilisateur
-        const newUser = await tx.user.create({
-          data: {
-            email: data.email,
-            password: hashedPassword,
-            nom: data.nom,
-            prenom: data.prenom,
-            pseudo: data.pseudo
-          }
-        });
-
-        // Créer la relation user-role
-        await tx.userRole.create({
-          data: {
-            userId: newUser.id,
-            roleId: userRole.id
-          }
-        });
-
-        // Récupérer l'utilisateur avec ses rôles
-        return await tx.user.findUnique({
-          where: { id: newUser.id },
-          include: {
-            roles: {
-              include: {
-                role: true
-              }
-            }
-          }
-        });
       });
-
-      if (!result) {
-        throw new Error('Échec de la création de l\'utilisateur');
-      }
+      console.log('Utilisateur créé:', user);
 
       // Générer le token JWT
-      const token = this.generateToken(result.id);
+      const token = this.generateToken(user.id);
+      console.log('Generated token:', token);
 
       // Retourner l'utilisateur sans le mot de passe et le token
-      const { password, ...userWithoutPassword } = result;
-      return { user: userWithoutPassword as Omit<User, 'password'>, token };
+      const { password, ...userWithoutPassword } = user;
+      const result = {
+        user: userWithoutPassword,
+        token
+      };
+
+      console.log('Service result:', result);
+      return result;
     } catch (error) {
-      console.error('Erreur lors de la création de l\'utilisateur:', error);
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Une erreur est survenue lors de la création de l\'utilisateur');
+      console.error('AuthService Register error:', error);
+      throw error;
     }
   }
 
@@ -154,14 +103,7 @@ class AuthService {
   async login(data: LoginData): Promise<AuthResponse> {
     // Rechercher l'utilisateur par email
     const user = await prisma.user.findUnique({
-      where: { email: data.email },
-      include: {
-        roles: {
-          include: {
-            role: true
-          }
-        }
-      }
+      where: { email: data.email }
     });
 
     if (!user) {
@@ -179,22 +121,15 @@ class AuthService {
 
     // Retourner l'utilisateur sans le mot de passe et le token
     const { password, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword as Omit<User, 'password'>, token };
+    return { user: userWithoutPassword, token };
   }
 
   /**
    * Récupérer les informations de l'utilisateur connecté
    */
-  async getCurrentUser(userId: string): Promise<Omit<User, 'password'>> {
+  async getCurrentUser(userId: string): Promise<User> {
     const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        roles: {
-          include: {
-            role: true
-          }
-        }
-      }
+      where: { id: userId }
     });
 
     if (!user) {
@@ -203,7 +138,7 @@ class AuthService {
 
     // Retourner l'utilisateur sans le mot de passe
     const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword as Omit<User, 'password'>;
+    return userWithoutPassword;
   }
 
   /**

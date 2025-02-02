@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,7 @@ interface FormData {
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, getCurrentUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -26,23 +26,54 @@ export default function LoginPage() {
     password: '',
     rememberMe: false
   });
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await getCurrentUser();
+        if (response.success && response.data?.user) {
+          router.push('/dashboard');
+        }
+      } catch (error) {
+        // Ignorer les erreurs d'authentification
+      }
+    };
+    checkAuth();
+  }, [getCurrentUser, router]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
+    if (isBlocked) {
+      setError('Trop de tentatives de connexion. Veuillez réessayer plus tard.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      await login(formData);
-      router.push('/dashboard');
-    } catch (error: any) {
-      if (error.message.includes('expired')) {
-        setError('Session expirée');
-      } else if (error.message.includes('invalid')) {
-        setError('Session invalide');
+      const result = await login({
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (result) {
+        router.push('/dashboard');
       } else {
-        setError('Problème de connexion');
+        setLoginAttempts(prev => prev + 1);
+        if (loginAttempts >= 2) {
+          setIsBlocked(true);
+          setError('Trop de tentatives de connexion. Veuillez réessayer plus tard.');
+        } else {
+          setError('Email ou mot de passe incorrect');
+        }
       }
+    } catch (err) {
+      setError('Problème de connexion');
+      setLoginAttempts(prev => prev + 1);
     } finally {
       setLoading(false);
     }
@@ -99,7 +130,11 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form 
+                className="space-y-6"
+                role="form"
+                onSubmit={handleSubmit}
+              >
                 {/* Email */}
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -146,6 +181,7 @@ export default function LoginPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       disabled={loading}
+                      aria-label="Afficher/Masquer le mot de passe"
                     >
                       {showPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -186,9 +222,9 @@ export default function LoginPage() {
                   whileTap={{ scale: loading ? 1 : 0.98 }}
                   type="submit"
                   className={`w-full py-3 bg-pink-400 text-white rounded-lg transition-colors ${
-                    loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-pink-500'
+                    loading || isBlocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-pink-500'
                   }`}
-                  disabled={loading}
+                  disabled={loading || isBlocked}
                   data-testid="submit"
                 >
                   {loading ? 'Connexion en cours...' : 'Se connecter'}

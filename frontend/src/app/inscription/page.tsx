@@ -23,7 +23,10 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [pseudo, setPseudo] = useState("");
+  const [pseudoError, setPseudoError] = useState("");
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -146,6 +149,7 @@ export default function RegisterPage() {
     });
     setFormErrors({});
     setError(null);
+    setSuccess(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -177,17 +181,34 @@ export default function RegisterPage() {
       });
 
       if (result.success) {
-        if (formData.newsletter) {
+        if (result.message === 'Email de validation envoyé') {
+          setSuccess('email de validation envoyé');
+          setTimeout(() => {
+            router.replace('/connexion');
+          }, 2000);
+        } else if (formData.newsletter) {
           await subscribe(formData.email);
+          resetForm();
+          router.replace('/connexion');
         }
-        resetForm();
-        router.push('/connexion');
       } else {
         setError(result.message || "Une erreur est survenue lors de l'inscription");
       }
     } catch (error) {
       if (error instanceof Error) {
-        setError(error.message);
+        if (error.message.includes('email') && error.message.includes('existe')) {
+          setError('Cet email est déjà utilisé');
+        } else if (error.message.includes('mot de passe') || error.message.includes('password')) {
+          setError('Le mot de passe ne respecte pas les critères de sécurité');
+        } else if (error.message.includes('SQL')) {
+          setError('Caractères non autorisés');
+        } else if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+          setError('Délai d\'attente dépassé');
+        } else if (error.message.includes('network') || error.message.includes('Network')) {
+          setError('Problème de connexion');
+        } else {
+          setError("Une erreur est survenue lors de l'inscription");
+        }
       } else {
         setError("Une erreur est survenue lors de l'inscription");
       }
@@ -234,14 +255,24 @@ export default function RegisterPage() {
                   Rejoignez notre communauté de passionnés de pâtisserie et partagez vos créations.
                 </p>
               </div>
+              
+              {success && (
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-600 rounded-lg" data-testid="success-message">
+                  {success}
+                </div>
+              )}
+              
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg" data-testid="error-message">
+                  {error}
+                </div>
+              )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {error && (
-                  <div data-testid="error-message" className="p-3 rounded bg-red-100 text-red-700 mb-4">
-                    {error}
-                  </div>
-                )}
-                
+              <form 
+                className="space-y-6"
+                role="form"
+                onSubmit={handleSubmit}
+              >
                 {/* Nom et Prénom */}
                 <div>
                   <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -252,7 +283,7 @@ export default function RegisterPage() {
                       type="text"
                       id="firstName"
                       name="firstName"
-                      data-testid="firstName"
+                      data-testid="prenom"
                       className="w-full pl-10 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
                       value={formData.firstName}
                       onChange={handleChange}
@@ -262,7 +293,7 @@ export default function RegisterPage() {
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   </div>
                   {formErrors.firstName && (
-                    <div data-testid="firstName-error" className="text-red-600 text-sm mt-1">
+                    <div data-testid="prenom-error" className="text-red-600 text-sm mt-1">
                       {formErrors.firstName}
                     </div>
                   )}
@@ -277,7 +308,7 @@ export default function RegisterPage() {
                       type="text"
                       id="lastName"
                       name="lastName"
-                      data-testid="lastName"
+                      data-testid="nom"
                       className="w-full pl-10 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
                       value={formData.lastName}
                       onChange={handleChange}
@@ -287,9 +318,36 @@ export default function RegisterPage() {
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   </div>
                   {formErrors.lastName && (
-                    <div data-testid="lastName-error" className="text-red-600 text-sm mt-1">
+                    <div data-testid="nom-error" className="text-red-600 text-sm mt-1">
                       {formErrors.lastName}
                     </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="pseudo">Pseudo</label>
+                  <div className="relative">
+                    <input
+                      className="w-full pl-10 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-200 focus:border-pink-300"
+                      data-testid="pseudo"
+                      id="pseudo"
+                      name="pseudo"
+                      type="text"
+                      placeholder="Votre pseudo"
+                      value={pseudo}
+                      onChange={(e) => {
+                         setPseudo(e.target.value);
+                         if (/['\"]/g.test(e.target.value)) {
+                           setPseudoError('caractères non autorisés');
+                         } else {
+                           setPseudoError('');
+                         }
+                      }}
+                      required
+                    />
+                  </div>
+                  {pseudoError && (
+                    <p className="mt-1 text-xs text-red-600" data-testid="pseudo-error">{pseudoError}</p>
                   )}
                 </div>
 

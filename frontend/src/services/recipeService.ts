@@ -44,4 +44,20 @@ export async function getLatestRecipes(limit: number = 6): Promise<Recipe[]> {
     console.error('Erreur lors de la récupération des recettes:', error);
     return [];
   }
-} 
+}
+
+export async function search(query: string): Promise<{ id: string, title: string }[]> {
+  try {
+    const response = await fetch(`${API_URL}/search?query=${encodeURIComponent(query)}`, fetchOptions);
+    if (!response.ok) {
+      throw new Error('Erreur lors de la recherche');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erreur lors de la recherche:', error);
+    return [];
+  }
+}
+
+export const recipeService = { search, getRecipeBySlug, getLatestRecipes }; 

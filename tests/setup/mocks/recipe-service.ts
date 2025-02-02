@@ -1,0 +1,18 @@
+export const recipeService = {
+  search: jest.fn(),
+  getRecipeById: jest.fn(),
+  createRecipe: jest.fn(),
+  updateRecipe: jest.fn(),
+  deleteRecipe: jest.fn(),
+  getRecipes: jest.fn(),
+  getFeaturedRecipes: jest.fn(),
+  getRecentRecipes: jest.fn(),
+  getPopularRecipes: jest.fn(),
+  rateRecipe: jest.fn(),
+  addComment: jest.fn(),
+  getComments: jest.fn(),
+  likeRecipe: jest.fn(),
+  unlikeRecipe: jest.fn(),
+  shareRecipe: jest.fn(),
+  getSharedRecipes: jest.fn(),
+}; 

@@ -1,0 +1,20 @@
+{
+  "extends": "../frontend/tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "jest", "@testing-library/jest-dom"],
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../frontend/src/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../frontend/src/**/*.ts",
+    "../frontend/src/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+} 
