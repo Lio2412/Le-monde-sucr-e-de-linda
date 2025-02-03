@@ -1,123 +1,163 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { authService } from '@/services/authService';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface User {
-  id: string;
+  id: number;
   email: string;
-  nom: string;
-  prenom: string;
-  pseudo: string;
-  roles: Array<{
-    role: {
-      nom: string;
-      description: string;
-    }
-  }>;
+  role: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
+  isLoading: boolean;
   error: string | null;
   isAuthenticated: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<any>;
-  logout: () => void;
-  hasRole: (roleName: string) => boolean;
-  register: (data: any) => Promise<any>;
-  getCurrentUser: () => Promise<any>;
+  login: (credentials: LoginCredentials) => Promise<AuthResponse>;
+  register: (data: RegisterData) => Promise<AuthResponse>;
+  logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface LoginCredentials {
+  email: string;
+  motDePasse: string;
+}
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface RegisterData {
+  email: string;
+  password: string;
+  prenom: string;
+  nom: string;
+  pseudo: string;
+}
 
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        if (authService.isAuthenticated()) {
-          const response = await authService.getCurrentUser();
-          if (response.success && response.data?.user) {
-            setUser(response.data.user);
-          }
-        }
-      } catch (error) {
-        console.error('Erreur lors de l\'initialisation de l\'auth:', error);
-        setError(error instanceof Error ? error.message : 'Erreur d\'authentification');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initAuth();
-  }, []);
-
-  const login = async (credentials: { email: string; password: string }) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await authService.login(credentials);
-      
-      if (response.success && response.data?.user) {
-        setUser(response.data.user);
-        return {
-          success: true,
-          redirectPath: '/dashboard',
-        };
-      }
-      
-      throw new Error(response.message || 'Erreur de connexion');
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Erreur de connexion');
-      throw error;
-    } finally {
-      setLoading(false);
-    }
+interface AuthResponse {
+  status: number;
+  data: {
+    token: string;
+    user: User;
+    message?: string;
   };
+}
 
-  const logout = () => {
-    authService.logout();
-    setUser(null);
-  };
-
-  const hasRole = (roleName: string): boolean => {
-    if (!user || !user.roles) return false;
-    return user.roles.some(userRole => userRole.role.nom === roleName);
-  };
-
-  const auth = {
-    user,
-    loading,
-    error,
-    isAuthenticated: !!user,
-    login,
-    logout,
-    hasRole,
-    register: async (data: any) => {
-      // Simulation d'une inscription réussie
-      return Promise.resolve({ message: 'Inscription réussie' });
-    },
-    getCurrentUser: async () => {
-      try {
-        const response = await authService.getCurrentUser();
-        if (response.success && response.data?.user) {
-          setUser(response.data.user);
-        }
-        return response;
-      } catch (error) {
-        console.error('Erreur lors de la récupération de l\'utilisateur:', error);
-        throw error;
-      }
-    }
-  };
-
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
-};
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error("useAuth doit être utilisé à l'intérieur d'un AuthProvider");
+  }
   return context;
-}; 
+};
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      // Simulation d'une requête API
+      const response: AuthResponse = {
+        status: 200,
+        data: {
+          token: 'mock-token',
+          user: {
+            id: 1,
+            email: credentials.email,
+            role: 'USER'
+          }
+        }
+      };
+      setUser(response.data.user);
+      return response;
+    } catch (err) {
+      setError("Erreur lors de la connexion");
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (data: RegisterData): Promise<AuthResponse> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      // Simulation d'une requête API
+      const response: AuthResponse = {
+        status: 200,
+        data: {
+          token: 'mock-token',
+          user: {
+            id: 1,
+            email: data.email,
+            role: 'USER'
+          }
+        }
+      };
+      return response;
+    } catch (err) {
+      setError("Erreur lors de l'inscription");
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async (): Promise<void> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setUser(null);
+      router.push('/connexion');
+    } catch (err) {
+      setError("Erreur lors de la déconnexion");
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const checkAuth = async (): Promise<void> => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      // Simulation de vérification du token
+      const token = localStorage.getItem('token');
+      if (token) {
+        setUser({
+          id: 1,
+          email: 'user@test.com',
+          role: 'USER'
+        });
+      }
+    } catch (err) {
+      setError("Erreur lors de la vérification de l'authentification");
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const value = {
+    user,
+    isLoading,
+    error,
+    isAuthenticated: !!user,
+    login,
+    register,
+    logout,
+    checkAuth
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export default AuthProvider; 

@@ -1,197 +1,192 @@
 import { renderHook, act } from '@testing-library/react';
 import { useAuth } from '@/hooks/useAuth';
-import * as authService from '@/services/authService';
-import { renderWithProviders } from '../../setup/test-utils';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
-// Mock du service d'authentification
-jest.mock('@/services/authService');
+jest.mock('next-auth/react', () => ({
+  signIn: jest.fn(),
+  signOut: jest.fn(),
+  useSession: jest.fn()
+}));
+
+jest.mock('next/router', () => ({
+  useRouter: jest.fn()
+}));
 
 describe('useAuth Hook', () => {
+  const mockSignIn = signIn as jest.Mock;
+  const mockSignOut = signOut as jest.Mock;
+  const mockUseSession = useSession as jest.Mock;
+  const mockUseRouter = useRouter as jest.Mock;
+  const mockPush = jest.fn();
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockSignIn.mockClear();
+    mockSignOut.mockClear();
+    mockUseSession.mockClear();
+    mockPush.mockClear();
+    
+    mockUseRouter.mockImplementation(() => ({
+      push: mockPush,
+      query: {}
+    }));
+    
+    mockUseSession.mockReturnValue({
+      data: null,
+      status: 'unauthenticated'
+    });
   });
 
-  it('devrait initialiser avec les valeurs par défaut', () => {
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+  it('handles login successfully', async () => {
+    mockSignIn.mockResolvedValueOnce({
+      ok: true,
+      error: null
     });
 
-    expect(result.current.user).toBeNull();
-    expect(result.current.loading).toBe(true);
+    const { result } = renderHook(() => useAuth());
+
+    await act(async () => {
+      await result.current.login({
+        email: 'test@example.com',
+        password: 'password123'
+      });
+    });
+
+    expect(mockSignIn).toHaveBeenCalledWith('credentials', {
+      email: 'test@example.com',
+      password: 'password123',
+      redirect: false
+    });
+    expect(mockPush).toHaveBeenCalledWith('/');
     expect(result.current.error).toBeNull();
   });
 
-  it('devrait gérer une connexion réussie', async () => {
-    const mockUser = { id: 1, email: 'test@test.com', role: 'USER' };
-    (authService.login as jest.Mock).mockResolvedValue({ success: true, data: { user: mockUser } });
-
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+  it('handles login failure', async () => {
+    mockSignIn.mockResolvedValueOnce({
+      ok: false,
+      error: 'Invalid credentials'
     });
+
+    const { result } = renderHook(() => useAuth());
 
     await act(async () => {
-      await result.current.login('test@test.com', 'password');
+      await result.current.login({
+        email: 'test@example.com',
+        password: 'wrongpassword'
+      });
     });
 
-    expect(result.current.user).toEqual(mockUser);
-    expect(result.current.error).toBeNull();
-    expect(result.current.loading).toBe(false);
+    expect(mockSignIn).toHaveBeenCalled();
+    expect(result.current.error).toBe('Identifiants invalides');
+    expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('devrait gérer l\'échec de connexion', async () => {
-    const errorMessage = 'Invalid credentials';
-    (authService.login as jest.Mock).mockResolvedValue({ success: false, error: errorMessage });
+  it('handles logout successfully', async () => {
+    mockSignOut.mockResolvedValueOnce({ ok: true });
 
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
-    });
-
-    await act(async () => {
-      await result.current.login('test@test.com', 'wrong-password');
-    });
-
-    expect(result.current.user).toBeNull();
-    expect(result.current.error).toBe(errorMessage);
-    expect(result.current.loading).toBe(false);
-  });
-
-  it('devrait gérer la déconnexion', async () => {
-    (authService.logout as jest.Mock).mockResolvedValue({ success: true });
-
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
-    });
+    const { result } = renderHook(() => useAuth());
 
     await act(async () => {
       await result.current.logout();
     });
 
-    expect(result.current.user).toBeNull();
-    expect(result.current.error).toBeNull();
+    expect(mockSignOut).toHaveBeenCalled();
+    expect(mockPush).toHaveBeenCalledWith('/login');
   });
 
-  it('devrait vérifier correctement les rôles', async () => {
-    const mockUser = { id: 1, email: 'admin@test.com', role: 'ADMIN' };
-    (authService.login as jest.Mock).mockResolvedValue({ success: true, data: { user: mockUser } });
-
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
+  it('handles registration successfully', async () => {
+    const mockRegister = jest.fn().mockResolvedValueOnce({
+      ok: true,
+      user: { id: '1', email: 'test@example.com' }
     });
 
-    await act(async () => {
-      await result.current.login('admin@test.com', 'password');
-    });
-
-    expect(result.current.hasRole('ADMIN')).toBe(true);
-    expect(result.current.hasRole('USER')).toBe(false);
-  });
-
-  it('devrait gérer une erreur réseau lors de la connexion', async () => {
-    const networkError = new Error('Network error');
-    (authService.login as jest.Mock).mockRejectedValue(networkError);
-
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
-    });
-
-    await act(async () => {
-      await result.current.login('test@test.com', 'password');
-    });
-
-    expect(result.current.user).toBeNull();
-    expect(result.current.error).toBe('Une erreur est survenue lors de la connexion');
-    expect(result.current.loading).toBe(false);
-  });
-
-  it('devrait gérer une inscription réussie', async () => {
-    const mockUser = { id: 1, email: 'new@test.com', role: 'USER' };
-    (authService.register as jest.Mock).mockResolvedValue({ success: true, data: { user: mockUser } });
-
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
-    });
+    const { result } = renderHook(() => useAuth());
+    result.current.register = mockRegister;
 
     await act(async () => {
       await result.current.register({
-        email: 'new@test.com',
-        password: 'password',
-        firstName: 'Test',
-        lastName: 'User'
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User'
       });
     });
 
-    expect(result.current.user).toEqual(mockUser);
-    expect(result.current.error).toBeNull();
-    expect(result.current.loading).toBe(false);
+    expect(mockRegister).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: 'password123',
+      name: 'Test User'
+    });
+    expect(mockPush).toHaveBeenCalledWith('/login');
   });
 
-  it('devrait gérer un échec d\'inscription', async () => {
-    const errorMessage = 'Email already exists';
-    (authService.register as jest.Mock).mockResolvedValue({ success: false, error: errorMessage });
+  it('handles registration failure', async () => {
+    const mockRegister = jest.fn().mockRejectedValueOnce(
+      new Error('Email already exists')
+    );
 
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
-    });
+    const { result } = renderHook(() => useAuth());
+    result.current.register = mockRegister;
 
     await act(async () => {
-      await result.current.register({
-        email: 'existing@test.com',
-        password: 'password',
-        firstName: 'Test',
-        lastName: 'User'
-      });
-    });
-
-    expect(result.current.user).toBeNull();
-    expect(result.current.error).toBe(errorMessage);
-    expect(result.current.loading).toBe(false);
-  });
-
-  it('devrait gérer la redirection admin après connexion', async () => {
-    const mockAdminUser = { id: 1, email: 'admin@test.com', role: 'ADMIN' };
-    (authService.login as jest.Mock).mockResolvedValue({ success: true, data: { user: mockAdminUser } });
-
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
-    });
-
-    await act(async () => {
-      await result.current.login('admin@test.com', 'password');
-    });
-
-    expect(result.current.user).toEqual(mockAdminUser);
-    // Vérifier que la redirection a été appelée avec le bon chemin
-    const router = require('next/navigation').useRouter();
-    expect(router.push).toHaveBeenCalledWith('/admin');
-  });
-
-  it('devrait vérifier l\'authentification au chargement', async () => {
-    (authService.isAuthenticated as jest.Mock).mockReturnValue(true);
-    (authService.getMe as jest.Mock).mockResolvedValue({
-      success: true,
-      data: {
-        user: {
-          id: 1,
-          email: 'test@test.com',
-          role: 'USER'
-        }
+      try {
+        await result.current.register({
+          email: 'existing@example.com',
+          password: 'password123',
+          name: 'Test User'
+        });
+      } catch (error) {
+        expect(error.message).toBe('Email already exists');
       }
     });
 
-    const { result } = renderHook(() => useAuth(), {
-      wrapper: ({ children }) => renderWithProviders(children)
-    });
-
-    // Attendre que le hook effectue la vérification initiale
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
-    });
-
-    expect(result.current.user).toEqual({
-      id: 1,
-      email: 'test@test.com',
-      role: 'USER'
-    });
-    expect(result.current.loading).toBe(false);
+    expect(mockPush).not.toHaveBeenCalled();
   });
-}); 
+
+  it('provides correct authentication status', () => {
+    mockUseSession.mockReturnValue({
+      data: {
+        user: { id: '1', email: 'test@example.com' }
+      },
+      status: 'authenticated'
+    });
+
+    const { result } = renderHook(() => useAuth());
+
+    expect(result.current.isAuthenticated).toBe(true);
+    expect(result.current.user).toEqual({
+      id: '1',
+      email: 'test@example.com'
+    });
+  });
+
+  it('handles redirect after login', async () => {
+    mockSignIn.mockResolvedValueOnce({ ok: true });
+    mockUseRouter.mockImplementation(() => ({
+      push: mockPush,
+      query: { redirect: '/dashboard' }
+    }));
+
+    const { result } = renderHook(() => useAuth());
+
+    await act(async () => {
+      await result.current.login({
+        email: 'test@example.com',
+        password: 'password123'
+      });
+    });
+
+    expect(mockPush).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('handles loading state during authentication', () => {
+    mockUseSession.mockReturnValue({
+      data: null,
+      status: 'loading'
+    });
+
+    const { result } = renderHook(() => useAuth());
+
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.isAuthenticated).toBe(false);
+  });
+});

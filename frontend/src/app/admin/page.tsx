@@ -1,89 +1,149 @@
 'use client';
 
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/hooks/useAuth';
+import { 
+  Users, 
+  ChefHat, 
+  FileText, 
+  MessageSquare,
+  Eye,
+  Star,
+  TrendingUp
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const stats = [
+  { name: 'Utilisateurs', value: '0', icon: Users, color: 'bg-blue-500' },
+  { name: 'Recettes', value: '0', icon: ChefHat, color: 'bg-green-500' },
+  { name: 'Articles', value: '0', icon: FileText, color: 'bg-purple-500' },
+  { name: 'Commentaires', value: '0', icon: MessageSquare, color: 'bg-yellow-500' },
+];
+
+const recentActivity = [
+  { id: 1, type: 'recette', title: 'Tarte au Citron Meringuée', status: 'en attente' },
+  { id: 2, type: 'article', title: 'Les Secrets de la Pâte Feuilletée', status: 'publié' },
+  { id: 3, type: 'commentaire', title: 'Nouveau commentaire sur Macarons', status: 'modération' },
+];
 
 export default function AdminPage() {
   const { user } = useAuth();
 
   return (
-    <ProtectedRoute requiredRoles={['admin']}>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8" data-testid="admin-title">Panel d'Administration</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Section Informations */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Informations</h2>
-            <div className="space-y-2">
-              <p className="text-gray-600">
-                <span className="font-medium">Administrateur :</span> {user?.prenom} {user?.nom}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium">Email :</span> {user?.email}
-              </p>
-              <p className="text-gray-600">
-                <span className="font-medium">Rôles :</span>{' '}
-                {user?.roles.map(r => r.role.nom).join(', ')}
-              </p>
-            </div>
-          </div>
-
-          {/* Section Gestion des Utilisateurs */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Gestion des Utilisateurs</h2>
-            <div className="space-y-3">
-              <button className="w-full px-4 py-2 text-sm text-white bg-primary rounded hover:bg-primary/90 transition-colors">
-                Liste des Utilisateurs
-              </button>
-              <button className="w-full px-4 py-2 text-sm text-white bg-primary rounded hover:bg-primary/90 transition-colors">
-                Créer un Utilisateur
-              </button>
-              <button className="w-full px-4 py-2 text-sm text-white bg-primary rounded hover:bg-primary/90 transition-colors">
-                Gérer les Rôles
-              </button>
-            </div>
-          </div>
-
-          {/* Section Statistiques */}
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Statistiques</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Utilisateurs Inscrits</p>
-                <div className="text-2xl font-bold text-primary">0</div>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Recettes Publiées</p>
-                <div className="text-2xl font-bold text-primary">0</div>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Commentaires</p>
-                <div className="text-2xl font-bold text-primary">0</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Section Actions Rapides */}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Actions Rapides</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button className="px-4 py-2 text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors">
-              Valider les Recettes
-            </button>
-            <button className="px-4 py-2 text-sm text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors">
-              Modérer les Commentaires
-            </button>
-            <button className="px-4 py-2 text-sm text-white bg-yellow-600 rounded hover:bg-yellow-700 transition-colors">
-              Gérer les Catégories
-            </button>
-            <button className="px-4 py-2 text-sm text-white bg-purple-600 rounded hover:bg-purple-700 transition-colors">
-              Paramètres du Site
-            </button>
-          </div>
+    <div className="space-y-6">
+      {/* En-tête */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Bonjour, {user?.prenom} 👋
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Voici un aperçu de votre activité aujourd'hui
+          </p>
         </div>
       </div>
-    </ProtectedRoute>
+
+      {/* Statistiques */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <motion.div
+            key={stat.name}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-lg bg-white p-5 shadow"
+          >
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <stat.icon className="h-6 w-6 text-gray-400" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    {stat.name}
+                  </dt>
+                  <dd className="text-lg font-semibold text-gray-900">
+                    {stat.value}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Contenu Principal */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        {/* Activité Récente */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="rounded-lg bg-white shadow"
+        >
+          <div className="p-6">
+            <h2 className="text-base font-semibold text-gray-900">
+              Activité Récente
+            </h2>
+            <div className="mt-6 flow-root">
+              <ul className="-my-5 divide-y divide-gray-200">
+                {recentActivity.map((item) => (
+                  <li key={item.id} className="py-4">
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-shrink-0">
+                        {item.type === 'recette' && <ChefHat className="h-5 w-5 text-gray-400" />}
+                        {item.type === 'article' && <FileText className="h-5 w-5 text-gray-400" />}
+                        {item.type === 'commentaire' && <MessageSquare className="h-5 w-5 text-gray-400" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-gray-900">
+                          {item.title}
+                        </p>
+                        <p className="truncate text-sm text-gray-500">
+                          {item.status}
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Métriques */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="rounded-lg bg-white shadow"
+        >
+          <div className="p-6">
+            <h2 className="text-base font-semibold text-gray-900">
+              Métriques
+            </h2>
+            <dl className="mt-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <dt className="flex items-center text-sm text-gray-600">
+                  <Eye className="h-5 w-5 text-gray-400 mr-2" />
+                  Vues Totales
+                </dt>
+                <dd className="text-sm font-semibold text-gray-900">0</dd>
+              </div>
+              <div className="flex items-center justify-between">
+                <dt className="flex items-center text-sm text-gray-600">
+                  <Star className="h-5 w-5 text-gray-400 mr-2" />
+                  Recettes Favorites
+                </dt>
+                <dd className="text-sm font-semibold text-gray-900">0</dd>
+              </div>
+              <div className="flex items-center justify-between">
+                <dt className="flex items-center text-sm text-gray-600">
+                  <TrendingUp className="h-5 w-5 text-gray-400 mr-2" />
+                  Taux d'Engagement
+                </dt>
+                <dd className="text-sm font-semibold text-gray-900">0%</dd>
+              </div>
+            </dl>
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 } 

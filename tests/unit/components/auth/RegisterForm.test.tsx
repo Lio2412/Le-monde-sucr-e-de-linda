@@ -1,133 +1,162 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { RegisterForm } from '@/components/auth/RegisterForm';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import RegisterForm from '@/components/auth/RegisterForm';
 import { useAuth } from '@/hooks/useAuth';
-import { vi } from 'vitest';
+import { useRouter } from 'next/router';
+import { ChakraProvider, theme } from '@chakra-ui/react';
 
-// Mock du hook useAuth
+// Mock framer-motion to avoid context issues
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: vi.fn().mockImplementation(({ children, ...props }) => (
+      <div {...props}>{children}</div>
+    )),
+  },
+  AnimatePresence: vi.fn().mockImplementation(({ children }) => children),
+}));
+
+// Mock the next/router module
+vi.mock('next/router', () => ({
+  useRouter: vi.fn()
+}));
+
+// Mock the useAuth hook
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: vi.fn()
 }));
 
 describe('RegisterForm', () => {
   const mockRegister = vi.fn();
-  
+  const mockPush = vi.fn();
+
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAuth as jest.Mock).mockReturnValue({
+    (useAuth as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       register: mockRegister,
-      isLoading: false,
-      error: null
+      user: null,
+      error: null,
+      loading: false
+    });
+    (useRouter as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      push: mockPush
     });
   });
 
-  it('devrait afficher tous les champs requis', () => {
-    render(<RegisterForm />);
+  const renderWithChakra = (component: React.ReactElement) => {
+    return render(
+      <ChakraProvider theme={theme}>
+        {component}
+      </ChakraProvider>
+    );
+  };
+
+  it('devrait afficher le formulaire d\'inscription avec les champs requis', () => {
+    renderWithChakra(<RegisterForm />);
     
-    expect(screen.getByTestId('email')).toBeInTheDocument();
-    expect(screen.getByTestId('password')).toBeInTheDocument();
-    expect(screen.getByTestId('confirmPassword')).toBeInTheDocument();
-    expect(screen.getByTestId('firstName')).toBeInTheDocument();
-    expect(screen.getByTestId('lastName')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /nom/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /email/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/mot de passe/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/confirmer le mot de passe/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /s'inscrire/i })).toBeInTheDocument();
   });
 
-  it('devrait valider les champs obligatoires', async () => {
-    render(<RegisterForm />);
+  it('devrait afficher des erreurs pour les champs vides', async () => {
+    renderWithChakra(<RegisterForm />);
     
-    const submitButton = screen.getByRole('button', { name: /s'inscrire/i });
-    fireEvent.click(submitButton);
+    await userEvent.click(screen.getByRole('button', { name: /s'inscrire/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/l'email est requis/i)).toBeInTheDocument();
-      expect(screen.getByText(/le mot de passe est requis/i)).toBeInTheDocument();
-      expect(screen.getByText(/la confirmation du mot de passe est requise/i)).toBeInTheDocument();
+      expect(screen.getByText('Le nom est requis')).toBeInTheDocument();
+      expect(screen.getByText("L'email est requis")).toBeInTheDocument();
+      expect(screen.getByText('Le mot de passe est requis')).toBeInTheDocument();
+      expect(screen.getByText('La confirmation du mot de passe est requise')).toBeInTheDocument();
     });
   });
 
-  it('devrait valider le format de l\'email', async () => {
-    render(<RegisterForm />);
+  it('devrait afficher une erreur quand les mots de passe ne correspondent pas', async () => {
+    renderWithChakra(<RegisterForm />);
     
-    const emailInput = screen.getByTestId('email');
-    fireEvent.change(emailInput, { target: { value: 'invalid-email' } });
+    await userEvent.type(screen.getByRole('textbox', { name: /nom/i }), 'John Doe');
+    await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'test@example.com');
+    await userEvent.type(screen.getByLabelText(/mot de passe/i), 'password123');
+    await userEvent.type(screen.getByLabelText(/confirmer le mot de passe/i), 'differentpassword');
     
-    const submitButton = screen.getByRole('button', { name: /s'inscrire/i });
-    fireEvent.click(submitButton);
+    await userEvent.click(screen.getByRole('button', { name: /s'inscrire/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/format d'email invalide/i)).toBeInTheDocument();
+      expect(screen.getByText('Les mots de passe ne correspondent pas')).toBeInTheDocument();
     });
   });
 
-  it('devrait valider la correspondance des mots de passe', async () => {
-    render(<RegisterForm />);
+  it('devrait afficher une erreur pour un format d\'email invalide', async () => {
+    renderWithChakra(<RegisterForm />);
     
-    const passwordInput = screen.getByTestId('password');
-    const confirmPasswordInput = screen.getByTestId('confirmPassword');
+    await userEvent.type(screen.getByRole('textbox', { name: /nom/i }), 'John Doe');
+    await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'invalidemail');
+    await userEvent.type(screen.getByLabelText(/mot de passe/i), 'password123');
+    await userEvent.type(screen.getByLabelText(/confirmer le mot de passe/i), 'password123');
     
-    fireEvent.change(passwordInput, { target: { value: 'Password123!' } });
-    fireEvent.change(confirmPasswordInput, { target: { value: 'DifferentPassword123!' } });
-    
-    const submitButton = screen.getByRole('button', { name: /s'inscrire/i });
-    fireEvent.click(submitButton);
+    await userEvent.click(screen.getByRole('button', { name: /s'inscrire/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/les mots de passe ne correspondent pas/i)).toBeInTheDocument();
+      expect(screen.getByText("Format d'email invalide")).toBeInTheDocument();
     });
   });
 
   it('devrait appeler la fonction register avec les données correctes', async () => {
-    render(<RegisterForm />);
+    mockRegister.mockResolvedValueOnce({ success: true });
     
-    const testData = {
-      email: 'test@example.com',
-      password: 'Password123!',
-      confirmPassword: 'Password123!',
-      firstName: 'John',
-      lastName: 'Doe'
-    };
+    renderWithChakra(<RegisterForm />);
     
-    fireEvent.change(screen.getByTestId('email'), { target: { value: testData.email } });
-    fireEvent.change(screen.getByTestId('password'), { target: { value: testData.password } });
-    fireEvent.change(screen.getByTestId('confirmPassword'), { target: { value: testData.confirmPassword } });
-    fireEvent.change(screen.getByTestId('firstName'), { target: { value: testData.firstName } });
-    fireEvent.change(screen.getByTestId('lastName'), { target: { value: testData.lastName } });
+    await userEvent.type(screen.getByRole('textbox', { name: /nom/i }), 'John Doe');
+    await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'test@example.com');
+    await userEvent.type(screen.getByLabelText(/mot de passe/i), 'password123');
+    await userEvent.type(screen.getByLabelText(/confirmer le mot de passe/i), 'password123');
     
-    const submitButton = screen.getByRole('button', { name: /s'inscrire/i });
-    fireEvent.click(submitButton);
+    await userEvent.click(screen.getByRole('button', { name: /s'inscrire/i }));
 
     await waitFor(() => {
       expect(mockRegister).toHaveBeenCalledWith({
-        email: testData.email,
-        password: testData.password,
-        firstName: testData.firstName,
-        lastName: testData.lastName
+        name: 'John Doe',
+        email: 'test@example.com',
+        password: 'password123'
       });
     });
   });
 
-  it('devrait afficher le loader pendant la soumission', () => {
-    (useAuth as jest.Mock).mockReturnValue({
-      register: mockRegister,
-      isLoading: true,
-      error: null
-    });
-
-    render(<RegisterForm />);
+  it('devrait rediriger vers le tableau de bord après une inscription réussie', async () => {
+    mockRegister.mockResolvedValueOnce({ success: true });
     
-    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /s'inscrire/i })).toBeDisabled();
+    renderWithChakra(<RegisterForm />);
+    
+    await userEvent.type(screen.getByRole('textbox', { name: /nom/i }), 'John Doe');
+    await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'test@example.com');
+    await userEvent.type(screen.getByLabelText(/mot de passe/i), 'password123');
+    await userEvent.type(screen.getByLabelText(/confirmer le mot de passe/i), 'password123');
+    
+    await userEvent.click(screen.getByRole('button', { name: /s'inscrire/i }));
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+    });
   });
 
-  it('devrait afficher les erreurs du serveur', () => {
-    const errorMessage = 'Cet email est déjà utilisé';
-    (useAuth as jest.Mock).mockReturnValue({
-      register: mockRegister,
-      isLoading: false,
-      error: errorMessage
-    });
-
-    render(<RegisterForm />);
+  it('devrait afficher un message d\'erreur en cas d\'échec de l\'inscription', async () => {
+    const errorMessage = "Une erreur s'est produite lors de l'inscription";
+    mockRegister.mockRejectedValueOnce(new Error(errorMessage));
     
-    expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    renderWithChakra(<RegisterForm />);
+    
+    await userEvent.type(screen.getByRole('textbox', { name: /nom/i }), 'John Doe');
+    await userEvent.type(screen.getByRole('textbox', { name: /email/i }), 'test@example.com');
+    await userEvent.type(screen.getByLabelText(/mot de passe/i), 'password123');
+    await userEvent.type(screen.getByLabelText(/confirmer le mot de passe/i), 'password123');
+    
+    await userEvent.click(screen.getByRole('button', { name: /s'inscrire/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(errorMessage);
+    });
   });
-}); 
+});

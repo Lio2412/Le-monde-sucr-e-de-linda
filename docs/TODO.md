@@ -137,7 +137,6 @@ Mise à jour : 2025-02-01
 ### Features
 - [ ] Système de commentaires
 - [ ] Notifications push
-- [ ] Mode sombre automatique
 - [ ] Recherche vocale
 - [ ] Export PDF des recettes
 
@@ -275,8 +274,6 @@ Mise à jour : 2025-02-01
 ## Fonctionnalités 🚀
 
 ### Haute Priorité ⚡
-- [ ] Système de paiement
-- [ ] Gestion des commandes
 - [ ] Interface d'administration
 - [ ] Notifications en temps réel
 
@@ -284,7 +281,6 @@ Mise à jour : 2025-02-01
 - [ ] Système de recherche avancé
 - [ ] Filtres personnalisés
 - [ ] Système de favoris
-- [ ] Historique des commandes
 
 ### Basse Priorité 📋
 - [ ] Mode hors ligne

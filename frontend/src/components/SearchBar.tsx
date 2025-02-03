@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { recipeService } from '../services/recipeService';
+import { recettesService } from '@/services/recettes.service';
 
 export interface SearchFilter {
   category?: string;
@@ -55,9 +55,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   useEffect(() => {
     if (query.trim() !== '') {
-      recipeService.search(query)
+      recettesService.getAll({ search: query })
         .then((data) => {
-          const suggestions: SearchSuggestion[] = data.map((item: { id: string; title: string }) => ({ ...item, type: 'recipe' }));
+          const suggestions: SearchSuggestion[] = data.recettes.map((item: { id: string; titre: string }) => ({ 
+            id: item.id, 
+            title: item.titre,
+            type: 'recipe' 
+          }));
           setSuggestionsInternal(suggestions);
           setError(null);
           setSelectedSuggestionIndex(-1);
@@ -87,7 +91,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(query);
+    onSearch(query, filters);
     setShowSuggestions(false);
   };
 

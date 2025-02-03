@@ -20,8 +20,8 @@ import { motion } from 'framer-motion';
 import { playfair } from '@/app/fonts';
 
 // Chargement différé des composants non-critiques
-const RatingSection = lazy(() => import('@/components/recipes/RatingSection'));
-const CommentSection = lazy(() => import('@/components/recipes/CommentSection'));
+const RatingSection = lazy(() => import('@/components/recipe/RatingSection'));
+const CommentSection = lazy(() => import('@/components/recipe/CommentSection'));
 
 // Import dynamique de Framer Motion avec fallback
 const MotionProvider = dynamic(

@@ -5,7 +5,7 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { playfair } from '@/app/fonts';
 import Footer from '@/components/layout/Footer';
-import RecipeCard from '@/components/recipes/RecipeCard';
+import RecipeCard from '@/components/recipe/RecipeCard';
 
 const categories = [
   { id: 'tous', name: 'Tous' },

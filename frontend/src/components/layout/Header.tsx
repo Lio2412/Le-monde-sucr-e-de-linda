@@ -16,7 +16,7 @@ const navigation = [
   { name: 'Contact', href: '/contact' },
 ];
 
-export default function Header() {
+const Header = () => {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
@@ -187,4 +187,6 @@ export default function Header() {
       </nav>
     </motion.header>
   );
-} 
+};
+
+export default Header; 

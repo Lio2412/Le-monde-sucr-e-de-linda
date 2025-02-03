@@ -1,26 +1,68 @@
 import '@testing-library/jest-dom';
+import { PrismaClient } from '@prisma/client';
+import { mockDeep, mockReset, DeepMockProxy } from 'jest-mock-extended';
+
+// Mock de PrismaClient
+jest.mock('@prisma/client', () => ({
+  PrismaClient: jest.fn(),
+}));
+
+// Mock global pour prisma
+export type Context = {
+  prisma: PrismaClient;
+};
+
+export type MockContext = {
+  prisma: DeepMockProxy<PrismaClient>;
+};
+
+export const createMockContext = () => ({
+  prisma: mockDeep<PrismaClient>(),
+});
+
+let mockCtx: MockContext;
+let ctx: Context;
+
+beforeEach(() => {
+  mockCtx = createMockContext() as MockContext;
+  ctx = mockCtx as unknown as Context;
+});
+
+afterEach(() => {
+  mockReset(mockCtx.prisma);
+});
 
 // Configuration globale pour les tests
 beforeAll(() => {
-  // Setup global avant tous les tests
-  // Configuration des variables d'environnement de test de manière sécurisée
-  Object.defineProperty(process.env, 'NODE_ENV', { value: 'test' });
-  Object.defineProperty(process.env, 'JWT_SECRET', { value: 'test-secret' });
-  Object.defineProperty(process.env, 'DATABASE_URL', { value: 'postgresql://test:test@localhost:5432/test_db' });
+  // Vérifier que nous sommes bien en environnement de test
+  if (process.env.NODE_ENV !== 'test') {
+    throw new Error('Tests must be run in test environment');
+  }
+
+  // Configuration des timeouts globaux
+  jest.setTimeout(10000);
+
+  // Configuration des mocks
+  jest.mock('bcrypt', () => ({
+    hash: jest.fn().mockResolvedValue('hashedPassword'),
+    compare: jest.fn().mockResolvedValue(true),
+    genSalt: jest.fn().mockResolvedValue('salt'),
+  }));
+
+// Nettoyage après tous les tests
+afterAll(async () => {
+  // Fermer toutes les connexions
+  await ctx.prisma.$disconnect();
 });
 
-afterAll(() => {
-  // Cleanup global après tous les tests
-});
+// Exporter le contexte mock pour utilisation dans les tests
+export { mockCtx, ctx };
 
 // Reset les mocks après chaque test
 afterEach(() => {
   jest.clearAllMocks();
   jest.resetModules();
 });
-
-// Configuration des timeouts globaux
-jest.setTimeout(10000); // 10 secondes
 
 // Désactiver les logs pendant les tests
 console.log = jest.fn();

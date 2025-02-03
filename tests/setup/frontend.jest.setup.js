@@ -1,77 +1,99 @@
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
+import { afterEach } from '@jest/globals';
+import { cleanup } from '@testing-library/react';
 
+// Polyfills pour Next.js
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
 
-// Mock de next/navigation
+// Mock Next.js
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-    prefetch: jest.fn(),
-    pathname: '/',
-  }),
-  usePathname: () => '/',
-  useSearchParams: () => new URLSearchParams(),
-}));
-
-// Mock de next/headers
-jest.mock('next/headers', () => ({
-  cookies: () => ({
-    get: jest.fn(),
-    set: jest.fn(),
-    delete: jest.fn(),
-  }),
-  headers: () => ({
-    get: jest.fn(),
-    set: jest.fn(),
-  }),
-}));
-
-// Mock de framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }) => <div {...props}>{children}</div>,
-    button: ({ children, ...props }) => <button {...props}>{children}</button>,
-    form: ({ children, ...props }) => <form {...props}>{children}</form>,
+  useRouter() {
+    return {
+      push: jest.fn(),
+      replace: jest.fn(),
+      prefetch: jest.fn(),
+      back: jest.fn(),
+      pathname: '/',
+      query: {},
+    };
   },
-  AnimatePresence: ({ children }) => children,
+  usePathname() {
+    return '/';
+  },
+  useSearchParams() {
+    return new URLSearchParams();
+  },
 }));
 
-// Supprimer les avertissements de console pendant les tests
-const originalError = console.error;
-console.error = (...args) => {
-  if (args[0]?.includes?.('Warning: ReactDOM.render is no longer supported')) {
-    return;
-  }
-  if (args[0]?.includes?.('Invalid hook call')) {
-    return;
-  }
-  originalError.call(console, ...args);
+// Mock next/image
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: (props) => {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img {...props} alt={props.alt} />;
+  },
+}));
+
+// Mock axios
+const mockAxios = {
+  create: jest.fn(() => ({
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+    patch: jest.fn(),
+    interceptors: {
+      request: { use: jest.fn(), eject: jest.fn() },
+      response: { use: jest.fn(), eject: jest.fn() },
+    },
+  })),
+  get: jest.fn(),
+  post: jest.fn(),
+  put: jest.fn(),
+  delete: jest.fn(),
+  patch: jest.fn(),
+  interceptors: {
+    request: { use: jest.fn(), eject: jest.fn() },
+    response: { use: jest.fn(), eject: jest.fn() },
+  },
 };
 
-// Configuration globale pour les tests
-beforeAll(() => {
-  // Nettoyer localStorage avant chaque test
-  Object.defineProperty(window, 'localStorage', {
-    value: {
-      getItem: jest.fn(),
-      setItem: jest.fn(),
-      removeItem: jest.fn(),
-      clear: jest.fn(),
-    },
-    writable: true,
-  });
-});
+jest.mock('axios', () => mockAxios);
 
+// Nettoyage après chaque test
 afterEach(() => {
-  // Nettoyer les mocks après chaque test
+  cleanup();
   jest.clearAllMocks();
-  localStorage.clear();
 });
 
-// Vous pouvez ajouter ici d'autres configurations globales pour Jest si nécessaire. 
+// Configuration globale
+jest.setTimeout(10000);
+
+// Suppression des warnings console pendant les tests
+const originalConsoleError = console.error;
+const originalConsoleWarn = console.warn;
+
+beforeAll(() => {
+  console.error = (...args) => {
+    if (
+      /Warning: ReactDOM.render is no longer supported in React 18/.test(args[0])
+    ) {
+      return;
+    }
+    originalConsoleError.call(console, ...args);
+  };
+
+  console.warn = (...args) => {
+    if (/Warning: useLayoutEffect does nothing on the server/.test(args[0])) {
+      return;
+    }
+    originalConsoleWarn.call(console, ...args);
+  };
+});
+
+afterAll(() => {
+  console.error = originalConsoleError;
+  console.warn = originalConsoleWarn;
+}); 

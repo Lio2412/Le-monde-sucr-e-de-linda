@@ -43,15 +43,29 @@ export interface AuthService {
   logout: () => void;
 }
 
-export interface AuthContextType {
-  user: UserData | null;
-  setUser: Dispatch<SetStateAction<UserData | null>>;
-  loading: boolean;
+export interface User {
+  id: number;
+  email: string;
+  nom: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface LoginCredentials {
+  email: string;
+  motDePasse: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
   error: string | null;
-  isAuthenticated: () => boolean;
-  login: (credentials: { email: string; password: string }) => Promise<any>;
+}
+
+export interface AuthContextType extends AuthState {
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
-  hasRole: (roleName: string) => boolean;
-  register: (data: RegisterData) => Promise<any>;
-  getCurrentUser: () => Promise<any>;
+  checkAuth: () => Promise<void>;
 } 

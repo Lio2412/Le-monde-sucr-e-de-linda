@@ -5,16 +5,22 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["../frontend/src/*"]
+      "@/*": ["../frontend/src/*"],
+      "@test-utils/*": ["./utils/*"]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     "../frontend/src/**/*.ts",
-    "../frontend/src/**/*.tsx"
+    "../frontend/src/**/*.tsx",
+    "./unit/**/*",
+    "./integration/**/*",
+    "./api/**/*",
+    "./e2e/**/*"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "coverage"
   ]
 } 

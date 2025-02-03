@@ -5,32 +5,44 @@ export default {
   setupFilesAfterEnv: ['<rootDir>/setup/backend.jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/../../backend/src/$1',
+    '^@/tests/(.*)$': '<rootDir>/../$1',
   },
   testMatch: [
-    '<rootDir>/../../tests/api/**/*.test.ts',
-    '<rootDir>/../../tests/unit/**/*.test.ts'
+    '<rootDir>/../unit/backend/**/*.{spec,test}.{js,jsx,ts,tsx}',
+    '<rootDir>/../api/**/*.{spec,test}.{js,jsx,ts,tsx}',
   ],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
-      tsconfig: '<rootDir>/../../backend/tsconfig.json'
-    }]
+      tsconfig: '<rootDir>/../../backend/tsconfig.json',
+      useESM: true,
+    }],
   },
-  clearMocks: true,
-  resetMocks: true,
-  restoreMocks: true,
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverage: true,
+  coverageDirectory: '<rootDir>/../../backend/coverage',
   coverageThreshold: {
     global: {
       branches: 70,
       functions: 70,
       lines: 70,
-      statements: 70
-    }
+      statements: 70,
+    },
   },
   collectCoverageFrom: [
-    '<rootDir>/../../backend/src/**/*.{js,ts}',
+    '<rootDir>/../../backend/src/**/*.{js,jsx,ts,tsx}',
     '!<rootDir>/../../backend/src/**/*.d.ts',
-    '!<rootDir>/../../backend/src/server.ts',
-    '!<rootDir>/../../backend/src/config/**/*'
-  ]
+  ],
+  globals: {
+    'ts-jest': {
+      tsconfig: '<rootDir>/../../backend/tsconfig.json',
+      useESM: true,
+    },
+  },
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+  ],
+  moduleDirectories: ['node_modules', '<rootDir>'],
+  verbose: true,
+  testTimeout: 30000,
 };

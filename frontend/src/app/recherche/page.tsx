@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import { playfair } from '@/app/fonts';
 import { Clock, ChefHat, Filter } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
-import RecipeCard from '@/components/recipes/RecipeCard';
+import RecipeCard from '@/components/recipe/RecipeCard';
 
 // Données de démonstration
 const categories = [
