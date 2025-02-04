@@ -8,7 +8,7 @@ import { dirname, join } from 'path';
 
 // Routes
 import recipeRoutes from './routes/recipes.js';
-import authRoutes from './routes/auth.js';
+import authRoutes from './routes/auth/v2.js';
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -83,4 +83,4 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
-export { app }; 
+export { app };

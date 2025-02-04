@@ -29,6 +29,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.18.2",
     "helmet": "^7.1.0",
+    "le-monde-sucre-de-linda": "file:..",
     "morgan": "^1.10.0",
     "uuid": "^11.0.5"
   },

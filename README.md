@@ -15,7 +15,6 @@ Application web de pâtisserie permettant aux utilisateurs de découvrir, comman
 
 ### En Cours de Développement 🚧
 - 🚧 Tests d'intégration des API (80% complétés)
-- 🚧 Gestion des commandes de pâtisseries
 - 🚧 Interface d'administration
 - 🚧 Optimisation des performances
 

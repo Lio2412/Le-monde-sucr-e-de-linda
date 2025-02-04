@@ -1,82 +1,53 @@
-# Frontend - Le Monde Sucré de Linda
+# Le Monde Sucré de Linda
+
+## Description
+Application web de pâtisserie permettant aux utilisateurs de découvrir, commander et personnaliser des pâtisseries artisanales.
+
+## Fonctionnalités Actuelles
+- Système d'authentification complet
+- Protection des routes par rôles
+- Interface moderne (Next.js, React, TailwindCSS, Radix UI)
+- Commande de pâtisseries (en cours)
+- Tests unitaires et E2E pour les fonctionnalités critiques
 
 ## Structure du Projet
+├── frontend/      # Application Next.js (React, TypeScript, TailwindCSS)
+└── backend/       # API Node.js (Express, TypeScript, Prisma)
 
-```
-frontend/
-├── src/
-│   ├── app/              # Pages et routes Next.js
-│   ├── components/       # Composants React réutilisables
-│   ├── hooks/           # Hooks React personnalisés
-│   ├── services/        # Services API et utilitaires
-│   ├── styles/          # Styles globaux et variables
-│   └── types/           # Types TypeScript
-├── public/              # Assets statiques
-├── cypress/             # Tests E2E
-└── __tests__/          # Tests unitaires
-```
+## Installation
+1. Cloner le repository:
+   git clone https://github.com/votre-username/le-monde-sucre-de-linda.git
+   cd le-monde-sucre-de-linda
 
-## Configuration
+2. Installer les dépendances:
+   - Frontend: cd frontend && npm install
+   - Backend: cd backend && npm install
 
-1. Installation des dépendances :
-```bash
-npm install
-```
-
-2. Configuration des variables d'environnement :
-```bash
-cp .env.example .env.local
-```
+3. Configurer les variables d'environnement:
+   - Frontend: cp .env.example .env.local
+   - Backend: créer un fichier .env avec les variables nécessaires
 
 ## Scripts Disponibles
 
-- `npm run dev` : Lance le serveur de développement
-- `npm run build` : Compile le projet pour la production
-- `npm start` : Lance le serveur de production
-- `npm test` : Lance les tests unitaires
-- `npm run cypress` : Lance les tests E2E
-- `npm run lint` : Vérifie le style du code
-- `npm run format` : Formate le code avec Prettier
+### Frontend
+npm run dev      # Démarrer le serveur de développement
+npm run build    # Build de production
+npm run start    # Lancement en production
+npm run lint     # Vérification ESLint
+npm run format   # Formatage avec Prettier
+
+### Backend
+node server.js   # Démarrer le serveur en développement
 
 ## Tests
+- Frontend: npm run test (unitaires et E2E)
+- Backend: Tests intégrés via CI/CD
 
-### Tests Unitaires
-Les tests unitaires utilisent Jest et React Testing Library.
-```bash
-npm test
-```
+## Documentation Complémentaire
+Pour plus d'informations, consultez le dossier /docs (API, tests, sécurité, etc.).
 
-### Tests E2E
-Les tests E2E utilisent Cypress.
-```bash
-npm run cypress
-```
+## Contribution
+Forkez le projet, créez une branche de fonctionnalité, commitez vos changements et ouvrez une pull request.
 
-## Composants UI
-
-Le projet utilise :
-- TailwindCSS pour le styling
-- Shadcn/ui pour les composants de base
-- Framer Motion pour les animations
-
-## Mode Cuisine
-
-Le mode cuisine est une fonctionnalité spéciale qui inclut :
-- Timer intégré
-- Système de notes
-- Mode plein écran
-- Progression des étapes
-
-## Conventions de Code
-
-- TypeScript strict
-- ESLint pour la qualité du code
-- Prettier pour le formatage
-- Tests unitaires pour les composants principaux
-
-## Performance
-
-- Optimisation des images avec next/image
-- Lazy loading des composants
-- Mise en cache avec SWR
-- Optimisation SEO avec les métadonnées Next.js 
+## Licence
+MIT 

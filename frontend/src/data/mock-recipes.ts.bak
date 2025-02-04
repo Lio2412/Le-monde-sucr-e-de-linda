@@ -1,0 +1,68 @@
+import { Recipe } from '@/types/recipe';
+
+export const mockRecipes: Recipe[] = [
+  {
+    id: '1',
+    title: 'Gâteau au Chocolat',
+    slug: 'gateau-au-chocolat',
+    description: 'Un délicieux gâteau au chocolat moelleux et fondant',
+    ingredients: [
+      '200g de chocolat noir',
+      '200g de beurre',
+      '200g de sucre',
+      '4 œufs',
+      '100g de farine'
+    ],
+    instructions: [
+      'Préchauffer le four à 180°C',
+      'Faire fondre le chocolat et le beurre au bain-marie',
+      'Mélanger les œufs et le sucre',
+      'Ajouter le mélange chocolat-beurre',
+      'Incorporer la farine',
+      'Cuire 25 minutes'
+    ],
+    prepTime: '15 minutes',
+    cookTime: '25 minutes',
+    totalTime: '40 minutes',
+    servings: 8,
+    difficulty: 'Facile',
+    category: 'Desserts',
+    tags: ['Chocolat', 'Gâteau', 'Dessert'],
+    image: '/images/recipes/gateau-chocolat.jpg',
+    rating: 4.5,
+    author: 'Linda',
+    createdAt: new Date('2024-01-01').toISOString(),
+    updatedAt: new Date('2024-01-01').toISOString()
+  },
+  {
+    id: '2',
+    title: 'Tarte aux Pommes',
+    slug: 'tarte-aux-pommes',
+    description: 'Une tarte aux pommes traditionnelle française',
+    ingredients: [
+      'Pâte brisée',
+      '6 pommes',
+      '100g de sucre',
+      'Cannelle'
+    ],
+    instructions: [
+      'Étaler la pâte',
+      'Éplucher et couper les pommes',
+      'Disposer les pommes sur la pâte',
+      'Saupoudrer de sucre et de cannelle',
+      'Cuire 45 minutes à 180°C'
+    ],
+    prepTime: '30 minutes',
+    cookTime: '45 minutes',
+    totalTime: '1h15',
+    servings: 8,
+    difficulty: 'Moyen',
+    category: 'Tartes',
+    tags: ['Pommes', 'Tarte', 'Dessert'],
+    image: '/images/recipes/tarte-pommes.jpg',
+    rating: 4.8,
+    author: 'Linda',
+    createdAt: new Date('2024-01-02').toISOString(),
+    updatedAt: new Date('2024-01-02').toISOString()
+  }
+]; 

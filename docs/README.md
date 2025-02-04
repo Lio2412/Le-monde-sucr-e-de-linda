@@ -1,5 +1,101 @@
 # Le Monde Sucré de Linda - Documentation
 
+## Description
+Blog de pâtisserie permettant de partager des recettes, des astuces et des articles sur l'art de la pâtisserie. Une plateforme pour les passionnés de pâtisserie souhaitant découvrir et échanger autour de recettes artisanales.
+
+## 🚀 Démarrage Rapide
+
+### Prérequis
+- Node.js 18+
+- PostgreSQL
+- npm ou yarn
+
+### Installation
+1. Cloner le projet
+```bash
+git clone https://github.com/votre-username/le-monde-sucre-de-linda.git
+cd le-monde-sucre-de-linda
+```
+
+2. Frontend (port 3000)
+```bash
+cd frontend
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+3. Backend (port 3001)
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+## 📚 Documentation
+
+### Pour les Développeurs
+- [Guide Technique](./TECHNICAL.md) - Architecture et stack technique
+- [API](./API.md) - Documentation des endpoints
+- [Sécurité](./SECURITY.md) - Mesures et configurations
+
+### Contribution
+- [Guide de Contribution](./CONTRIBUTING.md) - Comment contribuer
+- [Changelog](./CHANGELOG.md) - Historique des versions
+
+## 🔧 État Actuel (04/02/2024)
+
+### Implémenté ✅
+- Authentification de base (login/register)
+- Protection des routes par middleware
+- Structure de base du projet (frontend/backend)
+- Configuration initiale des tests
+- Tests E2E avec Cypress (100% de réussite)
+
+### En Développement 🚧
+- Système de gestion des articles et recettes
+- Interface d'administration pour la gestion du contenu
+- Tests d'intégration des API (80% complétés)
+- Système de commentaires et interactions
+- Optimisation des performances
+
+### Métriques de Qualité 📊
+- Coverage des tests : 83% (objectif : 90%)
+- Performance Lighthouse : 85+
+
+## 📝 Notes
+- Node.js 18+ requis
+- PostgreSQL requis pour la base de données
+- Variables d'environnement à configurer
+
+## Support
+Pour toute question : support@lemondesucre.fr
+
+## Table des Matières
+
+1. [API](API.md) - Description des endpoints et de la structure de l'API.
+2. [Tests](TESTING.md) - Guide pour exécuter et rédiger des tests (unitaires, intégration, E2E).
+3. [Performance](PERFORMANCE.md) - Optimisations et métriques de performance.
+4. [Sécurité](SECURITY.md) - Politiques de sécurité et bonnes pratiques.
+5. [Administration](ADMIN_IMPLEMENTATION.md) - Guide d'implémentation de l'administration.
+6. [Contribution](CONTRIBUTING.md) - Règles et processus pour contribuer au projet.
+7. [Changelog](CHANGELOG.md) - Historique des changements du projet.
+8. [Dépannage](TROUBLESHOOTING.md) - Solutions aux problèmes connus.
+9. [TODO](TODO.md) - Liste des tâches en cours et à venir.
+10. [Scénarios de Test](TEST_SCENARIOS.md) - Cas de test pour vérifier les fonctionnalités.
+11. [Documentation Technique](TECHNICAL.md) - Vue d'ensemble technique et architecture.
+
+## Guide Rapide
+
+- Pour toute contribution, référez-vous à [CONTRIBUTING.md](CONTRIBUTING.md).
+- Pour connaître les modifications récentes, consultez le [Changelog](CHANGELOG.md).
+- Pour tout problème ou question, reportez-vous à [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
+
+## Remarques
+
+La documentation est régulièrement mise à jour pour refléter l'état actuel du projet. Merci de contribuer si vous constatez des informations périmées.
+
 ## 📊 État Actuel (2025-02-02)
 
 ### Tests et Qualité
@@ -226,56 +322,101 @@ Pour toute question ou assistance :
 3. Mettre en place un monitoring des performances pour identifier rapidement toute régression.
 4. Continuer l'optimisation des endpoints critiques.
 
-## État Actuel du Projet (02/02/2024)
+## État Actuel du Projet (04/02/2024)
 
 ### Fonctionnalités Implémentées ✅
-- ✅ Système d'authentification complet avec gestion des rôles
-- ✅ Interface utilisateur moderne avec Tailwind et Radix UI
-- ✅ Système de blog et gestion des recettes
-- ✅ Dashboards utilisateur, admin et pâtissier
-- ✅ Système de commentaires et modération
-- ✅ Tests unitaires et E2E (83% de couverture)
+- Authentification de base (login/register)
+- Routes protégées par middleware
+- Structure de base du frontend (Next.js) et backend (Express)
+- Configuration initiale des tests
 
-### En Cours de Développement 🚧
-- 🚧 Enrichissement du contenu (vidéos, variantes de recettes)
-- 🚧 Système de notifications
-- 🚧 Optimisations de performance
-- 🚧 Améliorations SEO
-
-### Métriques de Qualité 📊
-- Coverage des tests : 83%
-- Performance Lighthouse : 85+
-- Accessibilité : AA WCAG 2.1
-- Tests E2E : 100% de réussite
-
-### Performance API ⚡
-- Login : ~37ms
-- Register : ~12ms
-- GET /me : ~9ms
-- Taux de cache : > 90%
-
-## Fonctionnalités Principales 🌟
-
-### 📝 Blog et Recettes
-- Gestion complète des recettes
-- Catégorisation et tags
-- Système de recherche avancé
-- Mode pas à pas pour les recettes
-
-### 👥 Gestion des Utilisateurs
-- Authentification sécurisée
-- Gestion des rôles (Admin, Pâtissier, Utilisateur)
-- Profils personnalisables
+### En Développement 🚧
+- Système complet de gestion des articles et recettes
+- Interface d'administration
 - Système de commentaires
+- Tests d'intégration
 
-### 🎨 Interface Utilisateur
-- Design responsive moderne
-- Composants réutilisables
-- Animations fluides
-- Mode sombre
+## Documentation Technique
 
-### 🔒 Sécurité
-- Protection CSRF
-- Validation des entrées
-- Rate limiting
-- Gestion des sessions
+### Frontend (Next.js 14)
+- [Configuration](./TECHNICAL.md) - Architecture et setup
+- [Tests](./TESTING.md) - Guide des tests
+- [Performance](./PERFORMANCE.md) - Optimisations
+
+### Backend (Express + TypeScript)
+- [API](./API.md) - Documentation des endpoints
+- [Sécurité](./SECURITY.md) - Authentification et protection
+- [Tests](./TESTING.md#backend) - Tests backend
+
+### Guides
+- [Contribution](./CONTRIBUTING.md) - Comment contribuer
+- [Dépannage](./TROUBLESHOOTING.md) - Résolution des problèmes
+- [TODO](./TODO.md) - Tâches en cours et planifiées
+
+## Installation Rapide
+
+### Frontend
+```bash
+cd frontend
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+### Backend
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+## Contact
+Pour toute question : support@lemondesucre.fr
+
+## 🔧 Dépannage
+
+### Problèmes Courants
+
+#### Installation
+- **Erreur de dépendances** : Assurez-vous d'utiliser Node.js 18+
+  ```bash
+  node --version
+  # Si besoin, mettez à jour Node.js
+  ```
+
+- **Erreur PostgreSQL** : Vérifiez que PostgreSQL est installé et en cours d'exécution
+  ```bash
+  # Windows
+  net start postgresql-x64-14
+  # Linux
+  sudo service postgresql status
+  ```
+
+#### Développement
+- **Le frontend ne se connecte pas à l'API** : 
+  - Vérifiez que le backend est en cours d'exécution
+  - Vérifiez les variables d'environnement dans `.env.local`
+  - Vérifiez les ports (3000 pour frontend, 3001 pour backend)
+
+- **Erreurs de compilation TypeScript** :
+  ```bash
+  # Nettoyez les caches
+  npm run clean
+  # Réinstallez les dépendances
+  npm install
+  ```
+
+- **Erreurs de test** :
+  - Vérifiez que la base de données de test est configurée
+  - Assurez-vous que tous les fichiers .env nécessaires sont présents
+
+### Logs et Debugging
+- Frontend : Consultez la console du navigateur
+- Backend : Consultez les logs dans la console ou `logs/`
+- Base de données : Consultez les logs PostgreSQL
+
+### Besoin d'Aide ?
+- Consultez la documentation technique détaillée
+- Ouvrez une issue sur GitHub
+- Contactez le support : support@lemondesucre.fr
