@@ -1,0 +1,8 @@
+a1e83ef83ac4c83243dbaf121729ff18e75ebdc1	refs/heads/backup/initial-setup
+2377386bdb69c9a14d2a9a0e080e9e2c428d366e	refs/heads/develop
+2f461d748597e5aab7c63318fe2db47db7856a1f	refs/heads/feature/001-page-recette-detaillee
+22a9fa4c609b2d0de82e713b7ab8511dc7ecc4f2	refs/heads/main
+2377386bdb69c9a14d2a9a0e080e9e2c428d366e	refs/remotes/origin/develop
+721d0477502d37943c4025a508b7a6359e776d44	refs/remotes/origin/fix/recipe-metadata
+e57c6c1fc1503532ae27ed43643a99d79b1f1a61	refs/remotes/origin/main
+b69dff7b0e02772c1474e3732424ebde341e5cc3	refs/stash

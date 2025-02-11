@@ -1,0 +1,84 @@
+0000000000000000000000000000000000000000 6ee824fb026ab9f857758c7593b80cc124130c51 Lio2412 <Hz_be@msn.com> 1737834360 +0100	commit (initial): Initial commit : Design minimaliste et élégant pour le blog de pâtisserie
+6ee824fb026ab9f857758c7593b80cc124130c51 0000000000000000000000000000000000000000 Lio2412 <Hz_be@msn.com> 1737834467 +0100	Branch: renamed refs/heads/master to refs/heads/main
+0000000000000000000000000000000000000000 6ee824fb026ab9f857758c7593b80cc124130c51 Lio2412 <Hz_be@msn.com> 1737834467 +0100	Branch: renamed refs/heads/master to refs/heads/main
+6ee824fb026ab9f857758c7593b80cc124130c51 6ee824fb026ab9f857758c7593b80cc124130c51 Lio2412 <Hz_be@msn.com> 1737834731 +0100	checkout: moving from main to develop
+6ee824fb026ab9f857758c7593b80cc124130c51 2377386bdb69c9a14d2a9a0e080e9e2c428d366e Lio2412 <Hz_be@msn.com> 1737834774 +0100	commit: chore: ajout des templates pour issues et pull requests
+2377386bdb69c9a14d2a9a0e080e9e2c428d366e 2377386bdb69c9a14d2a9a0e080e9e2c428d366e Lio2412 <Hz_be@msn.com> 1737834932 +0100	checkout: moving from develop to feature/001-page-recette-detaillee
+2377386bdb69c9a14d2a9a0e080e9e2c428d366e 2377386bdb69c9a14d2a9a0e080e9e2c428d366e Lio2412 <Hz_be@msn.com> 1737903307 +0100	checkout: moving from feature/001-page-recette-detaillee to feature/001-page-recette-detaillee
+2377386bdb69c9a14d2a9a0e080e9e2c428d366e 2f461d748597e5aab7c63318fe2db47db7856a1f Lio2412 <Hz_be@msn.com> 1737912032 +0100	commit: feat: sauvegarde avant développement - ajout des pages de base et configuration initiale
+2f461d748597e5aab7c63318fe2db47db7856a1f 2f461d748597e5aab7c63318fe2db47db7856a1f Lio2412 <Hz_be@msn.com> 1737912040 +0100	checkout: moving from feature/001-page-recette-detaillee to backup/initial-setup
+2f461d748597e5aab7c63318fe2db47db7856a1f 13713fdd71af8804b1a74bb3dd1930e09e52f407 Lio2412 <Hz_be@msn.com> 1737916741 +0100	commit: feat: Ajout du système de partage social et mise à jour de la documentation
+13713fdd71af8804b1a74bb3dd1930e09e52f407 2580d8776b74edb395c49e0ce6ac61e5256bc773 Lio2412 <Hz_be@msn.com> 1737917200 +0100	commit: feat: Implémentation du système de newsletter
+2580d8776b74edb395c49e0ce6ac61e5256bc773 e1da3e3462d43df743e9fdf14dc67ef2c4f15494 Lio2412 <Hz_be@msn.com> 1737917526 +0100	commit: feat: Ajout de la fonctionnalité d'impression des recettes
+e1da3e3462d43df743e9fdf14dc67ef2c4f15494 59eb6421267f2ec34ba0869a0ddca83f23df3c1d Lio2412 <Hz_be@msn.com> 1737917720 +0100	commit: feat: Optimisations SEO et métadonnées
+59eb6421267f2ec34ba0869a0ddca83f23df3c1d 8129253ecdf532900f0ca1accfb083289b259441 Lio2412 <Hz_be@msn.com> 1737918670 +0100	commit: feat: Optimisation des performances avec SWR et chargement dynamique
+8129253ecdf532900f0ca1accfb083289b259441 fbfd9acff1647bc6e8383aa11ae971e7ff674102 Lio2412 <Hz_be@msn.com> 1737919421 +0100	commit: fix: correction des erreurs de typage dans RecipeMetadata et mise à jour de la documentation SEO
+fbfd9acff1647bc6e8383aa11ae971e7ff674102 f7e9c48bc32a561d8b21bbabecddf9f58ff81117 Lio2412 <Hz_be@msn.com> 1737919457 +0100	commit: refactor: réorganisation des fichiers et mise à jour des composants
+f7e9c48bc32a561d8b21bbabecddf9f58ff81117 a1e83ef83ac4c83243dbaf121729ff18e75ebdc1 Lio2412 <Hz_be@msn.com> 1737919724 +0100	commit: feat: ajout de la gestion des erreurs et des optimisations
+a1e83ef83ac4c83243dbaf121729ff18e75ebdc1 a1e83ef83ac4c83243dbaf121729ff18e75ebdc1 Lio2412 <Hz_be@msn.com> 1737920694 +0100	reset: moving to HEAD
+a1e83ef83ac4c83243dbaf121729ff18e75ebdc1 a1e83ef83ac4c83243dbaf121729ff18e75ebdc1 Lio2412 <Hz_be@msn.com> 1737922068 +0100	reset: moving to HEAD
+a1e83ef83ac4c83243dbaf121729ff18e75ebdc1 fbfd9acff1647bc6e8383aa11ae971e7ff674102 Lio2412 <Hz_be@msn.com> 1737922074 +0100	checkout: moving from backup/initial-setup to fbfd9acff1647bc6e8383aa11ae971e7ff674102
+fbfd9acff1647bc6e8383aa11ae971e7ff674102 fbfd9acff1647bc6e8383aa11ae971e7ff674102 Lio2412 <Hz_be@msn.com> 1737922080 +0100	checkout: moving from fbfd9acff1647bc6e8383aa11ae971e7ff674102 to fix/recipe-metadata
+fbfd9acff1647bc6e8383aa11ae971e7ff674102 7962d0bfb443d02fbeeebadfcaac73bce16da129 Lio2412 <Hz_be@msn.com> 1737977467 +0100	commit: fix: restauration des composants Header et Footer
+7962d0bfb443d02fbeeebadfcaac73bce16da129 c4c89e7640a27795f7391ca92ac8082a77a839ca Lio2412 <Hz_be@msn.com> 1737977551 +0100	commit: refactor: mise à jour des fichiers de configuration et des composants
+c4c89e7640a27795f7391ca92ac8082a77a839ca b5bb959371364fef110f12f78b22762e9fccac3b Lio2412 <Hz_be@msn.com> 1737977667 +0100	commit: fix: mise à jour des liens de navigation dans le Footer
+b5bb959371364fef110f12f78b22762e9fccac3b 2b80505a4cafa95f69b7242c934d8618b651cc20 Lio2412 <Hz_be@msn.com> 1737977808 +0100	commit: docs: mise à jour du README avec l'état d'avancement du projet
+2b80505a4cafa95f69b7242c934d8618b651cc20 29058531cbb9b8192df6c13dcb6cd39c2f4dc1ae Lio2412 <Hz_be@msn.com> 1737978011 +0100	commit: docs: fusion et mise à jour complète du README
+29058531cbb9b8192df6c13dcb6cd39c2f4dc1ae e825c5a121305221029cef4e5b505e0680df4254 Lio2412 <Hz_be@msn.com> 1737978148 +0100	commit: docs: ajout d'une checklist détaillée des tâches frontend
+e825c5a121305221029cef4e5b505e0680df4254 4cdfe80806f6f7de85226d99b88e0cb94dfd158a Lio2412 <Hz_be@msn.com> 1737978274 +0100	commit: docs: mise à jour de la TODO list avec les fonctionnalités déjà implémentées
+4cdfe80806f6f7de85226d99b88e0cb94dfd158a 2d608700ede53ff22389b151231514947918b722 Lio2412 <Hz_be@msn.com> 1737978462 +0100	commit: docs: mise à jour majeure de la TODO list pour refléter l'état réel du projet
+2d608700ede53ff22389b151231514947918b722 cf3b43035eadd1635d2a957fd3b9fc748716dcdc Lio2412 <Hz_be@msn.com> 1737978672 +0100	commit: docs: réorganisation complète de la TODO list avec fonctionnalités complètes et améliorations
+cf3b43035eadd1635d2a957fd3b9fc748716dcdc a08b9e63ddea451d96de2f5f9d5f3f9d3fa55aa4 Lio2412 <Hz_be@msn.com> 1737978898 +0100	commit: docs: mise à jour complète de la TODO list pour refléter l'état exact du projet
+a08b9e63ddea451d96de2f5f9d5f3f9d3fa55aa4 83992de533e7e5b5e052c6296b14bdd3a8e0784e Lio2412 <Hz_be@msn.com> 1737979430 +0100	commit: docs: ajout de la section En Cours avec le Mode Cuisine
+83992de533e7e5b5e052c6296b14bdd3a8e0784e 1a26f81aaa2ad4ec5bd4de858e14d2136c808b2b Lio2412 <Hz_be@msn.com> 1737979719 +0100	commit: docs: mise à jour de la TODO list - interface utilisateur du mode cuisine complétée
+1a26f81aaa2ad4ec5bd4de858e14d2136c808b2b fddaaaef4e826401ffead5e9a754b47e41f02e2e Lio2412 <Hz_be@msn.com> 1737979825 +0100	commit: feat: amélioration de la navigation entre les étapes avec animations et raccourcis clavier
+fddaaaef4e826401ffead5e9a754b47e41f02e2e 3dec7e1f9ca885b7acb45c1592bb80464598d687 Lio2412 <Hz_be@msn.com> 1737980052 +0100	commit: feat: ajout du timer intégré avec notifications pour le mode cuisine
+3dec7e1f9ca885b7acb45c1592bb80464598d687 168596ca9aa8f30e6b6c61b8aeb5cd194df754ce Lio2412 <Hz_be@msn.com> 1737980741 +0100	commit: feat: amélioration de la liste des ingrédients avec ajustement des quantités et cases à cocher
+168596ca9aa8f30e6b6c61b8aeb5cd194df754ce 51ba3c6a77566c98cfe3f3c1562a1aee7987a399 Lio2412 <Hz_be@msn.com> 1737988461 +0100	commit: feat: ajout du wake lock API et amélioration des tests
+51ba3c6a77566c98cfe3f3c1562a1aee7987a399 fa1bef9edfb2965d350367969782b2c06a3e8158 Lio2412 <Hz_be@msn.com> 1737990166 +0100	commit: feat: ajout de la boîte de dialogue des raccourcis clavier et amélioration de l'accessibilité
+fa1bef9edfb2965d350367969782b2c06a3e8158 7023d422964013caf0e8f88a11ab359f3c6cc096 Lio2412 <Hz_be@msn.com> 1737996250 +0100	commit: docs: mise à jour de la TODO list avec les dernières fonctionnalités
+7023d422964013caf0e8f88a11ab359f3c6cc096 4dcdc69782d6ac3c3c0c41595099f4ea528bf876 Lio2412 <Hz_be@msn.com> 1738004246 +0100	commit: test: correction des tests du mode cuisine et des hooks
+4dcdc69782d6ac3c3c0c41595099f4ea528bf876 61af885bb3c12852440e284fcd2419b3dfcc81f4 Lio2412 <Hz_be@msn.com> 1738004340 +0100	commit: docs: mise à jour de la documentation et TODO list
+61af885bb3c12852440e284fcd2419b3dfcc81f4 970e0bc1c097f8f753a26e97697fab7baa71bfdc Lio2412 <Hz_be@msn.com> 1738009122 +0100	commit: fix: optimisation du mode cuisine et correction des boucles infinies
+970e0bc1c097f8f753a26e97697fab7baa71bfdc 721d0477502d37943c4025a508b7a6359e776d44 Lio2412 <Hz_be@msn.com> 1738171703 +0100	commit: feat(mode-cuisine): Ajout écran félicitations et notifications
+721d0477502d37943c4025a508b7a6359e776d44 abc86d52241f7644431422a4c21bb4fdbc4678c5 Lio2412 <Hz_be@msn.com> 1738175168 +0100	commit: feat: Implémentation complète du système de partage de recettes
+abc86d52241f7644431422a4c21bb4fdbc4678c5 acd7d9ba5f42d73da67660f9a1cee9bd10275c0c Lio2412 <Hz_be@msn.com> 1738175272 +0100	commit (amend): feat: Implémentation complète du système de partage de recettes
+acd7d9ba5f42d73da67660f9a1cee9bd10275c0c 8fb4012aaae8ccd62ca2ebac182c23c87ca20878 Lio2412 <Hz_be@msn.com> 1738175302 +0100	commit (amend): feat: Implémentation complète du système de partage de recettes
+8fb4012aaae8ccd62ca2ebac182c23c87ca20878 0000000000000000000000000000000000000000 Lio2412 <Hz_be@msn.com> 1738175315 +0100	Branch: renamed refs/heads/fix/recipe-metadata to refs/heads/main
+0000000000000000000000000000000000000000 8fb4012aaae8ccd62ca2ebac182c23c87ca20878 Lio2412 <Hz_be@msn.com> 1738175315 +0100	Branch: renamed refs/heads/fix/recipe-metadata to refs/heads/main
+8fb4012aaae8ccd62ca2ebac182c23c87ca20878 87e5f004156aac7b4df9d192228b26a31c5170f5 Lio2412 <Hz_be@msn.com> 1738175386 +0100	commit: chore: Ajout du fichier .gitignore
+87e5f004156aac7b4df9d192228b26a31c5170f5 cd2bcebab6a0f8b301ded36b69f3d7e9660b5de6 Lio2412 <Hz_be@msn.com> 1738176508 +0100	commit: feat: Implémentation du système de partage des réalisations
+cd2bcebab6a0f8b301ded36b69f3d7e9660b5de6 ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 Lio2412 <Hz_be@msn.com> 1738179661 +0100	commit: feat: Ajout du système de partage de recettes avec images et commentaires
+ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 2377386bdb69c9a14d2a9a0e080e9e2c428d366e Lio2412 <Hz_be@msn.com> 1738261140 +0100	reset: moving to origin/develop
+2377386bdb69c9a14d2a9a0e080e9e2c428d366e ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 Lio2412 <Hz_be@msn.com> 1738261347 +0100	reset: moving to ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93
+ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 Lio2412 <Hz_be@msn.com> 1738266175 +0100	checkout: moving from main to ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93
+ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 Lio2412 <Hz_be@msn.com> 1738266202 +0100	checkout: moving from ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 to main
+ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 Lio2412 <Hz_be@msn.com> 1738266243 +0100	reset: moving to ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93
+ce3b7da4f65eadd0e39a5ab8e68216d5d0a5ec93 fa4b0381e747c066881964b00b7500cb4080b0e8 Lio2412 <Hz_be@msn.com> 1738324050 +0100	commit: docs: mise à jour de la documentation avec les dernières configurations et corrections
+fa4b0381e747c066881964b00b7500cb4080b0e8 4906c6ca40cdbbf27c747e2abe4023238971d387 Lio2412 <Hz_be@msn.com> 1738346493 +0100	commit: docs: mise à jour de la documentation pour la gestion des images
+4906c6ca40cdbbf27c747e2abe4023238971d387 c93580f58c1d4faeb4a6e38cf8c199820d79c64c Lio2412 <Hz_be@msn.com> 1738347220 +0100	commit: docs: mise à jour de la documentation pour la gestion des images et des slugs
+c93580f58c1d4faeb4a6e38cf8c199820d79c64c 168352a9250a1fd0b3b9d3fe28725b2053063139 Lio2412 <Hz_be@msn.com> 1738349004 +0100	commit: refactor: Mise à jour de la structure du projet et de la documentation
+168352a9250a1fd0b3b9d3fe28725b2053063139 e57c6c1fc1503532ae27ed43643a99d79b1f1a61 Lio2412 <Hz_be@msn.com> 1738353325 +0100	commit: docs: mise à jour de la version et de la date dans .cursorrules
+e57c6c1fc1503532ae27ed43643a99d79b1f1a61 22a9fa4c609b2d0de82e713b7ab8511dc7ecc4f2 Lio2412 <Hz_be@msn.com> 1738397331 +0100	commit: feat: mise à jour de la documentation et configuration du dépôt distant
+22a9fa4c609b2d0de82e713b7ab8511dc7ecc4f2 dad578836fc353011cbcc77c7c8622ea3167546a Lio2412 <Hz_be@msn.com> 1738398793 +0100	commit: fix: Correction des erreurs d'import et suppression du dossier pages
+dad578836fc353011cbcc77c7c8622ea3167546a 6e078072ed7c74dfbf98d51e38ffae54d7ddae97 Lio2412 <Hz_be@msn.com> 1738422149 +0100	commit: docs: mise à jour complète de la documentation et des tests - métriques de performance, tests d'intégration, objectifs, sécurité, changelog et TODO
+6e078072ed7c74dfbf98d51e38ffae54d7ddae97 3f4c841b5ab15908ba7d59fca323eb69c8e1669e Lio2412 <Hz_be@msn.com> 1738423741 +0100	commit: feat: Mise à jour de l'authentification et des tests
+3f4c841b5ab15908ba7d59fca323eb69c8e1669e 52faafe0a1f0b081557e9e95343297993d3bdcc1 Lio2412 <Hz_be@msn.com> 1738425458 +0100	commit: docs: mise à jour de la documentation des tests et du README
+52faafe0a1f0b081557e9e95343297993d3bdcc1 f19cf19a41d57575df42bab18e7e97b5d777988d Lio2412 <Hz_be@msn.com> 1738425741 +0100	commit: docs: mise à jour complète de la documentation
+f19cf19a41d57575df42bab18e7e97b5d777988d a4f67455156f4ef30799cd945bea8c504f1a3d13 Lio2412 <Hz_be@msn.com> 1738509366 +0100	commit: Initial commit: Le Monde Sucré de Linda
+a4f67455156f4ef30799cd945bea8c504f1a3d13 a37e85724f42523ea2cdc3e54dfabbdcd8824625 Lio2412 <Hz_be@msn.com> 1738579443 +0100	commit: feat: Mise à jour majeure du projet - Ajout de la documentation des tests et correction des conflits de routage Next.js
+a37e85724f42523ea2cdc3e54dfabbdcd8824625 873eb1fea8b96386f8c866de9886f436f95e7108 Lio2412 <Hz_be@msn.com> 1738588917 +0100	commit: refactor: Nettoyage de la configuration des tests
+873eb1fea8b96386f8c866de9886f436f95e7108 9527aeaa5e7637cbcca05fe6fe819d78b30ba8c6 Lio2412 <Hz_be@msn.com> 1738588965 +0100	commit: refactor: Renommage des fichiers selon les conventions kebab-case
+9527aeaa5e7637cbcca05fe6fe819d78b30ba8c6 a25c9f8fe834ae5e43a16a9ecebdcd7063a2d9cd Lio2412 <Hz_be@msn.com> 1738589239 +0100	commit: refactor: Déplacement des fichiers redondants ou inutiles dans to-delete/
+a25c9f8fe834ae5e43a16a9ecebdcd7063a2d9cd aec88c23c7adedd9f1991324d15d91caf1e8db64 Lio2412 <Hz_be@msn.com> 1738589264 +0100	commit: docs: Ajout de la documentation sur la structure du projet
+aec88c23c7adedd9f1991324d15d91caf1e8db64 a25c9f8fe834ae5e43a16a9ecebdcd7063a2d9cd Lio2412 <Hz_be@msn.com> 1738594152 +0100	reset: moving to a25c9f8fe834ae5e43a16a9ecebdcd7063a2d9cd
+a25c9f8fe834ae5e43a16a9ecebdcd7063a2d9cd a37e85724f42523ea2cdc3e54dfabbdcd8824625 Lio2412 <Hz_be@msn.com> 1738600447 +0100	checkout: moving from main to a37e85724f42523ea2cdc3e54dfabbdcd8824625
+a37e85724f42523ea2cdc3e54dfabbdcd8824625 a37e85724f42523ea2cdc3e54dfabbdcd8824625 Lio2412 <Hz_be@msn.com> 1738600875 +0100	checkout: moving from a37e85724f42523ea2cdc3e54dfabbdcd8824625 to PROJET-FONCTIONNEL
+a37e85724f42523ea2cdc3e54dfabbdcd8824625 0000000000000000000000000000000000000000 Lio2412 <Hz_be@msn.com> 1738600886 +0100	Branch: renamed refs/heads/PROJET-FONCTIONNEL to refs/heads/main
+0000000000000000000000000000000000000000 a37e85724f42523ea2cdc3e54dfabbdcd8824625 Lio2412 <Hz_be@msn.com> 1738600886 +0100	Branch: renamed refs/heads/PROJET-FONCTIONNEL to refs/heads/main
+a37e85724f42523ea2cdc3e54dfabbdcd8824625 b4803b8b385ab09ac222dd09f1f166cbc904ec84 Lio2412 <Hz_be@msn.com> 1738691226 +0100	commit: docs: mise à jour complète de la documentation pour refléter l'état actuel du projet - blog de pâtisserie
+b4803b8b385ab09ac222dd09f1f166cbc904ec84 eceece69ae946a098dc737cb5b488dcf2397b5da Lio2412 <Hz_be@msn.com> 1739131764 +0100	commit: revert: restauration de la version précédente de la page recettes
+eceece69ae946a098dc737cb5b488dcf2397b5da eceece69ae946a098dc737cb5b488dcf2397b5da Lio2412 <Hz_be@msn.com> 1739131861 +0100	reset: moving to HEAD
+eceece69ae946a098dc737cb5b488dcf2397b5da 2f461d748597e5aab7c63318fe2db47db7856a1f Lio2412 <Hz_be@msn.com> 1739131865 +0100	checkout: moving from main to feature/001-page-recette-detaillee
+2f461d748597e5aab7c63318fe2db47db7856a1f a1e83ef83ac4c83243dbaf121729ff18e75ebdc1 Lio2412 <Hz_be@msn.com> 1739131876 +0100	checkout: moving from feature/001-page-recette-detaillee to backup/initial-setup
+a1e83ef83ac4c83243dbaf121729ff18e75ebdc1 eceece69ae946a098dc737cb5b488dcf2397b5da Lio2412 <Hz_be@msn.com> 1739131903 +0100	checkout: moving from backup/initial-setup to main
