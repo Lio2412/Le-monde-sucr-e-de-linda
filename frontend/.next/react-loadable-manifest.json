@@ -1,0 +1,21 @@
+{
+  "..\\app\\recettes\\[slug]\\RecipeClient.tsx -> @/components/providers": {
+    "id": "..\\app\\recettes\\[slug]\\RecipeClient.tsx -> @/components/providers",
+    "files": [
+      "static/chunks/_app-pages-browser_src_components_providers_index_ts.js"
+    ]
+  },
+  "..\\app\\recettes\\[slug]\\RecipeClient.tsx -> @/components/recipe/CommentSection": {
+    "id": "..\\app\\recettes\\[slug]\\RecipeClient.tsx -> @/components/recipe/CommentSection",
+    "files": [
+      "static/css/_app-pages-browser_src_components_recipe_CommentSection_tsx.css",
+      "static/chunks/_app-pages-browser_src_components_recipe_CommentSection_tsx.js"
+    ]
+  },
+  "..\\app\\recettes\\[slug]\\RecipeClient.tsx -> @/components/recipe/RatingSection": {
+    "id": "..\\app\\recettes\\[slug]\\RecipeClient.tsx -> @/components/recipe/RatingSection",
+    "files": [
+      "static/chunks/_app-pages-browser_src_components_recipe_RatingSection_tsx.js"
+    ]
+  }
+}
