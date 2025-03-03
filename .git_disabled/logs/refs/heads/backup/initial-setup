@@ -1,0 +1,9 @@
+0000000000000000000000000000000000000000 2f461d748597e5aab7c63318fe2db47db7856a1f Lio2412 <Hz_be@msn.com> 1737912040 +0100	branch: Created from HEAD
+2f461d748597e5aab7c63318fe2db47db7856a1f 13713fdd71af8804b1a74bb3dd1930e09e52f407 Lio2412 <Hz_be@msn.com> 1737916741 +0100	commit: feat: Ajout du système de partage social et mise à jour de la documentation
+13713fdd71af8804b1a74bb3dd1930e09e52f407 2580d8776b74edb395c49e0ce6ac61e5256bc773 Lio2412 <Hz_be@msn.com> 1737917200 +0100	commit: feat: Implémentation du système de newsletter
+2580d8776b74edb395c49e0ce6ac61e5256bc773 e1da3e3462d43df743e9fdf14dc67ef2c4f15494 Lio2412 <Hz_be@msn.com> 1737917526 +0100	commit: feat: Ajout de la fonctionnalité d'impression des recettes
+e1da3e3462d43df743e9fdf14dc67ef2c4f15494 59eb6421267f2ec34ba0869a0ddca83f23df3c1d Lio2412 <Hz_be@msn.com> 1737917720 +0100	commit: feat: Optimisations SEO et métadonnées
+59eb6421267f2ec34ba0869a0ddca83f23df3c1d 8129253ecdf532900f0ca1accfb083289b259441 Lio2412 <Hz_be@msn.com> 1737918670 +0100	commit: feat: Optimisation des performances avec SWR et chargement dynamique
+8129253ecdf532900f0ca1accfb083289b259441 fbfd9acff1647bc6e8383aa11ae971e7ff674102 Lio2412 <Hz_be@msn.com> 1737919421 +0100	commit: fix: correction des erreurs de typage dans RecipeMetadata et mise à jour de la documentation SEO
+fbfd9acff1647bc6e8383aa11ae971e7ff674102 f7e9c48bc32a561d8b21bbabecddf9f58ff81117 Lio2412 <Hz_be@msn.com> 1737919457 +0100	commit: refactor: réorganisation des fichiers et mise à jour des composants
+f7e9c48bc32a561d8b21bbabecddf9f58ff81117 a1e83ef83ac4c83243dbaf121729ff18e75ebdc1 Lio2412 <Hz_be@msn.com> 1737919724 +0100	commit: feat: ajout de la gestion des erreurs et des optimisations
