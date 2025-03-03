@@ -21,6 +21,7 @@ interface StepDisplayProps {
   temperature?: number;
   direction?: number;
   imageUrl?: string;
+  progress?: number;
 }
 
 const slideVariants = {
@@ -50,9 +51,12 @@ export function StepDisplay({
   temperature,
   direction = 0,
   imageUrl,
+  progress: externalProgress,
 }: StepDisplayProps) {
   const [imageError, setImageError] = useState(false);
-  const progress = ((currentIndex + 1) / totalSteps) * 100;
+  const progress = externalProgress !== undefined 
+    ? externalProgress 
+    : ((currentIndex + 1) / totalSteps) * 100;
 
   return (
     <div className="space-y-6">

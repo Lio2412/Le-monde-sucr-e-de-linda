@@ -2473,6 +2473,9 @@ video {
   color: rgba(133, 77, 14, 1);
   color: rgba(133, 77, 14, var(--tw-text-opacity, 1));
 }
+.line-through {
+  text-decoration-line: line-through;
+}
 .underline-offset-4 {
   text-underline-offset: 4px;
 }

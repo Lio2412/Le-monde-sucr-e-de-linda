@@ -13,6 +13,7 @@ interface UseStepCompletionReturn {
 
 export function useStepCompletion({ totalSteps }: UseStepCompletionProps): UseStepCompletionReturn {
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [progress, setProgress] = useState(0);
 
   const toggleStep = useCallback((stepIndex: number) => {
     setCompletedSteps(prev => {
@@ -22,17 +23,17 @@ export function useStepCompletion({ totalSteps }: UseStepCompletionProps): UseSt
       } else {
         newSet.add(stepIndex);
       }
+      
+      const newProgress = Math.round((newSet.size / totalSteps) * 100);
+      setProgress(newProgress);
+      
       return newSet;
     });
-  }, []);
+  }, [totalSteps]);
 
   const isStepCompleted = useCallback((stepIndex: number) => {
     return completedSteps.has(stepIndex);
   }, [completedSteps]);
-
-  const progress = useMemo(() => {
-    return Math.round((completedSteps.size / totalSteps) * 100);
-  }, [completedSteps, totalSteps]);
 
   return {
     completedSteps,

@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef } from 'react';
-import { Ingredient } from '@/types/recipe';
+import React, { useMemo, useRef, useCallback, useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
@@ -9,14 +8,78 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useVirtualizer } from '@tanstack/react-virtual';
 
+// Définition du type Ingredient
+interface Ingredient {
+  name: string;
+  quantity?: number;
+  unit?: string;
+}
+
 interface IngredientsListProps {
-  ingredients: Ingredient[];
+  ingredients: Ingredient[] | string[];
   defaultServings: number;
   servings: number;
   onToggleIngredient?: (index: number) => void;
   completedIngredients?: Set<number>;
   onClose?: () => void;
 }
+
+// Fonction pour formater les nombres décimaux - déclarée en dehors du composant
+const formatNumber = (num: number): string => {
+  if (Number.isInteger(num)) return num.toString();
+  
+  // Arrondir à 2 décimales maximum
+  const rounded = Math.round(num * 100) / 100;
+  
+  // Convertir les fractions courantes
+  const fractions: Record<number, string> = {
+    0.25: '¼',
+    0.5: '½',
+    0.75: '¾',
+    0.33: '⅓',
+    0.67: '⅔'
+  };
+  
+  for (const [decimal, fraction] of Object.entries(fractions)) {
+    if (Math.abs(rounded - parseFloat(decimal)) < 0.01) {
+      return fraction;
+    }
+  }
+  
+  return rounded.toString();
+};
+
+// Fonction pour extraire la quantité, l'unité et le nom d'un ingrédient sous forme de chaîne
+const parseIngredient = (ingredient: string): { quantity: number | null; unit: string; name: string } => {
+  // Regex pour extraire la quantité (nombre), l'unité et le nom
+  const regex = /^([\d.,/]+)?\s*([a-zéèêëàâäôöùûüç]+)?\s*(.+)$/i;
+  const match = ingredient.match(regex);
+  
+  if (!match) {
+    return { quantity: null, unit: '', name: ingredient };
+  }
+  
+  const [, quantityStr, unit, name] = match;
+  
+  // Convertir la quantité en nombre
+  let quantity: number | null = null;
+  if (quantityStr) {
+    // Gérer les fractions comme "1/2"
+    if (quantityStr.includes('/')) {
+      const [numerator, denominator] = quantityStr.split('/').map(Number);
+      quantity = numerator / denominator;
+    } else {
+      // Remplacer la virgule par un point pour la conversion en nombre
+      quantity = parseFloat(quantityStr.replace(',', '.'));
+    }
+  }
+  
+  return {
+    quantity,
+    unit: unit || '',
+    name: name.trim()
+  };
+};
 
 export function IngredientsList({ 
   ingredients, 
@@ -26,8 +89,20 @@ export function IngredientsList({
   completedIngredients = new Set(),
   onClose
 }: IngredientsListProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [progress, setProgress] = useState(0);
   const parentRef = useRef<HTMLDivElement>(null);
 
+  // Mettre à jour la progression lorsque les ingrédients complétés changent
+  useEffect(() => {
+    if (!ingredients?.length) {
+      setProgress(0);
+    } else {
+      setProgress((completedIngredients.size / ingredients.length) * 100);
+    }
+  }, [ingredients, completedIngredients]);
+
+  // Memoize virtualizer configuration
   const rowVirtualizer = useVirtualizer({
     count: ingredients.length,
     getScrollElement: () => parentRef.current,
@@ -35,55 +110,62 @@ export function IngredientsList({
     overscan: 5 // Nombre d'éléments à pré-rendre
   });
 
-  // Fonction pour formater les nombres décimaux
-  const formatNumber = (num: number): string => {
-    if (Number.isInteger(num)) return num.toString();
-    
-    // Arrondir à 2 décimales maximum
-    const rounded = Math.round(num * 100) / 100;
-    
-    // Convertir les fractions courantes
-    const fractions: Record<number, string> = {
-      0.25: '¼',
-      0.5: '½',
-      0.75: '¾',
-      0.33: '⅓',
-      0.67: '⅔'
-    };
-    
-    for (const [decimal, fraction] of Object.entries(fractions)) {
-      if (Math.abs(rounded - parseFloat(decimal)) < 0.01) {
-        return fraction;
-      }
-    }
-    
-    return rounded.toString();
-  };
-
   // Calculer les ingrédients ajustés
   const adjustedIngredients = useMemo(() => {
     if (!ingredients?.length) return [];
     
-    return ingredients.map(ingredient => {
+    return ingredients.map((ingredient) => {
+      // S'adapter aux deux types de données possibles (string ou Ingredient)
+      if (typeof ingredient === 'string') {
+        const { quantity, unit, name } = parseIngredient(ingredient);
+        
+        if (quantity === null) {
+          return { text: ingredient };
+        }
+        
+        // Calculer la nouvelle quantité
+        const ratio = servings / defaultServings;
+        const rawQuantity = quantity * ratio;
+        
+        // Formater la quantité
+        const adjustedQuantity = formatNumber(rawQuantity);
+        
+        return {
+          name,
+          unit,
+          quantity,
+          adjustedQuantity,
+          originalText: ingredient
+        };
+      }
+      
+      // Pour les objets Ingredient complets
+      const ingredientObj = ingredient as (typeof ingredient & { quantity?: number, unit?: string });
+      if (!ingredientObj.quantity) {
+        return { text: ingredientObj.name || String(ingredient) };
+      }
+      
       // Calculer la nouvelle quantité
       const ratio = servings / defaultServings;
-      const rawQuantity = ingredient.quantity * ratio;
+      const rawQuantity = ingredientObj.quantity * ratio;
       
       // Formater la quantité
       const adjustedQuantity = formatNumber(rawQuantity);
 
       return {
-        ...ingredient,
+        ...ingredientObj,
         adjustedQuantity,
-        originalQuantity: ingredient.quantity
+        originalQuantity: ingredientObj.quantity
       };
     });
   }, [ingredients, servings, defaultServings]);
 
-  const progress = useMemo(() => {
-    if (!ingredients?.length) return 0;
-    return (completedIngredients.size / ingredients.length) * 100;
-  }, [ingredients, completedIngredients]);
+  // Memoize handler pour toggleIngredient
+  const handleToggleIngredient = useCallback((index: number) => {
+    if (onToggleIngredient) {
+      onToggleIngredient(index);
+    }
+  }, [onToggleIngredient]);
 
   if (!ingredients?.length) {
     return (
@@ -136,24 +218,49 @@ export function IngredientsList({
           }}
         >
           {rowVirtualizer.getVirtualItems().map((virtualItem) => {
-            const ingredient = ingredients[virtualItem.index];
-            const quantity = (ingredient.quantity / defaultServings) * servings;
+            const index = virtualItem.index;
+            const ingredient = adjustedIngredients[index];
+            const isCompleted = completedIngredients.has(index);
             
             return (
               <div
                 key={virtualItem.key}
-                data-index={virtualItem.index}
+                data-index={index}
                 ref={rowVirtualizer.measureElement}
                 className="absolute top-0 left-0 w-full"
                 style={{
-                  transform: `translateY(${virtualItem.start}px)`
+                  transform: `translateY(${virtualItem.start}px)`,
+                  willChange: 'transform'
                 }}
               >
                 <div className="flex items-center gap-3 py-2">
-                  <div className="h-2 w-2 rounded-full bg-primary/50" />
-                  <span className="text-sm">
-                    {quantity} {ingredient.unit} {ingredient.name}
-                  </span>
+                  {onToggleIngredient ? (
+                    <Checkbox
+                      id={`ingredient-${index}`}
+                      checked={isCompleted}
+                      onCheckedChange={() => handleToggleIngredient(index)}
+                      className="h-4 w-4"
+                    />
+                  ) : (
+                    <div className="h-2 w-2 rounded-full bg-primary/50" />
+                  )}
+                  <label
+                    htmlFor={`ingredient-${index}`}
+                    className={cn(
+                      "text-sm cursor-pointer",
+                      isCompleted && "line-through text-muted-foreground"
+                    )}
+                  >
+                    {typeof ingredient === 'string' 
+                      ? ingredient 
+                      : 'text' in ingredient 
+                        ? ingredient.text
+                        : 'adjustedQuantity' in ingredient && ingredient.adjustedQuantity
+                          ? `${ingredient.adjustedQuantity} ${ingredient.unit || ''} ${ingredient.name || ''}`
+                          : 'originalText' in ingredient
+                            ? ingredient.originalText
+                            : String(ingredient)}
+                  </label>
                 </div>
               </div>
             );

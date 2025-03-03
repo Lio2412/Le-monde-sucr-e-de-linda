@@ -82,29 +82,43 @@ export const usePrint = () => {
         </head>
         <body>
           <h1>${recipe.title}</h1>
-          <div class="info">
-            <span>⏱️ Préparation: ${recipe.preparationTime}min</span>
-            <span>⏱️ Cuisson: ${recipe.cookingTime}min</span>
-            <span>👨‍🍳 Difficulté: ${recipe.difficulty}</span>
-            <span>👥 Pour ${recipe.servings} personnes</span>
+          <div class="recipe-meta">
+            <div class="recipe-meta-item">
+              <span>⏱️ Préparation: ${recipe.prepTime}min</span>
+              <span>⏱️ Cuisson: ${recipe.cookTime}min</span>
+              <span>👥 Portions: ${recipe.servings}</span>
+              <span>📊 Difficulté: ${recipe.difficulty}</span>
+            </div>
           </div>
           <p>${recipe.description}</p>
           
-          <h2>Ingrédients</h2>
           <div class="ingredients">
+            <h2>Ingrédients</h2>
             <ul>
-              ${recipe.ingredients.map(ing => 
-                `<li>${ing.quantity}${ing.unit} ${ing.name}</li>`
-              ).join('')}
+              ${recipe.ingredients.map(ing => {
+                // Vérifier si l'ingrédient est un objet ou une chaîne
+                if (typeof ing === 'string') {
+                  return `<li>${ing}</li>`;
+                } else if (typeof ing === 'object' && ing !== null) {
+                  // Supposer que l'ingrédient est un objet avec les propriétés name, quantity et unit
+                  return `<li>${ing.quantity || ''}${ing.unit || ''} ${ing.name || ''}</li>`;
+                }
+                return `<li>${ing}</li>`;
+              }).join('')}
             </ul>
           </div>
           
-          <h2>Préparation</h2>
-          <div class="steps">
+          <div class="instructions">
+            <h2>Instructions</h2>
             <ol>
-              ${recipe.steps.map(step => 
-                `<li>${step.description}</li>`
-              ).join('')}
+              ${recipe.instructions.map((instruction, index) => {
+                if (typeof instruction === 'string') {
+                  return `<li>${instruction}</li>`;
+                } else if (typeof instruction === 'object' && instruction !== null && 'description' in instruction) {
+                  return `<li>${instruction.description}</li>`;
+                }
+                return `<li>${instruction}</li>`;
+              }).join('')}
             </ol>
           </div>
           

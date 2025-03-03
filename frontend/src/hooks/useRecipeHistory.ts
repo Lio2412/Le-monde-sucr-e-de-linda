@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface RecipeHistoryItem {
   id: string;
@@ -19,8 +19,17 @@ export function useRecipeHistory() {
     }
   }, []);
 
-  const addToHistory = (recipe: { id: string; title: string; slug: string }) => {
+  const addToHistory = useCallback((recipe: { id: string; title: string; slug: string }) => {
     setHistory(prevHistory => {
+      // Vérifier si la recette est déjà dans l'historique avec les mêmes propriétés
+      const existingRecipe = prevHistory.find(item => item.id === recipe.id);
+      if (existingRecipe && 
+          existingRecipe.title === recipe.title && 
+          existingRecipe.slug === recipe.slug) {
+        // Si la recette est identique, ne pas modifier l'historique
+        return prevHistory;
+      }
+
       const newHistory = prevHistory.filter(item => item.id !== recipe.id);
       const historyItem: RecipeHistoryItem = {
         ...recipe,
@@ -31,7 +40,7 @@ export function useRecipeHistory() {
       localStorage.setItem('recipeHistory', JSON.stringify(updatedHistory));
       return updatedHistory;
     });
-  };
+  }, []);
 
   const clearHistory = () => {
     localStorage.removeItem('recipeHistory');
@@ -43,4 +52,4 @@ export function useRecipeHistory() {
     addToHistory,
     clearHistory
   };
-} 
+}

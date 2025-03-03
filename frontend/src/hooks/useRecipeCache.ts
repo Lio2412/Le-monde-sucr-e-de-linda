@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Recipe } from '@/types/recipe';
 
 const CACHE_KEY = 'recipe_cache';
@@ -14,6 +14,7 @@ interface CacheData {
 }
 
 export function useRecipeCache() {
+  // Memoize les opérations de cache pour éviter de créer de nouvelles fonctions à chaque rendu
   const getCache = useCallback((): CacheData => {
     try {
       const cache = localStorage.getItem(CACHE_KEY);
@@ -31,8 +32,19 @@ export function useRecipeCache() {
     }
   }, []);
 
+  // Utiliser des mémos pour éviter les rendus en cascade
   const cacheRecipe = useCallback((recipe: Recipe) => {
+    if (!recipe?.id) return;
+    
     const cache = getCache();
+    if (cache[recipe.id]?.data) {
+      // Si la recette est déjà en cache avec les mêmes données, ne rien faire
+      const cachedData = cache[recipe.id].data;
+      if (JSON.stringify(cachedData) === JSON.stringify(recipe)) {
+        return;
+      }
+    }
+    
     cache[recipe.id] = {
       data: recipe,
       timestamp: Date.now()
@@ -41,6 +53,8 @@ export function useRecipeCache() {
   }, [getCache, setCache]);
 
   const getCachedRecipe = useCallback((recipeId: string): Recipe | null => {
+    if (!recipeId) return null;
+
     const cache = getCache();
     const entry = cache[recipeId];
 

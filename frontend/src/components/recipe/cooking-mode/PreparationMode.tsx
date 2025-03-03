@@ -25,7 +25,7 @@ export function PreparationMode({
   onServingsChange 
 }: PreparationModeProps) {
   const [servings, setServings] = useState(initialServings || recipe.servings || 1);
-  const totalTime = recipe.preparationTime + recipe.cookingTime;
+  const totalTime = parseInt(recipe.prepTime) + parseInt(recipe.cookTime);
 
   const adjustServings = (increment: boolean) => {
     const newValue = increment ? servings + 1 : servings - 1;
@@ -108,7 +108,7 @@ export function PreparationMode({
           <h2 className="text-2xl font-semibold mb-6">Équipements recommandés</h2>
           <Card className="p-6">
             <div className="space-y-4">
-              {recipe.equipment?.map((item, index) => (
+              {recipe.equipment?.map((item: string, index: number) => (
                 <div key={index} className="flex items-center gap-3">
                   <div className="h-2 w-2 rounded-full bg-primary/50" />
                   <span className="text-sm">{item}</span>

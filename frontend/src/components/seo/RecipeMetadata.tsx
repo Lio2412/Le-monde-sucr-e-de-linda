@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import type { Recipe } from '@/data/mock-recipes';
+import type { Recipe } from '@/types/recipe';
 
 interface RecipeMetadataProps {
   recipe: Recipe;

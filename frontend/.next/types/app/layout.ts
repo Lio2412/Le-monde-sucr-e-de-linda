@@ -1,4 +1,4 @@
-// File: C:\Users\Win\Desktop\le-monde-sucre-de-linda-V2\frontend\src\app\layout.tsx
+// File: C:\Users\Win\Desktop\le-monde-sucre-de-linda-V2 - Copie\frontend\src\app\layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

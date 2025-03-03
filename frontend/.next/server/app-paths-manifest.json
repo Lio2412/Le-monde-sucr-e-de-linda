@@ -1,6 +1,7 @@
 {
   "/page": "app/page.js",
-  "/connexion/page": "app/connexion/page.js",
-  "/inscription/page": "app/inscription/page.js",
-  "/recettes/[slug]/page": "app/recettes/[slug]/page.js"
+  "/blog/page": "app/blog/page.js",
+  "/not-found": "app/not-found.js",
+  "/recettes/[slug]/page": "app/recettes/[slug]/page.js",
+  "/recettes/page": "app/recettes/page.js"
 }
