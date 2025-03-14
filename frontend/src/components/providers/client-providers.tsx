@@ -24,4 +24,4 @@ export function ClientProviders({ children }: ClientProvidersProps) {
       </AuthProvider>
     </ThemeProvider>
   );
-} 
+}

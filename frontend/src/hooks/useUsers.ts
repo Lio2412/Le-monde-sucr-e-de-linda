@@ -96,6 +96,19 @@ export function useUsers() {
     }
   }, []);
 
+  const resetUserPassword = useCallback(async (id: string) => {
+    setError(null);
+    try {
+      await userService.resetUserPassword(id);
+      toast.success('Mot de passe de l\'utilisateur réinitialisé avec succès');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Une erreur est survenue';
+      setError(errorMessage);
+      toast.error('Erreur lors de la réinitialisation du mot de passe');
+      throw err;
+    }
+  }, []);
+
   return {
     users,
     isLoading,
@@ -106,5 +119,6 @@ export function useUsers() {
     deleteUser,
     banUser,
     changeUserRole,
+    resetUserPassword,
   };
-} 
+}

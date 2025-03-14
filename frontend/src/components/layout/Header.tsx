@@ -107,6 +107,7 @@ export default function Header() {
               <button
                 onClick={handleLogout}
                 className="relative inline-flex items-center gap-x-2 text-sm font-medium leading-6 px-6 py-2.5 rounded-lg bg-pink-400 text-white hover:bg-pink-500 transition-colors duration-200"
+                data-testid="logout-button"
               >
                 <span>Déconnexion</span>
                 <LogOut className="h-4 w-4" />
@@ -166,6 +167,7 @@ export default function Header() {
                     setMobileMenuOpen(false);
                   }}
                   className="block w-full text-center rounded-lg px-4 py-2.5 text-base font-medium bg-pink-400 text-white hover:bg-pink-500 transition-colors duration-200 mt-4"
+                  data-testid="logout-button"
                 >
                   <span className="flex items-center justify-center gap-2">
                     Déconnexion

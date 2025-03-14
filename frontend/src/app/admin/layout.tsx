@@ -12,13 +12,13 @@ import {
   BarChart, 
   Settings,
   Menu,
-  X
+  X,
+  Home
 } from 'lucide-react';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { cn } from '@/lib/utils';
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Recettes', href: '/admin/recettes', icon: ChefHat },
   { name: 'Blog', href: '/admin/blog', icon: FileText },
   { name: 'Médias', href: '/admin/medias', icon: ImageIcon },
@@ -36,29 +36,49 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <ProtectedRoute requiredRoles={['admin']}>
-      <div className="min-h-screen bg-gray-50">
-        {/* Sidebar Mobile */}
-        <div className="lg:hidden">
-          <button
-            className="fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            {sidebarOpen ? (
-              <X className="w-6 h-6 text-gray-600" />
-            ) : (
-              <Menu className="w-6 h-6 text-gray-600" />
-            )}
-          </button>
+    <>
+      {/* Supprime le layout principal du site */}
+      <style jsx global>{`
+        body > div:first-child > header,
+        body > div:first-child > nav {
+          display: none !important;
+        }
+      `}</style>
 
-          {/* Overlay */}
-          {sidebarOpen && (
-            <div
-              className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
+      <div className="min-h-screen bg-gray-50">
+        {/* Mobile Header */}
+        <div className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-20 lg:hidden">
+          <div className="flex items-center justify-between px-4 h-full">
+            <button
+              className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? (
+                <X className="w-6 h-6 text-gray-600" />
+              ) : (
+                <Menu className="w-6 h-6 text-gray-600" />
+              )}
+            </button>
+            <div className="text-lg font-semibold text-gray-800">
+              Administration
+            </div>
+            <Link
+              href="/"
+              className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
+              title="Retour au site"
+            >
+              <Home className="w-6 h-6 text-gray-600" />
+            </Link>
+          </div>
         </div>
+
+        {/* Overlay du menu mobile */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm transition-opacity lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
         {/* Sidebar */}
         <aside
@@ -69,9 +89,16 @@ export default function AdminLayout({
         >
           <div className="flex flex-col h-full">
             {/* Logo */}
-            <div className="flex items-center justify-center h-16 border-b border-gray-200">
-              <Link href="/admin" className="text-xl font-semibold text-gray-800">
+            <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
+              <Link href="/admin/dashboard" className="text-xl font-semibold text-gray-800">
                 Administration
+              </Link>
+              <Link
+                href="/"
+                className="hidden lg:block p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                title="Retour au site"
+              >
+                <Home className="w-5 h-5 text-gray-600" />
               </Link>
             </div>
 
@@ -101,15 +128,12 @@ export default function AdminLayout({
         </aside>
 
         {/* Main content */}
-        <main className={cn(
-          "transition-all duration-200",
-          "lg:ml-64 min-h-screen"
-        )}>
-          <div className="p-4 sm:p-6 lg:p-8">
-            {children}
-          </div>
-        </main>
+        <div className="lg:pl-64">
+          <main className="py-10 pt-20 lg:pt-10">
+            <div className="px-4 sm:px-6 lg:px-8">{children}</div>
+          </main>
+        </div>
       </div>
-    </ProtectedRoute>
+    </>
   );
-} 
+}

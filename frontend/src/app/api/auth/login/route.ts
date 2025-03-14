@@ -1,30 +1,33 @@
 import { NextResponse } from 'next/server';
-import apiClient from '@/lib/api-client';
-import { LoginFormData } from '@/types/auth';
+
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
 
 export async function POST(request: Request) {
   try {
-    const data: LoginFormData = await request.json();
-
-    const response = await apiClient.post('/auth/login', {
-      email: data.email,
-      password: data.password,
-    });
-
-    const { user, token } = response.data;
-
-    return NextResponse.json({
-      user,
-      token
-    });
-  } catch (error: any) {
-    console.error('Erreur de connexion:', error);
-    const status = error.response?.status || 500;
-    const message = error.response?.data?.message || 'Erreur lors de la connexion';
+    const data = await request.json();
     
+    console.log('Tentative de connexion au backend:', `${BACKEND_URL}/api/auth/login`);
+    
+    // Transmettre la requête au backend
+    const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const responseData = await response.json();
+    console.log('Réponse du backend:', responseData);
+
+    // Retourner la réponse du backend avec le même statut
+    return NextResponse.json(responseData, { status: response.status });
+    
+  } catch (error: any) {
+    console.error('Erreur lors de la connexion:', error);
     return NextResponse.json(
-      { error: message },
-      { status }
+      { error: 'Erreur lors de la connexion' },
+      { status: 500 }
     );
   }
-}
+} 

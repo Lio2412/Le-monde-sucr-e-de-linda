@@ -26,12 +26,17 @@ export interface RecipeFormData {
   steps: Step[];
   status: string;
   image?: File;
+  imageUrl?: string;
+}
+
+export interface ImageUploadResponse {
+  url: string;
 }
 
 export const adminService = {
   // Récupérer toutes les recettes avec pagination
   getRecipes: async (page = 1, limit = 10) => {
-    const response = await axios.get(`${API_URL}/admin/recipes`, {
+    const response = await axios.get(`${API_URL}/api/admin/recipes`, {
       params: { page, limit },
       withCredentials: true
     });
@@ -40,7 +45,7 @@ export const adminService = {
 
   // Récupérer une recette par ID
   getRecipe: async (id: string) => {
-    const response = await axios.get(`${API_URL}/admin/recipes/${id}`, {
+    const response = await axios.get(`${API_URL}/api/admin/recipes/${id}`, {
       withCredentials: true
     });
     return response.data;
@@ -59,7 +64,7 @@ export const adminService = {
       }
     });
 
-    const response = await axios.post(`${API_URL}/admin/recipes`, formData, {
+    const response = await axios.post(`${API_URL}/api/admin/recipes`, formData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -81,7 +86,7 @@ export const adminService = {
       }
     });
 
-    const response = await axios.put(`${API_URL}/admin/recipes/${id}`, formData, {
+    const response = await axios.put(`${API_URL}/api/admin/recipes/${id}`, formData, {
       withCredentials: true,
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -92,7 +97,7 @@ export const adminService = {
 
   // Supprimer une recette
   deleteRecipe: async (id: string) => {
-    const response = await axios.delete(`${API_URL}/admin/recipes/${id}`, {
+    const response = await axios.delete(`${API_URL}/api/admin/recipes/${id}`, {
       withCredentials: true
     });
     return response.data;
@@ -100,9 +105,26 @@ export const adminService = {
 
   // Récupérer les statistiques du dashboard
   getDashboardStats: async () => {
-    const response = await axios.get(`${API_URL}/admin/stats`, {
+    const response = await axios.get(`${API_URL}/api/admin/stats`, {
       withCredentials: true
     });
     return response.data;
-  }
+  },
+
+  uploadImage: async (formData: FormData): Promise<ImageUploadResponse> => {
+    const response = await axios.post(`${API_URL}/admin/upload-image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      withCredentials: true,
+    });
+    return response.data;
+  },
+
+  createRecipe: async (data: RecipeFormData): Promise<any> => {
+    const response = await axios.post(`${API_URL}/admin/recipes`, data, {
+      withCredentials: true,
+    });
+    return response.data;
+  },
 }; 

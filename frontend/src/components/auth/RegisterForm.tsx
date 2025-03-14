@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/router';
-import {
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  Input,
-  Button,
-  CircularProgress,
-  Box,
-  Alert,
-  AlertIcon,
-} from '@chakra-ui/react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Alert } from '@/components/ui/alert';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { cn } from '@/lib/utils';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -96,9 +91,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       }
 
       await register({
-        name: formData.name,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        nom: formData.name,
+        prenom: "",
+        pseudo: formData.name
       });
       
       if (onSuccess) {
@@ -114,108 +111,116 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   };
 
   return (
-    <Box as="form" role="form" onSubmit={handleSubmit} spacing={4}>
+    <form role="form" onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <Alert status="error" mb={4}>
-          <AlertIcon />
+        <Alert variant="destructive">
           {error}
         </Alert>
       )}
       
-      <FormControl 
-        id="name" 
-        isInvalid={!!errors.name} 
-        data-testid="form-control-name"
-        isRequired
-      >
-        <FormLabel>Nom</FormLabel>
+      <div className="space-y-2">
+        <Label htmlFor="name">
+          Nom <span className="text-red-500">*</span>
+        </Label>
         <Input
+          id="name"
           type="text"
           name="name"
           value={formData.name}
           onChange={handleChange}
           aria-invalid={!!errors.name}
+          data-testid="form-control-name"
+          aria-required="true"
+          className={cn(errors.name && "border-red-500")}
         />
         {errors.name && (
-          <FormErrorMessage role="alert" data-testid="name-error">
+          <p className="text-sm text-red-500" role="alert" data-testid="name-error">
             {errors.name}
-          </FormErrorMessage>
+          </p>
         )}
-      </FormControl>
+      </div>
 
-      <FormControl 
-        id="email" 
-        isInvalid={!!errors.email} 
-        data-testid="form-control-email"
-        isRequired
-      >
-        <FormLabel>Email</FormLabel>
+      <div className="space-y-2">
+        <Label htmlFor="email">
+          Email <span className="text-red-500">*</span>
+        </Label>
         <Input
+          id="email"
           type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
           aria-invalid={!!errors.email}
+          data-testid="form-control-email"
+          aria-required="true"
+          className={cn(errors.email && "border-red-500")}
         />
         {errors.email && (
-          <FormErrorMessage role="alert" data-testid="email-error">
+          <p className="text-sm text-red-500" role="alert" data-testid="email-error">
             {errors.email}
-          </FormErrorMessage>
+          </p>
         )}
-      </FormControl>
+      </div>
 
-      <FormControl 
-        id="password" 
-        isInvalid={!!errors.password} 
-        data-testid="form-control-password"
-        isRequired
-      >
-        <FormLabel>Mot de passe</FormLabel>
+      <div className="space-y-2">
+        <Label htmlFor="password">
+          Mot de passe <span className="text-red-500">*</span>
+        </Label>
         <Input
+          id="password"
           type="password"
           name="password"
           value={formData.password}
           onChange={handleChange}
           aria-invalid={!!errors.password}
+          data-testid="form-control-password"
+          aria-required="true"
+          className={cn(errors.password && "border-red-500")}
         />
         {errors.password && (
-          <FormErrorMessage role="alert" data-testid="password-error">
+          <p className="text-sm text-red-500" role="alert" data-testid="password-error">
             {errors.password}
-          </FormErrorMessage>
+          </p>
         )}
-      </FormControl>
+      </div>
 
-      <FormControl 
-        id="confirmPassword" 
-        isInvalid={!!errors.confirmPassword} 
-        data-testid="form-control-confirmPassword"
-        isRequired
-      >
-        <FormLabel>Confirmer le mot de passe</FormLabel>
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">
+          Confirmer le mot de passe <span className="text-red-500">*</span>
+        </Label>
         <Input
+          id="confirmPassword"
           type="password"
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
           aria-invalid={!!errors.confirmPassword}
+          data-testid="form-control-confirmPassword"
+          aria-required="true"
+          className={cn(errors.confirmPassword && "border-red-500")}
         />
         {errors.confirmPassword && (
-          <FormErrorMessage role="alert" data-testid="confirmPassword-error">
+          <p className="text-sm text-red-500" role="alert" data-testid="confirmPassword-error">
             {errors.confirmPassword}
-          </FormErrorMessage>
+          </p>
         )}
-      </FormControl>
+      </div>
 
       <Button
         type="submit"
-        colorScheme="blue"
-        width="full"
-        isLoading={loading}
-        loadingText="Inscription en cours..."
+        className="w-full bg-blue-600 hover:bg-blue-700"
+        disabled={loading}
       >
-        S'inscrire
+        {loading ? (
+          <>
+            <LoadingSpinner className="mr-2" />
+            Inscription en cours...
+          </>
+        ) : (
+          "S'inscrire"
+        )}
       </Button>
-    </Box>
+    </form>
   );
 };
 

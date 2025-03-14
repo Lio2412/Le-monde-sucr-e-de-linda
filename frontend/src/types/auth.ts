@@ -42,25 +42,42 @@ export interface AuthService {
   logout: () => void;
 }
 
+/**
+ * Énumération des rôles utilisateur
+ */
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN'
+}
+
+/**
+ * Interface pour l'utilisateur
+ */
 export interface User {
   id: string;
+  name: string | null;
   email: string;
-  nom: string;
-  prenom: string;
-  pseudo: string;
-  roles: Array<{
-    role: {
-      nom: string;
-      description: string;
-    };
-  }>;
-  createdAt?: Date;
-  updatedAt?: Date;
+  role: UserRole;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  image?: string | null;
+}
+
+/**
+ * Interface pour le payload du token JWT
+ */
+export interface JwtPayload {
+  userId: string;
+  email: string;
+  role: UserRole;
+  iat?: number;
+  exp?: number;
 }
 
 export interface LoginCredentials {
   email: string;
-  motDePasse: string;
+  password: string;
 }
 
 export interface AuthState {

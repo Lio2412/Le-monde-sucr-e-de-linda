@@ -24,6 +24,32 @@
       "static/css/app/not-found.css",
       "static/chunks/app/not-found.js"
     ],
+    "/connexion/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/connexion/page.css",
+      "static/chunks/app/connexion/page.js"
+    ],
+    "/admin/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/layout.js"
+    ],
+    "/admin/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/dashboard/page.js"
+    ],
+    "/admin/recettes/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/recettes/page.js"
+    ],
+    "/admin/recettes/nouvelle/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/admin/recettes/nouvelle/page.js"
+    ],
     "/recettes/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -40,17 +66,23 @@
       "static/chunks/main-app.js",
       "static/chunks/app/recettes/not-found.js"
     ],
-    "/recettes/[slug]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/recettes/[slug]/page.css",
-      "static/chunks/app/recettes/[slug]/page.js"
-    ],
     "/blog/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/blog/page.css",
       "static/chunks/app/blog/page.js"
+    ],
+    "/a-propos/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/a-propos/page.css",
+      "static/chunks/app/a-propos/page.js"
+    ],
+    "/contact/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/contact/page.css",
+      "static/chunks/app/contact/page.js"
     ]
   }
 }

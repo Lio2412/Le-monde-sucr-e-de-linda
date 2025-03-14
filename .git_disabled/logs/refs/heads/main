@@ -1,4 +1,0 @@
-0000000000000000000000000000000000000000 a37e85724f42523ea2cdc3e54dfabbdcd8824625 Lio2412 <Hz_be@msn.com> 1738600875 +0100	branch: Created from HEAD
-a37e85724f42523ea2cdc3e54dfabbdcd8824625 a37e85724f42523ea2cdc3e54dfabbdcd8824625 Lio2412 <Hz_be@msn.com> 1738600886 +0100	Branch: renamed refs/heads/PROJET-FONCTIONNEL to refs/heads/main
-a37e85724f42523ea2cdc3e54dfabbdcd8824625 b4803b8b385ab09ac222dd09f1f166cbc904ec84 Lio2412 <Hz_be@msn.com> 1738691226 +0100	commit: docs: mise à jour complète de la documentation pour refléter l'état actuel du projet - blog de pâtisserie
-b4803b8b385ab09ac222dd09f1f166cbc904ec84 eceece69ae946a098dc737cb5b488dcf2397b5da Lio2412 <Hz_be@msn.com> 1739131764 +0100	commit: revert: restauration de la version précédente de la page recettes

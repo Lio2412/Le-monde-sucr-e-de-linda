@@ -1,15 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { ArrowLeft, Save, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { toast } from 'react-hot-toast';
+import { adminService } from '@/services/admin';
 
-// Import dynamique de l'éditeur pour éviter les erreurs SSR
+// Import dynamique de l'éditeur
 const Editor = dynamic(() => import('@/components/editor/Editor'), { 
   ssr: false,
   loading: () => <div className="h-64 w-full bg-gray-100 animate-pulse rounded-lg" />
 });
+
+// Schéma de validation
+const recipeSchema = z.object({
+  title: z.string().min(3, 'Le titre doit contenir au moins 3 caractères'),
+  description: z.string().min(10, 'La description doit contenir au moins 10 caractères'),
+  preparationTime: z.number().min(1, 'Le temps de préparation est requis'),
+  cookingTime: z.number().min(1, 'Le temps de cuisson est requis'),
+  difficulty: z.string().min(1, 'La difficulté est requise'),
+  servings: z.number().min(1, 'Le nombre de portions est requis'),
+  category: z.string().min(1, 'La catégorie est requise'),
+  ingredients: z.array(z.string().min(1, 'L\'ingrédient ne peut pas être vide')),
+  instructions: z.string().min(10, 'Les instructions doivent contenir au moins 10 caractères'),
+  status: z.string().optional()
+});
+
+type RecipeFormData = z.infer<typeof recipeSchema>;
 
 const categories = [
   'Gâteaux',
@@ -22,39 +45,99 @@ const categories = [
 const difficultes = ['Facile', 'Moyen', 'Difficile'];
 
 export default function NouvelleRecettePage() {
-  const [formData, setFormData] = useState({
-    titre: '',
-    description: '',
-    tempsPreparation: '',
-    tempsCuisson: '',
-    difficulte: '',
-    portions: '',
-    ingredients: [''],
-    instructions: '',
-    categorie: '',
+  const router = useRouter();
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<RecipeFormData>({
+    resolver: zodResolver(recipeSchema),
+    defaultValues: {
+      ingredients: [''],
+      instructions: '',
+    }
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implémenter la soumission du formulaire
-    console.log('Données du formulaire:', formData);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Optimisation des ingrédients avec virtualisation
+  const ingredients = watch('ingredients');
+  const parentRef = useRef<HTMLDivElement>(null);
+  const rowVirtualizer = useVirtualizer({
+    count: ingredients.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 40,
+    overscan: 5,
+  });
+
+  // Gestion optimisée des images
+  const handleImageChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Vérification de la taille et du type
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('L\'image ne doit pas dépasser 10MB');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error('Le fichier doit être une image');
+        return;
+      }
+
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  // Mémoisation des options de catégories et difficultés
+  const categoryOptions = useMemo(() => 
+    categories.map(cat => (
+      <option key={cat} value={cat}>{cat}</option>
+    )), 
+    []
+  );
+
+  const difficultyOptions = useMemo(() => 
+    difficultes.map(diff => (
+      <option key={diff} value={diff}>{diff}</option>
+    )), 
+    []
+  );
+
+  const onSubmit = async (data: RecipeFormData) => {
+    try {
+      setIsSubmitting(true);
+      
+      const recipeData = {
+        ...data,
+        status: 'DRAFT'
+      };
+
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+        // Upload de l'image d'abord
+        const imageResponse = await adminService.uploadImage(formData);
+        recipeData.imageUrl = imageResponse.url;
+      }
+
+      await adminService.createRecipe(recipeData);
+      toast.success('Recette créée avec succès');
+      router.push('/admin/recettes');
+    } catch (error) {
+      console.error('Erreur lors de la création de la recette:', error);
+      toast.error('Erreur lors de la création de la recette');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const addIngredient = () => {
-    setFormData(prev => ({
-      ...prev,
-      ingredients: [...prev.ingredients, '']
-    }));
-  };
-
-  const updateIngredient = (index: number, value: string) => {
-    const newIngredients = [...formData.ingredients];
-    newIngredients[index] = value;
-    setFormData(prev => ({
-      ...prev,
-      ingredients: newIngredients
-    }));
-  };
+  const addIngredient = useCallback(() => {
+    const currentIngredients = watch('ingredients');
+    setValue('ingredients', [...currentIngredients, '']);
+  }, [watch, setValue]);
 
   return (
     <div className="space-y-6">
@@ -73,16 +156,25 @@ export default function NouvelleRecettePage() {
           </h1>
         </div>
         <button
-          onClick={handleSubmit}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+          onClick={handleSubmit(onSubmit)}
+          disabled={isSubmitting}
+          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
         >
-          <Save className="h-4 w-4 mr-2" />
-          Enregistrer
+          {isSubmitting ? (
+            <>
+              <span className="animate-spin mr-2">⌛</span>
+              Enregistrement...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4 mr-2" />
+              Enregistrer
+            </>
+          )}
         </button>
       </div>
 
-      {/* Formulaire */}
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Informations de base */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">
@@ -90,16 +182,18 @@ export default function NouvelleRecettePage() {
           </h2>
           <div className="grid grid-cols-1 gap-6">
             <div>
-              <label htmlFor="titre" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
                 Titre
               </label>
               <input
                 type="text"
-                id="titre"
-                value={formData.titre}
-                onChange={(e) => setFormData(prev => ({ ...prev, titre: e.target.value }))}
+                id="title"
+                {...register('title')}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
               />
+              {errors.title && (
+                <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+              )}
             </div>
 
             <div>
@@ -109,106 +203,139 @@ export default function NouvelleRecettePage() {
               <textarea
                 id="description"
                 rows={3}
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                {...register('description')}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
               />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label htmlFor="tempsPreparation" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="preparationTime" className="block text-sm font-medium text-gray-700">
                   Temps de préparation (min)
                 </label>
                 <input
                   type="number"
-                  id="tempsPreparation"
-                  value={formData.tempsPreparation}
-                  onChange={(e) => setFormData(prev => ({ ...prev, tempsPreparation: e.target.value }))}
+                  id="preparationTime"
+                  {...register('preparationTime')}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
                 />
+                {errors.preparationTime && (
+                  <p className="mt-1 text-sm text-red-600">{errors.preparationTime.message}</p>
+                )}
               </div>
 
               <div>
-                <label htmlFor="tempsCuisson" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="cookingTime" className="block text-sm font-medium text-gray-700">
                   Temps de cuisson (min)
                 </label>
                 <input
                   type="number"
-                  id="tempsCuisson"
-                  value={formData.tempsCuisson}
-                  onChange={(e) => setFormData(prev => ({ ...prev, tempsCuisson: e.target.value }))}
+                  id="cookingTime"
+                  {...register('cookingTime')}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
                 />
+                {errors.cookingTime && (
+                  <p className="mt-1 text-sm text-red-600">{errors.cookingTime.message}</p>
+                )}
               </div>
 
               <div>
-                <label htmlFor="portions" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="servings" className="block text-sm font-medium text-gray-700">
                   Nombre de portions
                 </label>
                 <input
                   type="number"
-                  id="portions"
-                  value={formData.portions}
-                  onChange={(e) => setFormData(prev => ({ ...prev, portions: e.target.value }))}
+                  id="servings"
+                  {...register('servings')}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
                 />
+                {errors.servings && (
+                  <p className="mt-1 text-sm text-red-600">{errors.servings.message}</p>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="categorie" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
                   Catégorie
                 </label>
                 <select
-                  id="categorie"
-                  value={formData.categorie}
-                  onChange={(e) => setFormData(prev => ({ ...prev, categorie: e.target.value }))}
+                  id="category"
+                  {...register('category')}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
                 >
                   <option value="">Sélectionner une catégorie</option>
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
+                  {categoryOptions}
                 </select>
+                {errors.category && (
+                  <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>
+                )}
               </div>
 
               <div>
-                <label htmlFor="difficulte" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700">
                   Difficulté
                 </label>
                 <select
-                  id="difficulte"
-                  value={formData.difficulte}
-                  onChange={(e) => setFormData(prev => ({ ...prev, difficulte: e.target.value }))}
+                  id="difficulty"
+                  {...register('difficulty')}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
                 >
                   <option value="">Sélectionner une difficulté</option>
-                  {difficultes.map(diff => (
-                    <option key={diff} value={diff}>{diff}</option>
-                  ))}
+                  {difficultyOptions}
                 </select>
+                {errors.difficulty && (
+                  <p className="mt-1 text-sm text-red-600">{errors.difficulty.message}</p>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Image principale */}
+        {/* Image principale avec preview et validation */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">
             Image principale
           </h2>
           <div className="flex items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg">
             <div className="text-center">
-              <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
+              {imagePreview ? (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Aperçu"
+                    className="mx-auto h-32 w-32 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview(null);
+                    }}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
+              )}
               <div className="mt-2">
-                <button
-                  type="button"
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
-                >
-                  Ajouter une image
-                </button>
+                <label className="cursor-pointer">
+                  <span className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                    {imagePreview ? 'Changer l\'image' : 'Ajouter une image'}
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </label>
               </div>
               <p className="mt-2 text-xs text-gray-500">
                 PNG, JPG, GIF jusqu'à 10MB
@@ -217,42 +344,62 @@ export default function NouvelleRecettePage() {
           </div>
         </div>
 
-        {/* Ingrédients */}
+        {/* Liste d'ingrédients virtualisée */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">
             Ingrédients
           </h2>
-          <div className="space-y-4">
-            {formData.ingredients.map((ingredient, index) => (
-              <div key={index} className="flex gap-4">
-                <input
-                  type="text"
-                  value={ingredient}
-                  onChange={(e) => updateIngredient(index, e.target.value)}
-                  placeholder="Ex: 200g de farine"
-                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-                />
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addIngredient}
-              className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+          <div ref={parentRef} className="h-[300px] overflow-auto">
+            <div
+              style={{
+                height: `${rowVirtualizer.getTotalSize()}px`,
+                width: '100%',
+                position: 'relative',
+              }}
             >
-              + Ajouter un ingrédient
-            </button>
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+                <div
+                  key={virtualRow.index}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: `${virtualRow.size}px`,
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  <input
+                    type="text"
+                    {...register(`ingredients.${virtualRow.index}`)}
+                    placeholder="Ex: 200g de farine"
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={addIngredient}
+            className="mt-4 inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
+          >
+            + Ajouter un ingrédient
+          </button>
         </div>
 
-        {/* Instructions */}
+        {/* Éditeur d'instructions */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">
             Instructions
           </h2>
           <Editor
-            value={formData.instructions}
-            onChange={(value) => setFormData(prev => ({ ...prev, instructions: value }))}
+            value={watch('instructions')}
+            onChange={(value) => setValue('instructions', value)}
           />
+          {errors.instructions && (
+            <p className="mt-1 text-sm text-red-600">{errors.instructions.message}</p>
+          )}
         </div>
       </form>
     </div>

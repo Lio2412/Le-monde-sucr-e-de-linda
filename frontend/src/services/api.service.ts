@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import { api as apiClient } from '@/lib/api-client';
 
 // Types
 export interface Recipe {
@@ -29,89 +29,46 @@ export interface Comment {
   likes: number;
 }
 
-// Helpers
-const handleResponse = async (response: Response) => {
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Une erreur est survenue');
-  }
-  return response.json();
-};
-
 // API Calls
 export const api = {
   // Recettes
   recipes: {
     getAll: async () => {
-      const response = await fetch(`${API_URL}/recipes`);
-      return handleResponse(response);
+      return await apiClient.get<Recipe[]>('/api/recipes');
     },
 
     getById: async (id: string) => {
-      const response = await fetch(`${API_URL}/recipes/${id}`);
-      return handleResponse(response);
+      return await apiClient.get<Recipe>(`/api/recipes/${id}`);
     },
 
     like: async (id: string) => {
-      const response = await fetch(`${API_URL}/recipes/${id}/like`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      return handleResponse(response);
+      return await apiClient.post<{success: boolean}>(`/api/recipes/${id}/like`);
     },
 
     comment: async (id: string, content: string) => {
-      const response = await fetch(`${API_URL}/recipes/${id}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ content }),
-      });
-      return handleResponse(response);
+      return await apiClient.post<Comment>(`/api/recipes/${id}/comments`, { content });
     },
   },
 
   // Newsletter
   newsletter: {
     subscribe: async (email: string) => {
-      const response = await fetch(`${API_URL}/newsletter/subscribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      return handleResponse(response);
+      return await apiClient.post<{success: boolean}>('/api/newsletter/subscribe', { email });
     },
 
     unsubscribe: async (email: string) => {
-      const response = await fetch(`${API_URL}/newsletter/unsubscribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      return handleResponse(response);
+      return await apiClient.post<{success: boolean}>('/api/newsletter/unsubscribe', { email });
     },
   },
 
   // Social
   social: {
     likeComment: async (recipeId: string, commentId: string) => {
-      const response = await fetch(
-        `${API_URL}/recipes/${recipeId}/comments/${commentId}/like`,
-        {
-          method: 'POST',
-          credentials: 'include',
-        }
-      );
-      return handleResponse(response);
+      return await apiClient.post<{success: boolean}>(`/api/recipes/${recipeId}/comments/${commentId}/like`);
     },
 
     shareRecipe: async (recipeId: string, platform: string) => {
-      const response = await fetch(`${API_URL}/recipes/${recipeId}/share`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ platform }),
-      });
-      return handleResponse(response);
+      return await apiClient.post<{success: boolean, shareUrl: string}>(`/api/recipes/${recipeId}/share`, { platform });
     },
   },
 }; 

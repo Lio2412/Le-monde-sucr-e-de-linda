@@ -1,43 +1,40 @@
 # Dépendances
 node_modules/
-/.pnp
+.pnp/
 .pnp.js
 
-# Build et cache
+# Fichiers de build
 .next/
-/out/
-/build
-.vercel
-.turbo
+out/
+build/
 dist/
-.cache/
 
-# Fichiers de développement
-.DS_Store
-*.pem
+# Fichiers d'environnement (sauf exemples)
+.env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-.env
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.eslintcache
-
-# Fichiers de test
-/coverage
-
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
 
 # Logs
 logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Fichiers d'IDE
-.idea/
-.vscode/
+# Système d'exploitation
+.DS_Store
+Thumbs.db
+
+# Cache et fichiers temporaires
+.vercel
+.cache/
 *.swp
 *.swo
+
+# Fichiers de couverture de test
+coverage/
+
+# Backend
+backend/.env 

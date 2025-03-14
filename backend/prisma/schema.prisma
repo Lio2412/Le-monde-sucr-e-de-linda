@@ -1,0 +1,113 @@
+// Schema Prisma pour Le Monde Sucré de Linda
+// Version simplifiée pour le développement avec SQLite
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modèle Utilisateur
+model User {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  password          String
+  name              String?
+  image             String?
+  role              String    @default("USER") // "USER" ou "ADMIN"
+  isActive          Boolean   @default(true)
+  emailVerified     DateTime?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  recipes           Recipe[]
+  
+  @@map("users")
+}
+
+// Modèle Recette
+model Recipe {
+  id                String    @id @default(uuid())
+  title             String
+  slug              String    @unique
+  description       String?
+  ingredients       String    // Stocké en JSON stringifié
+  instructions      String    // Stocké en JSON stringifié
+  prepTime          Int       @map("prep_time") // En minutes
+  cookTime          Int       @map("cook_time") // En minutes
+  servings          Int
+  difficulty        String
+  isPublished       Boolean   @default(false) @map("is_published")
+  publishedAt       DateTime? @map("published_at")
+  userId            String    @map("user_id")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categories        CategoriesOnRecipes[]
+  tags              TagsOnRecipes[]
+  
+  @@map("recipes")
+}
+
+// Modèle Catégorie
+model Category {
+  id                String    @id @default(uuid())
+  name              String    @unique
+  slug              String    @unique
+  description       String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  recipes           CategoriesOnRecipes[]
+  
+  @@map("categories")
+}
+
+// Relation entre Catégories et Recettes
+model CategoriesOnRecipes {
+  recipeId          String    @map("recipe_id")
+  categoryId        String    @map("category_id")
+  assignedAt        DateTime  @default(now()) @map("assigned_at")
+  
+  // Relations
+  recipe            Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  category          Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  @@id([recipeId, categoryId])
+  @@map("categories_on_recipes")
+}
+
+// Modèle Tag
+model Tag {
+  id                String    @id @default(uuid())
+  name              String    @unique
+  slug              String    @unique
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  recipes           TagsOnRecipes[]
+  
+  @@map("tags")
+}
+
+// Relation entre Tags et Recettes
+model TagsOnRecipes {
+  recipeId          String    @map("recipe_id")
+  tagId             String    @map("tag_id")
+  assignedAt        DateTime  @default(now()) @map("assigned_at")
+  
+  // Relations
+  recipe            Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  tag               Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([recipeId, tagId])
+  @@map("tags_on_recipes")
+}
